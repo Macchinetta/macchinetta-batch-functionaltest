@@ -1,0 +1,86 @@
+= Functional Test of Macchinetta Batch Framework
+
+This project provides functional tests of https://github.com/Macchinetta[Macchinetta Batch Framework (2.x)].
+
+== How to contribute
+
+**Contributing (bug report, pull request, any comments etc.) is welcome !!** Please see the link:CONTRIBUTING.adoc[contributing guideline] for details.
+
+== Test case design
+
+Test case scenarios are managed at link:/docs/[docs] directory.
+
+[NOTE]
+.Supported language
+====
+Currently, support language is Japanese only.
+====
+
+== Tested environments at the time of release
+
+Tested environments are managed at https://github.com/Macchinetta/macchinetta-batch-functionaltest/wiki/Tested-Environment[wiki page].
+
+== How to perform functional test
+
+**Preconditions are as follow:**
+
+* http://openjdk.java.net/[OpenJDK 8] installed. (`JAVA_HOME` defined as environment variable.)
+* https://maven.apache.org/download.cgi[Maven] installed. (Can run `mvn` command.)
+* https://www.mongodb.com/download-center[MongoDB] installed. (Default install.)
+* https://www.postgresql.org/download/[PostgreSQL] installed. (Default install.)
+* http://tomcat.apache.org/index.html[Tomcat] installed. (Default install.)
+
+=== [Step 1] Create database of PostgreSQL
+
+Create two database of PostgreSQL into local machine in the following name.
+
+* admin
+* postgres
+
+=== [Step 2] Setup Tomcat
+
+Configure Tomcat user and port as follows.
+
+* User settings.
+** username="admin"
+** password=""
+
+[source, xml]
+.$CATALINA_BASE/conf/tomcat-users.xml
+----
+<tomcat-users>
+  <role rolename="manager-gui"/>
+  <role rolename="manager-script"/>
+  <user username="admin" password="" roles="manager-gui,manager-script"/>
+</tomcat-users>
+----
+
+* Port settings.
+** port="8088"
+
+[source, xml]
+.$CATALINA_BASE/conf/server.xml
+----
+<Connector port="8088" protocol="HTTP/1.1"
+           connectionTimeout="20000"
+           redirectPort="8443" />
+----
+
+=== [Step 3] Clone a repository
+
+Clone the ``Macchinetta/batch-functionaltest`` repository into local machine.
+
+[source, text]
+----
+$ git clone https://github.com/Macchinetta/macchinetta-batch-functionaltest.git
+----
+
+=== [Step 4] Run functional tests
+
+Run test using maven commands as follows.
+
+[source, text]
+----
+$ cd {your repository directory}
+$ mvn verify
+----

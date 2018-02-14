@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org/DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="jp.co.ntt.fw.macchinetta.batch.functionaltest.app.repository.evaluation.EvaluationRepository">
+    <select id="findAllBranch" resultType="jp.co.ntt.fw.macchinetta.batch.functionaltest.app.model.mst.Branch">
+        <![CDATA[
+        SELECT
+            branch_id AS branchId,
+            branch_name AS branchName,
+            branch_address AS branchAddrss,
+            branch_tel AS branchTel,
+            create_date AS createDate,
+            update_date AS updateDate
+        FROM
+            branch_mst
+        ORDER BY
+            branch_id
+        ]]>
+    </select>
+
+    <select id="findEvaluationData" resultType="jp.co.ntt.fw.macchinetta.batch.functionaltest.app.model.evaluation.EvaluationReport">
+        <![CDATA[
+        SELECT
+            t1.branch_id AS branchId,
+            t1.year AS year,
+            t1.month AS month,
+            t1.amount AS planAmount,
+            t2.amount AS performanceAmount
+        FROM sales_plan_summary t1
+        INNER JOIN sales_performance_summary t2
+        ON
+            t1.branch_id = t2.branch_id
+        AND
+            t1.year = t2.year
+        AND
+            t1.month = t2.month
+        WHERE
+            t1.branch_id = #{branchId}
+        AND
+            t1.year = #{year}
+        AND
+            t1.month = #{month}
+
+        ]]>
+    </select>
+
+</mapper>
+

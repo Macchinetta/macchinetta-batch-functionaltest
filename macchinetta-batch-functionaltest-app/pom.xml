@@ -1,0 +1,317 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>macchinetta-batch-functionaltest-app</artifactId>
+    <packaging>jar</packaging>
+
+    <parent>
+        <groupId>jp.co.ntt.fw.macchinetta.batch</groupId>
+        <artifactId>macchinetta-batch-functionaltest-build</artifactId>
+        <version>2.0.0.RELEASE</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+    
+    <name>app</name>
+    <description>Functionality Test Sample Application using Macchinetta Batch Framework</description>
+    <inceptionYear>2017</inceptionYear>
+    <licenses>
+        <license>
+            <name>Apache License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>manual</distribution>
+        </license>
+    </licenses>
+
+    <properties>
+        <jdk.version>1.8</jdk.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <io.spring.platform.version>Brussels-SR5</io.spring.platform.version>
+        <terasoluna-batch.version>5.1.0.RELEASE</terasoluna-batch.version>
+        <mongo-java-driver.version>2.13.3</mongo-java-driver.version>
+
+        <maven-compiler-plugin.version>3.5.1</maven-compiler-plugin.version>
+        <maven-jar-plugin.version>3.0.2</maven-jar-plugin.version>
+        <maven-resources-plugin.version>3.0.1</maven-resources-plugin.version>
+        <com.google.code.maven-license-plugin.version>1.4.0</com.google.code.maven-license-plugin.version>
+        <formatter-maven-plugin.version>0.5.2</formatter-maven-plugin.version>
+
+        <ch.qos.logback.contrib.version>0.1.5</ch.qos.logback.contrib.version>
+
+        <oracle.jdbc.version>12.2.0.1</oracle.jdbc.version>
+
+        <project.root.basedir>${project.basedir}</project.root.basedir>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>io.spring.platform</groupId>
+                <artifactId>platform-bom</artifactId>
+                <version>${io.spring.platform.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.terasoluna.batch</groupId>
+                <artifactId>terasoluna-batch</artifactId>
+                <version>${terasoluna-batch.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>ch.qos.logback.contrib</groupId>
+                <artifactId>logback-mongodb-classic</artifactId>
+                <version>${ch.qos.logback.contrib.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.mongodb</groupId>
+                <artifactId>mongo-java-driver</artifactId>
+                <version>${mongo-java-driver.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.oracle.jdbc</groupId>
+                <artifactId>ojdbc8</artifactId>
+                <version>${oracle.jdbc.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.terasoluna.batch</groupId>
+            <artifactId>terasoluna-batch</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-validator</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.glassfish</groupId>
+            <artifactId>javax.el</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>ch.qos.logback.contrib</groupId>
+            <artifactId>logback-mongodb-classic</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.data</groupId>
+            <artifactId>spring-data-commons</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-oxm</artifactId>
+        </dependency>
+
+    </dependencies>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>${maven-compiler-plugin.version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-jar-plugin</artifactId>
+                    <version>${maven-jar-plugin.version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-resources-plugin</artifactId>
+                    <version>${maven-resources-plugin.version}</version>
+                    <configuration>
+                        <encoding>${encoding}</encoding>
+                    </configuration>
+                </plugin>
+                <!-- licence and formatter -->
+                <plugin>
+                    <groupId>com.google.code.maven-license-plugin</groupId>
+                    <artifactId>maven-license-plugin</artifactId>
+                    <version>${com.google.code.maven-license-plugin.version}</version>
+                    <configuration>
+                        <header>${project.root.basedir}/../license/header.txt</header>
+                        <includes>
+                            <include>src/**/*.java</include>
+                        </includes>
+                        <encoding>${encoding}</encoding>
+                        <headerDefinitions>
+                            <headerDefinition>${project.root.basedir}/../license/header-definition.xml</headerDefinition>
+                        </headerDefinitions>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>net.revelc.code</groupId>
+                    <artifactId>formatter-maven-plugin</artifactId>
+                    <version>${formatter-maven-plugin.version}</version>
+                    <configuration>
+                        <configFile>${project.root.basedir}/../eclipse/formatter.xml
+                        </configFile>
+                        <lineEnding>LF</lineEnding>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>${jdk.version}</source>
+                    <target>${jdk.version}</target>
+                    <testSource>${jdk.version}</testSource>
+                    <testTarget>${jdk.version}</testTarget>
+                    <encoding>${project.build.sourceEncoding}</encoding>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <excludes>
+                        <exclude>${exclude-property}</exclude>
+                        <exclude>${exclude-log}</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>net.revelc.code</groupId>
+                <artifactId>formatter-maven-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>com.google.code.maven-license-plugin</groupId>
+                <artifactId>maven-license-plugin</artifactId>
+            </plugin>
+        </plugins>
+
+        <!-- Setting the resource according to the test environment -->
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+            </resource>
+            <resource>
+                <directory>${project.root.basedir}/${project.config.resource.directory.rdbms}</directory>
+            </resource>
+            <resource>
+                <directory>${project.root.basedir}/${project.config.resource.directory.mongo}</directory>
+            </resource>
+        </resources>
+    </build>
+
+    <profiles>
+        <!-- Including application properties and log settings into package. (default) -->
+        <profile>
+            <id>IncludeSettings</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <exclude-property/>
+                <exclude-log/>
+            </properties>
+        </profile>
+
+        <!-- Excluding application properties and log settings into package. -->
+        <profile>
+            <id>ExcludeSettings</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <properties>
+                <exclude-property>batch-application.properties</exclude-property>
+                <exclude-log>logback.xml</exclude-log>
+            </properties>
+        </profile>
+
+        <profile>
+            <id>postgresql9-local</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>org.postgresql</groupId>
+                    <artifactId>postgresql</artifactId>
+                    <scope>runtime</scope>
+                </dependency>
+            </dependencies>
+            <properties>
+                <project.config.resource.directory.rdbms>config/rdbms/postgresql9/local</project.config.resource.directory.rdbms>
+                <project.config.resource.directory.mongo>config/mongo/local</project.config.resource.directory.mongo>
+            </properties>
+        </profile>
+        <profile>
+            <id>postgresql9-it</id>
+            <dependencies>
+                <dependency>
+                    <groupId>org.postgresql</groupId>
+                    <artifactId>postgresql</artifactId>
+                    <scope>runtime</scope>
+                </dependency>
+            </dependencies>
+            <properties>
+                <project.config.resource.directory.rdbms>config/rdbms/postgresql9/it</project.config.resource.directory.rdbms>
+                <project.config.resource.directory.mongo>config/mongo/it</project.config.resource.directory.mongo>
+            </properties>
+        </profile>
+        <profile>
+            <id>oracle12c-local</id>
+            <dependencies>
+                <dependency>
+                    <groupId>com.oracle.jdbc</groupId>
+                    <artifactId>ojdbc8</artifactId>
+                    <scope>runtime</scope>
+                </dependency>
+            </dependencies>
+            <properties>
+                <project.config.resource.directory.rdbms>config/rdbms/oracle12c/local</project.config.resource.directory.rdbms>
+                <project.config.resource.directory.mongo>config/mongo/local</project.config.resource.directory.mongo>
+            </properties>
+        </profile>
+        <profile>
+            <id>oracle12c-it</id>
+            <dependencies>
+                <dependency>
+                    <groupId>com.oracle.jdbc</groupId>
+                    <artifactId>ojdbc8</artifactId>
+                    <scope>runtime</scope>
+                </dependency>
+            </dependencies>
+            <properties>
+                <project.config.resource.directory.rdbms>config/rdbms/oracle12c/it</project.config.resource.directory.rdbms>
+                <project.config.resource.directory.mongo>config/mongo/it</project.config.resource.directory.mongo>
+            </properties>
+        </profile>
+
+    </profiles>
+
+</project>

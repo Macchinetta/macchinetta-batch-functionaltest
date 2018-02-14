@@ -1,0 +1,20 @@
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    <xs:element name="customer">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="name" type="stringMaxSize5"/>
+                <xs:element ref="phone-number" maxOccurs="2"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="phone-number">
+        <xs:complexType>
+            <xs:sequence/>
+        </xs:complexType>
+    </xs:element>
+    <xs:simpleType name="stringMaxSize5">
+        <xs:restriction base="xs:string">
+            <xs:maxLength value="5"/>
+        </xs:restriction>
+    </xs:simpleType>
+</xs:schema>

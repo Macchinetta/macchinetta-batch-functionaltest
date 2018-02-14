@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:batch="http://www.springframework.org/schema/batch"
+       xmlns:context="http://www.springframework.org/schema/context" xmlns:c="http://www.springframework.org/schema/c"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <import resource="classpath:META-INF/spring/job-base-context.xml"/>
+
+    <context:component-scan base-package="jp.co.ntt.fw.macchinetta.batch.functionaltest.ch08.flowcontrol"/>
+
+    <bean id="listItemReader" class="org.springframework.batch.item.support.ListItemReader"
+          scope="step" c:list="#{'item1'}"/>
+
+    <batch:job id="jobChunkPromotionalFlow" job-repository="jobRepository">
+        <batch:step id="jobChunkPromotionalFlow.step1" parent="sourceStep" next="jobChunkPromotionalFlow.step2">
+            <batch:listeners>
+                <batch:listener>
+                    <bean class="org.springframework.batch.core.listener.ExecutionContextPromotionListener"
+                          p:keys="promotion"
+                          p:strict="true"/>
+                </batch:listener>
+            </batch:listeners>
+        </batch:step>
+        <batch:step id="jobChunkPromotionalFlow.step2" parent="targetStep"/>
+    </batch:job>
+
+    <batch:step id="sourceStep" job-repository="jobRepository">
+        <batch:tasklet transaction-manager="jobTransactionManager">
+            <batch:chunk reader="listItemReader" processor="promotionSourceItemProcessor"
+                         writer="promotionLogItemWriter" commit-interval="1"/>
+        </batch:tasklet>
+    </batch:step>
+
+    <batch:step id="targetStep" job-repository="jobRepository">
+        <batch:tasklet transaction-manager="jobTransactionManager">
+            <batch:chunk reader="listItemReader" processor="promotionTargetItemProcessor"
+                         writer="promotionLogItemWriter" commit-interval="1"/>
+        </batch:tasklet>
+    </batch:step>
+
+</beans>

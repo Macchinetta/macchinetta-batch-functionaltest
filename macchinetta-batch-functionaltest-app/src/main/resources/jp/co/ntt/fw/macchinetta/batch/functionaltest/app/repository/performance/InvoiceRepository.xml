@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org/DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="jp.co.ntt.fw.macchinetta.batch.functionaltest.app.repository.performance.InvoiceRepository">
+
+    <select id="findAll" resultType="jp.co.ntt.fw.macchinetta.batch.functionaltest.app.model.performance.Invoice">
+        <![CDATA[
+        SELECT
+            invoice_no AS invoiceNo,
+            invoice_date AS invoiceDate,
+            invoice_amount AS invoiceAmount,
+            customer_id AS customerId
+        FROM
+            invoice
+        ORDER BY
+            invoice_no ASC
+        ]]>
+    </select>
+
+    <insert id="create" parameterType="jp.co.ntt.fw.macchinetta.batch.functionaltest.app.model.performance.Invoice">
+        <![CDATA[
+        INSERT INTO
+            invoice(invoice_no, invoice_date, invoice_amount, customer_id)
+        VALUES (
+            #{invoiceNo}, #{invoiceDate}, #{invoiceAmount}, #{customerId}
+        )
+        ]]>
+    </insert>
+
+    <delete id="deleteAll">
+        <![CDATA[
+        DELETE FROM
+            invoice
+        ]]>
+    </delete>
+
+    <select id="summarizeInvoice" resultType="jp.co.ntt.fw.macchinetta.batch.functionaltest.app.model.performance.SalesPerformanceDetail">
+        <![CDATA[
+        SELECT
+            branchId, year, month, customerId, SUM(amount) AS amount
+        FROM (
+            SELECT
+                t2.charge_branch_id AS branchId,
+                extract(year from t1.invoice_date) AS year,
+                extract(month from t1.invoice_date) AS month,
+                t1.customer_id AS customerId,
+                t1.invoice_amount AS amount
+            FROM invoice t1
+            INNER JOIN customer_mst t2 ON t1.customer_id = t2.customer_id
+            WHERE
+                t2.charge_branch_id = #{branchId}
+            ) t3
+        GROUP BY branchId, year, month, customerId
+        ORDER BY branchId ASC, year ASC, month ASC, customerId ASC
+        ]]>
+    </select>
+
+</mapper>
+

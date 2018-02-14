@@ -1,0 +1,77 @@
+= その他の入出力の機能試験
+:table-caption!:
+:icons: font
+:sectnums!:
+
+== テストケース
+テストケースクラス：jp.co.ntt.fw.macchinetta.batch.functionaltest.chxxx.XXXSpec
+
+[cols="5,25a,70a", options="headers"]
+.テストケース一覧
+|===
+|項番
+|テストケース
+|確認事項
+
+|1
+|<<multiResource>>
+|初版では割愛のため、現時点では試験対象外 +
+ファイルとデータベースによるトランザクション制御については、link:ch05_Transaction.adoc[トランザクション制御]を参照
+
+|2
+|<<existingService>>
+|初版では割愛のため、現時点では試験対象外
+
+|3
+|<<otherThanFileAndDatabase>>
+|初版では割愛のため、現時点では試験対象外
+
+|===
+
+== 試験項目一覧
+各試験の項目一覧を示す。
+
+:sectnums:
+:leveloffset: -1
+
+[[multiResource]]
+=== マルチリソースのテスト
+マルチリソースの入出力を確認する。
+
+[cols="5,20,25a,25a,25a", options="header"]
+.試験項目一覧
+|===
+|項番
+|観点
+|試験項目
+|試験条件
+|確認内容
+|===
+
+[[existingService]]
+=== 既存サービスによる入出力のテスト
+既存サービスによる入出力を確認する。
+
+[cols="5,20,25a,25a,25a", options="header"]
+.試験項目一覧
+|===
+|項番
+|観点
+|試験項目
+|試験条件
+|確認内容
+|===
+
+[[otherThanFileAndDatabase]]
+=== ファイル・データベース以外による入出力のテスト
+ファイル・データベース以外による入出力を確認する。
+
+[cols="5,20,25a,25a,25a", options="header"]
+.試験項目一覧
+|===
+|項番
+|観点
+|試験項目
+|試験条件
+|確認内容
+|===

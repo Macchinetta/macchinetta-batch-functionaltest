@@ -1,0 +1,6 @@
+customer_id,customer_name,customer_address,customer_tel,charge_branch_id,create_date
+C0001,customer01,customer01_address,000,0001,2016-12-27
+C0002,customer02,customer02_address,000,0002,2016-12-27
+C0003,customer03,customer03_address,000,0003,2016-12-27
+C0004,customer04,customer04_address,000,0004,2016-12-27
+C0005,customer05,customer05_address,000,0001,2016-12-27

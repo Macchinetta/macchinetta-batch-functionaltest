@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org/DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="jp.co.ntt.fw.macchinetta.batch.functionaltest.ch05.exclusivecontrol.repository.ExclusiveControlRepository">
+
+    <select id="planFindByBranch" resultType="jp.co.ntt.fw.macchinetta.batch.functionaltest.app.model.plan.SalesPlanDetail">
+        <![CDATA[
+        SELECT
+            branch_id AS branchId, year, month, customer_id AS customerId, amount
+        FROM
+            sales_plan_detail
+        WHERE
+            branch_id = #{branchId}
+        ORDER BY
+            branch_id ASC, year ASC, month ASC, customer_id ASC
+        ]]>
+    </select>
+
+
+    <select id="branchFindOne" resultType="jp.co.ntt.fw.macchinetta.batch.functionaltest.app.model.mst.Branch">
+        <![CDATA[
+        SELECT
+            branch_id AS branchId,
+            branch_name AS branchName,
+            branch_address AS branchAddress,
+            branch_tel AS branchTel,
+            create_date AS createDate,
+            update_date AS updateDate
+        FROM
+            branch_mst
+        WHERE
+            branch_id = #{branchId}
+        ]]>
+    </select>
+
+    <update id="branchExclusiveUpdate" parameterType="jp.co.ntt.fw.macchinetta.batch.functionaltest.ch05.exclusivecontrol.model.ExclusiveBranch">
+        <![CDATA[
+        UPDATE
+            branch_mst
+        SET
+            branch_name = #{branchName,jdbcType=VARCHAR},
+            branch_address = #{branchAddress,jdbcType=VARCHAR},
+            branch_tel = #{branchTel,jdbcType=VARCHAR},
+            update_date = #{updateDate,jdbcType=TIMESTAMP}
+        WHERE
+            branch_id = #{branchId}
+        AND
+            branch_name = #{oldBranchName}
+        ]]>
+    </update>
+
+    <update id="branchUpdate" parameterType="jp.co.ntt.fw.macchinetta.batch.functionaltest.app.model.mst.Branch">
+        <![CDATA[
+        UPDATE
+            branch_mst
+        SET
+            branch_name = #{branchName,jdbcType=VARCHAR},
+            branch_address = #{branchAddress,jdbcType=VARCHAR},
+            branch_tel = #{branchTel,jdbcType=VARCHAR},
+            update_date = #{updateDate,jdbcType=TIMESTAMP}
+        WHERE
+            branch_id = #{branchId}
+        ]]>
+    </update>
+
+    <select id="branchFindOneWithNowWaitLock" resultType="jp.co.ntt.fw.macchinetta.batch.functionaltest.app.model.mst.Branch">
+        <![CDATA[
+        SELECT
+            branch_id AS branchId,
+            branch_name AS branchName,
+            branch_address AS branchAddress,
+            branch_tel AS branchTel,
+            create_date AS createDate,
+            update_date AS updateDate
+        FROM
+            branch_mst
+        WHERE
+            branch_id = #{branchId}
+        FOR UPDATE NOWAIT
+        ]]>
+    </select>
+
+    <select id="branchIdFindByName" resultType="string">
+        <![CDATA[
+        SELECT
+            branch_id
+        FROM
+            branch_mst
+        WHERE
+            branch_name = #{branchName}
+        ORDER BY
+            branch_id ASC
+        ]]>
+    </select>
+
+    <select id="branchFindOneByNameWithNowWaitLock" resultType="jp.co.ntt.fw.macchinetta.batch.functionaltest.app.model.mst.Branch">
+        <![CDATA[
+        SELECT
+            branch_id AS branchId,
+            branch_name AS branchName,
+            branch_address AS branchAddress,
+            branch_tel AS branchTel,
+            create_date AS createDate,
+            update_date AS updateDate
+        FROM
+            branch_mst
+        WHERE
+            branch_id = #{branchId}
+        AND
+            branch_name = #{branchName}
+        FOR UPDATE NOWAIT
+        ]]>
+    </select>
+
+</mapper>
+

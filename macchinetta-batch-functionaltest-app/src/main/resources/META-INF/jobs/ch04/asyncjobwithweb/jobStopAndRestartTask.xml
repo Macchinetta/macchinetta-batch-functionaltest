@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:batch="http://www.springframework.org/schema/batch" xmlns:c="http://www.springframework.org/schema/c"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+             http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+             http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch.xsd">
+
+    <!-- Because of working on 'async' profile as web applications, this import will be ignored. (for using definition consistently.)  -->
+    <import resource="classpath:META-INF/spring/job-base-context.xml"/>
+
+    <bean id="emulatedLongBatchTask"
+          class="jp.co.ntt.fw.macchinetta.batch.functionaltest.ch04.asyncjobwithweb.EmulatedLongBatchTask"/>
+
+    <bean id="simpleJobTasklet" class="jp.co.ntt.fw.macchinetta.batch.functionaltest.app.common.SimpleJobTasklet"/>
+
+    <batch:job id="jobStopAndRestartTask" job-repository="jobRepository">
+        <batch:step id="jobStopAndRestartTask.step01" next="jobStopAndRestartTask.step02">
+            <batch:tasklet transaction-manager="jobTransactionManager" ref="emulatedLongBatchTask"/>
+        </batch:step>
+        <batch:step id="jobStopAndRestartTask.step02">
+            <batch:tasklet transaction-manager="jobTransactionManager" ref="simpleJobTasklet"/>
+        </batch:step>
+    </batch:job>
+
+</beans>

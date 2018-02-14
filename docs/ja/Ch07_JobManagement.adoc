@@ -1,0 +1,330 @@
+= ジョブの管理の機能試験
+:table-caption!:
+:icons: font
+:sectnums!:
+
+== テストケース
+テストケースクラス：jp.co.ntt.fw.macchinetta.batch.functionaltest.ch07.JobManagementSpec
+
+[cols="5,25a,70a", options="headers"]
+.テストケース一覧
+|===
+|項番
+|テストケース
+|確認事項
+
+|1
+|<<statusManagement>>
+|
+* 状態の永続化
+** 機能試験は永続化させて実施。試験観点も特に無し。
+* 状態の確認
+** SQL直接発行
+** JobExplorerからのAPIコール
+* ジョブの停止
+** CommandLineJobRunnerから
+** JonOperator#stopから
+
+|2
+|<<customizeJobExitCode>>
+|
+* Listenerを利用した終了状態の設定
+** StepJobExecutionListener
+** JobExecutionListener
+* ジョブ終了コードとVM終了コードのマッピング
+
+|3
+|二重起動防止
+|Macchinetta Batch 2.xでは常に別ジョブとして起動するため、
+二重起動防止は提供していない。よって、試験対象外とする
+
+
+|4
+|ロギング
+|Macchinetta Batch 2.x特有の機能はないため、試験対象外とする
+
+|5
+|<<messageOutput>>
+|
+* MessageSourceを利用したメッセージの取得
+|===
+
+== 試験項目一覧
+各試験の項目一覧を示す。
+
+:sectnums:
+:leveloffset: -1
+
+[[statusManagement]]
+=== ジョブの状態管理のテスト
+ジョブの状態管理を確認する。
+
+[cols="5,20,25a,25a,25a", options="header"]
+.試験項目一覧
+|===
+|項番
+|観点
+|試験項目
+|試験条件
+|確認内容
+
+|1
+|正常系 +
+同期型起動
+|JobExplorerによるジョブの状態参照
+|
+* JobOperator#startでジョブを起動する。
+* JobExplorerで起動したジョブの各種情報を取得する
+|
+* JobExplorerから起動したジョブの各種情報が取得できていること
+* ジョブの情報
+** ジョブパラメータ
+** ジョブ名
+** 終了コード
+* ステップの情報
+** 終了状態
+** コミット、ロールバック、読み込み、書き込み件数
+
+|2
+|正常系 +
+同期型起動
+|SQL直接発行によるジョブの状態参照
+|
+* CommandLineJobRunnerで起動する。
+* ジョブ名を条件にBATCH_JOB_INSTANCEからJOB_INSTACE_IDを取得する
+* JOB_INSTACE_IDを条件にBATCH_JOB_EXECUTIONから最新のJOB_EXECUTION_IDをもつレコードの情報を取得する
+* BATCH_JOB_EXECUTIONで取得したJOB_EXECUTION_IDを条件にBATCH_JOB_EXECUTION_PARMAS、BATCH_STEP_EXECUTIONから必要な情報を取得する
+|
+* SQLから起動したジョブの各種情報が取得できていること
+* ジョブの情報
+** ジョブパラメータ
+** ジョブ名
+** 終了コード
+* ステップの情報
+** 終了状態
+** コミット、ロールバック、読み込み、書き込み件数
+
+|3
+|正常系 +
+同期型起動
+|CommandLineJobRunnerによるジョブ停止
+|
+* 割り込みが有効な長期ジョブを実行する
+** CommandLineJobRunnerで起動する
+* テストケースから、実行中のジョブを停止する
+** CommandLineJobRunnerで-stopオプションを利用する
+*** ジョブ名を指定する
+|
+* JobRepositoryから、終了コードがSTOPPEDであること
+* ジョブが異常終了すること
+
+|4
+|正常系 +
+同期型起動
+|CommandLineJobRunnerによるジョブ停止
+|
+* 割り込みが有効な長期ジョブを実行する
+** JobOperator#startでジョブを起動する。
+* テストケースから、実行中のジョブを停止する
+** CommandLineJobRunnerで-stopオプションを利用する
+*** JobExecutionIDを指定する
+|
+* JobRepositoryから、終了コードがSTOPPEDであること
+* ジョブが異常終了すること
+
+|5
+|正常系 +
+同期型起動
+|JobOperatorによるジョブ停止
+|
+* 割り込みが有効な長期ジョブを実行する
+** JobOperator#startで起動する
+* テストケースから、実行中のジョブを停止する
+** JobOperator#stopで停止する
+|
+* JobRepositoryから、終了コードがSTOPPEDであること
+* ジョブが異常終了すること
+
+|6
+|異常系 +
+同期型起動
+|正常終了したジョブに対する停止処理
+|
+* JobRepositoryに状態がCOMPLETEDのジョブを登録する
+** 終了時刻はnot nullの値を設定
+* CommandLineJobRunnerで-stopオプションを利用する
+** ジョブ名を指定する
+|
+* JobRepositoryから、終了コードが変化していないこと
+* 停止ジョブが異常終了すること
+* ログで「Job Terminated in error」が出力されること
+
+|7
+|異常系 +
+同期型起動
+|異常終了したジョブに対する停止処理
+|
+* JobRepositoryに状態がFAILEDのジョブを登録する
+** 終了時刻はnot nullの値を設定
+* CommandLineJobRunnerで-stopオプションを利用する
+** ジョブ名を指定する
+|
+* JobRepositoryから、終了コードが変化していないこと
+* 停止ジョブが異常終了すること
+* ログで「Job Terminated in error」が出力されること
+
+|8
+|異常系 +
+同期型起動
+|停止したジョブに対する停止処理
+|
+* JobRepositoryに状態がSTOPPEDのジョブを登録する
+** 終了時刻はnot nullの値を設定
+* CommandLineJobRunnerで-stopオプションを利用する
+** ジョブ名を指定する
+|
+* JobRepositoryから、終了コードが変化していないこと
+* 停止ジョブが異常終了すること
+* ログで「Job Terminated in error」が出力されること
+
+|9
+|正常系 +
+同期型起動
+|ジョブ開始前(STARTING)のジョブに対する停止処理
+|
+* JobRepositoryに状態がSTARTINGのジョブを登録する
+** 終了時刻はnullの値を設定
+* CommandLineJobRunnerで-stopオプションを利用する
+** ジョブ名を指定する
+|
+* JobRepositoryから、終了コードが"STOPPING"
+** STARTING状態のジョブを試験で停止することは難しいため、JobRepositoryにSTOPPINGが登録されればジョブが停止するのでSTOPPINGが登録されてことだけを確認することとする
+* 停止ジョブが正常終了すること
+* ログで「Job Terminated in error」が出力されないこと
+|===
+
+
+[[customizeJobExitCode]]
+=== 終了コードのカスタマイズのテスト
+終了コードのカスタマイズを確認する。
+
+[cols="5,20,25a,25a,25a", options="header"]
+.試験項目一覧
+|===
+|項番
+|観点
+|試験項目
+|試験条件
+|確認内容
+
+|1
+|正常系 +
+同期型起動
+|チャンクモデルにおける終了コードのカスタマイズの確認
+|
+* ItemProcessorで入力チェックを行うジョブを起動する
+** 入力チェックエラーはスキップする
+** 入力チェックエラーによりスキップした場合は、"STEP COMPLETED WITH SKIPS"のステップ終了コードにする
+** ジョブ終了時に、ステップの終了コードが"STEP COMPLETED WITH SKIPS"を含んでいる場合は、"JOB COMPLETED WITH SKIPS"をジョブの終了コードにする
+** ジョブの終了状態"JOB COMPLETED WITH SKIPS"は、VM終了コード100にマッピングされる設定
+* 入力チェックエラーが発生するデータを読み込む
+|
+* ジョブが終了コード=100で終了する
+* JobRepositoryより、カスタマイズされたコードが登録されている
+** ステップ終了状態="COMPLETED"
+** ステップ終了コード="STEP COMPLETED WITH SKIPS"
+** ジョブ終了状態="COMPLETED"
+** ジョブ終了コード="JOB COMPLETED WITH SKIPS"
+
+|2
+|正常系 +
+同期型起動
+|タスクレットモデルにおける終了コードのカスタマイズの確認
+|
+* Taskletで入力チェックを行うジョブを起動する
+** 入力チェックエラーはスキップする
+** 入力チェックエラーによりスキップした場合は、"STEP COMPLETED WITH SKIPS"のステップ終了コードにする
+** ジョブ終了時に、ステップの終了コードが"STEP COMPLETED WITH SKIPS"を含んでいる場合は、"JOB COMPLETED WITH SKIPS"をジョブの終了コードにする
+** ジョブの終了状態"JOB COMPLETED WITH SKIPS"は、VM終了コード100にマッピングされる設定
+* 入力チェックエラーが発生するデータを読み込む
+|
+* ジョブが終了コード=100で終了する
+* JobRepositoryより、カスタマイズされたコードが登録されている
+** ステップ終了状態="COMPLETED"
+** ステップ終了コード="STEP COMPLETED WITH SKIPS"
+** ジョブ終了状態="COMPLETED"
+** ジョブ終了コード="JOB COMPLETED WITH SKIPS"
+
+|3
+|正常系 +
+同期型起動
+|終了コードのマッピングの確認
+|
+* 終了コードを以下のようにマッピングする
+** COMPLETED=0
+** FAILED=250
+** STOPPED=200
+* CommandLineJobRunnerからジョブを起動し、正常終了させる
+
+|
+* CommandLineJobRunnerのプロセスの終了コードが0
+
+|4
+|異常系 +
+同期型起動
+|終了コードのマッピングの確認
+|
+* 終了コードを以下のようにマッピングする
+** COMPLETED=0
+** FAILED=250
+** STOPPED=200
+* CommandLineJobRunnerからジョブを起動し、異常終了させる
+
+|
+* CommandLineJobRunnerのプロセスの終了コードが250
+
+|5
+|異常系 +
+同期型起動
+|終了コードのマッピングの確認
+|
+* 終了コードを以下のようにマッピングする
+** COMPLETED=0
+** FAILED=250
+** STOPPED=200
+* CommandLineJobRunnerからジョブを起動し、ジョブを停止させる
+** <<statusManagement>>の項番3と同様のジョブ
+|
+* CommandLineJobRunnerのプロセスの終了コードが200
+|===
+
+
+=== 二重起動防止
+試験対象外。
+
+
+=== ロギング
+試験対象外。
+
+[[messageOutput]]
+=== メッセージ取得のテスト
+メッセージ出力を確認する。
+
+[cols="5,20,25a,25a,25a", options="header"]
+.試験項目一覧
+|===
+|項番
+|観点
+|試験項目
+|試験条件
+|確認内容
+
+|1
+|正常系 +
+同期型起動
+|MessageSourceを利用したメッセージ取得の確認
+|
+* application-messages.propertiesにメッセージを定義しておく
+|
+* ログ出力により、メッセージが正しく取得できていること
+|===

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org/DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="jp.co.ntt.fw.macchinetta.batch.functionaltest.app.repository.mst.BranchRepository">
+
+    <select id="findOne" resultType="jp.co.ntt.fw.macchinetta.batch.functionaltest.app.model.mst.Branch">
+        <![CDATA[
+        SELECT
+            branch_id AS branchId,
+            branch_name AS branchName,
+            branch_address AS branchAddress,
+            branch_tel AS branchTel,
+            create_date AS createDate,
+            update_date AS updateDate
+        FROM
+            branch_mst
+        WHERE
+            branch_id = #{branchId}
+        ]]>
+    </select>
+
+</mapper>
+

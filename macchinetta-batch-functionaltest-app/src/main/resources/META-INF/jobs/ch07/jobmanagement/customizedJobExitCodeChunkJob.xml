@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:batch="http://www.springframework.org/schema/batch"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xmlns:mybatis="http://mybatis.org/schema/mybatis-spring"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+             http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+             http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
+             http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch.xsd
+             http://mybatis.org/schema/mybatis-spring http://mybatis.org/schema/mybatis-spring.xsd">
+
+    <import resource="classpath:META-INF/spring/job-base-context.xml"/>
+
+    <context:component-scan base-package="jp.co.ntt.fw.macchinetta.batch.functionaltest.app.common"/>
+    <context:component-scan base-package="jp.co.ntt.fw.macchinetta.batch.functionaltest.ch07.jobmanagement"/>
+    <mybatis:scan
+            base-package="jp.co.ntt.fw.macchinetta.batch.functionaltest.app.repository.plan"
+            factory-ref="jobSqlSessionFactory"/>
+
+    <bean id="summarizeDetails" class="org.mybatis.spring.batch.MyBatisCursorItemReader"
+          p:queryId="jp.co.ntt.fw.macchinetta.batch.functionaltest.app.repository.plan.SalesPlanDetailRepository.summarizeDetails"
+          p:sqlSessionFactory-ref="jobSqlSessionFactory"/>
+
+    <bean id="summaryWriter" class="org.mybatis.spring.batch.MyBatisBatchItemWriter"
+          p:statementId="jp.co.ntt.fw.macchinetta.batch.functionaltest.app.repository.plan.SalesPlanSummaryRepository.create"
+          p:sqlSessionTemplate-ref="batchModeSqlSessionTemplate"/>
+
+    <bean id="compositeProcessor" class="org.springframework.batch.item.support.CompositeItemProcessor">
+        <property name="delegates">
+            <list>
+                <ref bean="checkAmountItemProcessor"/>
+                <ref bean="emulateLongTaskItemProcessor"/>
+            </list>
+        </property>
+    </bean>
+
+    <batch:job id="customizedJobExitCodeChunkJob" job-repository="jobRepository">
+        <batch:step id="customizedJobExitCodeChunkJob.step01">
+            <batch:tasklet transaction-manager="jobTransactionManager">
+                <batch:chunk reader="summarizeDetails" processor="compositeProcessor"
+                             writer="summaryWriter" commit-interval="10"/>
+                <batch:listeners>
+                    <batch:listener ref="checkAmountItemProcessor"/>
+                </batch:listeners>
+            </batch:tasklet>
+        </batch:step>
+        <batch:listeners>
+            <batch:listener ref="jobExitCodeChangeListener"/>
+            <batch:listener ref="jobExecutionLoggingListener"/>
+        </batch:listeners>
+    </batch:job>
+
+    <bean id="exitCodeMapper" class="org.springframework.batch.core.launch.support.SimpleJvmExitCodeMapper">
+        <property name="mapping">
+            <util:map id="exitCodeMapper" key-type="java.lang.String"
+                      value-type="java.lang.Integer">
+                <entry key="NOOP" value="0"/>
+                <entry key="COMPLETED" value="0"/>
+                <entry key="STOPPED" value="200"/>
+                <entry key="FAILED" value="250"/>
+                <entry key="UNKNOWN" value="255"/>
+                <entry key="JOB COMPLETED WITH SKIPS" value="100"/>
+            </util:map>
+        </property>
+    </bean>
+
+</beans>

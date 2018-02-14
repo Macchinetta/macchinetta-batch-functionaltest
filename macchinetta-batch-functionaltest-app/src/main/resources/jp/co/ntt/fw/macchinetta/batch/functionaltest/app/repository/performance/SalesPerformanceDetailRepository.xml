@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org/DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="jp.co.ntt.fw.macchinetta.batch.functionaltest.app.repository.performance.SalesPerformanceDetailRepository">
+
+    <select id="findAll" resultType="jp.co.ntt.fw.macchinetta.batch.functionaltest.app.model.performance.SalesPerformanceDetail">
+        <![CDATA[
+        SELECT
+            branch_id AS branchId, year, month, customer_id AS customerId, amount
+        FROM
+            sales_performance_detail
+        ORDER BY
+            branch_id ASC, year ASC, month ASC, customer_id ASC
+        ]]>
+    </select>
+
+    <insert id="create" parameterType="jp.co.ntt.fw.macchinetta.batch.functionaltest.app.model.performance.SalesPerformanceDetail">
+        <![CDATA[
+        INSERT INTO
+            sales_performance_detail(branch_id, year, month, customer_id, amount)
+        VALUES (
+            #{branchId}, #{year}, #{month}, #{customerId}, #{amount}
+        )
+        ]]>
+    </insert>
+
+    <delete id="deleteAll">
+        <![CDATA[
+        DELETE FROM
+            sales_performance_detail
+        ]]>
+    </delete>
+
+    <select id="summarizeDetails" resultType="jp.co.ntt.fw.macchinetta.batch.functionaltest.app.model.performance.SalesPerformanceSummary">
+        <![CDATA[
+        SELECT
+            branch_id AS branchId, year, month, SUM(amount) AS amount
+        FROM
+            sales_performance_detail
+        GROUP BY
+            branch_id, year, month
+        ORDER BY
+            branch_id ASC, year ASC, month ASC
+         ]]>
+    </select>
+
+</mapper>
+

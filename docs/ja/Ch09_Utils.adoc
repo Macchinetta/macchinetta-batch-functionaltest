@@ -1,0 +1,39 @@
+= 各種ユーティリティの機能試験
+:table-caption!:
+:icons: font
+:sectnums!:
+
+== テストケース
+テストケースクラス：jp.co.ntt.fw.macchinetta.batch.functionaltest.ch09.UtilsSpec
+
+[cols="5,25a,70a", options="headers"]
+.テストケース一覧
+|===
+|項番
+|テストケース
+|確認事項
+
+|1
+|プロパティ管理
+|現時点では、Macchinetta Batch Framework (2.x)特有の事象はないため、試験対象外
+
+|2
+|日付操作(JSR-310 Date and Time API)
+|現時点では、Macchinetta Batch Framework (2.x)特有の事象はないため、試験対象外
+
+|3
+|日付操作(Joda Time)
+|現時点では、Macchinetta Batch Framework (2.x)特有の事象はないため、試験対象外
+
+|4
+|システム時刻
+|現時点では、Macchinetta Batch Framework (2.x)特有の事象はないため、試験対象外
+
+|5
+|文字列処理
+|現時点では、Macchinetta Batch Framework (2.x)特有の事象はないため、試験対象外
+
+|6
+|Beanマッピング(Dozer)
+|現時点では、Macchinetta Batch Framework (2.x)特有の事象はないため、試験対象外
+|===

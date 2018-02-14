@@ -1,0 +1,475 @@
+= 機能試験用アプリケーション仕様
+
+:example-caption!:
+:table-caption!:
+
+== 仕様
+アプリケーションの仕様
+
+* 売上計画登録
+. 各支店は売上計画をファイルで本店へ送付する
+. 本店は送付されたファイルからDBへ売上計画を登録する
+. 全店の登録が完了したら、売上計画のサマリを算出し登録する
+
+* 売上実績登録
+. 各支店は請求書(Invoice)をDBへ登録する
+. 各支店は、Invoiceから売上実績を作成し、ファイル出力する
+. 各支店は売上実績をファイルで本店へ送付する
+. 本店は送付されたファイルからDBへ売上実績を登録する
+. 全店の登録が完了したら、売上実績のサマリを算出し登録する
+
+* 評価レポート
+. 評価対象の年月はパラメータ指定
+. 各支店別に、売上計画・売上実績を比較し評価を行う
+** 計画に対して、実績が100％以上…S
+** 計画に対して、実績が90％以上100％未満…A
+** 計画に対して、実績が80％以上90％未満…B
+** 計画に対して、実績が70％以上80％未満…C
+** 計画に対して、実績が70％未満…D
+. 評価結果をファイルにして、各支店へ送付する
+
+* 顧客一覧
+. 顧客マスタの一覧をファイル出力する
+. 担当する支店情報もあわせて出力する
+. 全体と担当支店別の2種類ある
+
+* 非機能要件
+. 各支店からの売上計画・売上実績の登録は並列実行可能とする
+
+* ファイルについて
+. 形式
+** CSV
+** TSV
+** 固定長・改行なし
+** 単一行文字列
+** XML
+. 場所指定
+** ジョブパラメータとして渡す
+
+
+IMPORTANT: 機能試験だけのためのジョブもある
+
+:leveloffset: +1
+
+include::table.adoc[]
+
+:leveloffset: -1
+
+== 機能試験ID一覧
+機能試験IDの一覧を以下に示す。
+
+[cols="20,40,40", options="header"]
+|===
+|機能試験ID
+|分類
+|機能名
+
+|CH0401
+.5+.^|ジョブの起動
+|同期実行
+
+|CH0402
+|ジョブの起動パラメータ
+
+|CH0403
+|非同期実行（DBポーリング）
+
+|CH0404
+|非同期実行（Webコンテナ）
+
+|CH0405
+|リスナー
+
+|CH0501
+.5+.^|データの入出力
+|トランザクション制御
+
+|CH0502
+|データベースアクセス
+
+|CH0503
+|ファイルアクセス
+
+|CH0504
+|その他の入出力
+
+|CH0505
+|排他制御
+
+|CH0601
+.3+.^|異常系への対応
+|入力チェック
+
+|CH0602
+|例外ハンドリング
+
+|CH0603
+|処理の再実行
+
+|CH0701
+.2+.^|ジョブの管理
+|ジョブの管理
+
+|CH0702
+|H2(インメモリデータベース)を管理DBとした同期実行
+
+
+|CH0801
+.2+.^|フロー制御と並列・多重処理
+|フロー制御
+
+|CH0802
+|並列処理と多重処理
+
+|CH0901
+2+|各種ユーティリティ
+
+|===
+
+== ジョブ一覧
+ジョブ一覧を以下に示す。
+
+[cols="20,40a,40a"]
+.基本アプリケーションジョブ
+|===
+|ジョブID
+|引数(定義ファイルとジョブID以外)
+|概要
+
+
+
+|jobCustomerList01.xml
+|outputFile=出力ファイルフルパス
+|顧客一覧全体の出力ジョブ
+
+|jobCustomerList02.xml
+|
+* outputFile=出力ファイルフルパス
+* branchId=対象支店ID
+|支店別顧客一覧の出力ジョブ
+
+|jobEvaluationReport01.xml
+|
+* outputPath=評価レポート出力ディレクトリ
+* year=レポート対象の年
+* month=レポート対象の月
+|
+|jobInvoice01.xml
+|inputFile=請求書ファイルのフルパス
+|請求書データ取り込みジョブ
+
+|jobInvoice02.xml
+|
+* outputFile=出力ファイルフルパス
+* branchId=対象支店ID
+|支店別請求書集計データ作成＆出力ジョブ
+
+|jobSalesPerformance01.xml
+|inputFile=売上実績詳細ファイルのフルパス
+|売上実績詳細取り込みジョブ
+
+|jobSalesPerformance02.xml
+|なし
+|売上実績集計ジョブ
+
+|jobSalesPlan01.xml
+|inputFile=売上計画詳細ファイルのフルパス
+|売上計画詳細取り込みジョブ
+
+|jobSalesPlan02.xml
+|なし
+|売上計画集計ジョブ
+
+|===
+
+== REST API
+Webコンテナ起動用のREST APIの仕様を説明する。
+
+=== REST API一覧
+REST APIの一覧を示す。
+
+[cols="10,15,10,20,15a,30a"]
+|===
+|項番
+|API名
+|HTTP Method
+|リソースパス
+|ステータスコード
+|API概要
+
+|1
+|POST Job
+|POST
+|/api/v1/job/{jobName}
+|
+* 200 (OK)
+* 400 (Bad Request)
+|指定したジョブを非同期実行する
+
+* ジョブ起動時に例外が発生した場合は、HTTP Status=400となる
+** ErrorMessageに発生した例外のメッセージが設定される
+
+|2
+|GET Job
+|GET
+|/api/v1/job/{jobExecutionId}
+|200 (OK)
+|指定したjobExecutionIdのジョブの情報を検索する
+
+* 対象ジョブが見つからない場合でも、HTTP Status=200となる
+** ErrorMessageに対象ジョブがない旨のメッセージが設定される
+
+|3
+|PUT Stop job
+|PUT
+|/api/v1/job/stop/{jobExecutionId}
+|
+* 200 (OK)
+* 400 (Bad Request)
+|指定したjobExecutionIdのジョブを停止する
+
+* ジョブ停止時に例外が発生した場合は、HTTP Status=400となる
+** ErrorMessageに発生した例外のメッセージが設定される
+* ジョブ停止実行の成否は、ResultMessageに設定される
+
+|4
+|PUT Restart job
+|PUT
+|/api/v1/job/restart/{jobExecutionId}
+|
+* 200 (OK)
+* 400 (Bad Request)
+|指定したjobExecutionIdのジョブをリスタートする
+
+* ジョブリスタート時に例外が発生した場合は、HTTP Status=400となる
+** ErrorMessageに発生した例外のメッセージが設定される
+* リスタート時にJobOperatorから取得できるJobExecutionIdは、ResultMessageにメッセージと一緒に設定される
+
+|===
+
+=== リソース項目定義
+REST APIで使用されるリソース定義を示す。
+
+[cols="10,15,15,60a"]
+.ジョブ操作リソース(JobOperationResource)
+|===
+|項番
+|項目名
+|型
+|概要・その他仕様
+
+|1
+|jobName
+|String
+|ジョブ実行時に指定したジョブ名が設定される
+
+|2
+|jobParams
+|String
+|<パラメータ名>=<パラメータ値>の形式 +
+複数パラメータを指定する場合は、スペース区切りでパラメータを連結する +
+ex) <パラメータ1名>=<パラメータ1値>△<パラメータ2名>=<パラメータ2値>△... +
+△：半角スペースを示す
+
+|3
+|jobExecutionId
+|Long
+|
+* ジョブ実行時
+** 払い出されたJobExecutionIdが設定される
+* ジョブ停止・リスタート時
+** 指定したJobExecutionIdが設定される
+
+|4
+|resultMessage
+|String
+|ジョブ操作の成否に関するメッセージが設定される
+
+|5
+|errorMessage
+|String
+|ジョブ操作時に例外が発生した場合、例外のメッセージが設定される
+
+|===
+
+
+[cols="10,15,15,60a"]
+.ジョブ実行情報リソース(JobExecutionResource)
+|===
+|項番
+|項目名
+|型
+|概要・その他仕様
+
+|1
+|jobExecutionId
+|Long
+|ジョブ実行ID
+
+|2
+|jobName
+|String
+|ジョブ名
+
+|3
+|jobParameters
+|String
+|ジョブパラメータ +
+<パラメータ名>=<パラメータ値>の形式
+
+|4
+|stepExecutions
+|List<StepExecutionResource>
+|StepExecutionResourceの情報
+
+|5
+|status
+|String
+|ジョブ単位のBatchステータス
+
+|6
+|startTime
+|Date
+|ジョブ開始日時
+
+|7
+|createTime
+|Date
+|ジョブリポジトリへの登録日時
+
+|8
+|endTime
+|Date
+|ジョブ終了日時
+
+|9
+|exitStatus
+|String
+|ジョブの終了状態
+
+|10
+|lastUpdated
+|Date
+|ジョブリポジトリへの最終更新日時
+
+|11
+|executionContext
+|String
+|JobExecutionContextの内容
+
+|12
+|failureExceptions
+|List<String>
+|ジョブ内で発生した例外
+
+|13
+|jobConfigurationName
+|String
+|ジョブ設定名（たぶん未使用）
+
+|14
+|errorMessage
+|String
+|JobExplorerによる検索で対象のJobExecutionが見つからない場合、ここにエラーメッセージが設定される
+
+|===
+
+[cols="10,15,15,60a"]
+.ステップ実行情報リソース(StepExecutionResource)
+|===
+|項番
+|項目名
+|型
+|概要・その他仕様
+
+|1
+|stepExecutionId
+|Long
+|ステップ実行ID
+
+|2
+|stepName
+|String
+|ステップ名
+
+|3
+|status
+|String
+|ステップ単位のBatchステータス
+
+|4
+|readCount
+|int
+|Item読み取り件数
+
+|5
+|writeCount
+|int
+|Item書き込み件数
+
+|6
+|commitCount
+|int
+|コミット発行回数
+
+|7
+|rollbackCount
+|int
+|ロールバック発行回数
+
+|8
+|readSkipCount
+|int
+|読み込み処理スキップ件数
+
+|9
+|processSkipCount
+|int
+|プロセス処理スキップ件数
+
+|10
+|writeSkipCount
+|int
+|書き込み処理スキップ件数
+
+|11
+|startTime
+|Date
+|ステップ開始日時
+
+|12
+|endTime
+|Date
+|ステップ終了日時
+
+|13
+|lastUpdated
+|Date
+|ジョブリポジトリへの最終更新日時
+
+|14
+|executionContext
+|String
+|StepExecutionContextの内容
+
+|15
+|exitStatus
+|String
+|ステップの終了状態
+
+|16
+|terminateOnly
+|boolean
+|中断フラグ
+
+|17
+|filterCount
+|int
+|フィルタリング件数
+
+|18
+|failureExceptions
+|List<String>
+|ステップ内で発生した例外
+
+|===

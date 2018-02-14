@@ -1,0 +1,77 @@
+@startuml
+
+skinparam Note {
+  BackgroundColor #8bffc0
+  BorderColor black
+}
+
+skinparam Class {
+  BorderColor black
+  ArrowColor black
+}
+
+class sales_plan_detail << (T,#05adff) >> {
+  +branch_id : varchar[6]
+  +year : integer
+  +month : integer
+  +customer_id : varchar[10]
+  amount : numeric[10]
+}
+
+class sales_plan_summary << (T,#05adff) >> {
+  +branch_id : varchar[6]
+  +year : integer
+  +month : integer
+  amount : numeric[10]
+}
+
+class sales_performance_detail << (T,#05adff) >> {
+  +branch_id : varchar[6]
+  +year : integer
+  +month : integer
+  +customer_id : varchar[10]
+  amount : numeric[10]
+}
+
+class sales_performance_summary << (T,#05adff) >> {
+  +branch_id : varchar[6]
+  +year : integer
+  +month : integer
+  amount : numeric[10]
+}
+
+class invoice << (T,#05adff) >> {
+  +invoice_no : varchar[20]
+  invoice_date : date
+  invoice_amount: numeric[8]
+  customer_id: varchar[10]
+}
+
+class branch_mst << (T,#05adff) >> {
+  +branch_id : varchar[6]
+  branch_name : varchar[50]
+  branch_address : varchar[200]
+  branch_tel : varchar[11]
+  create_date : timestamp
+  update_date : timestamp
+}
+
+class customer_mst << (T,#05adff) >> {
+  +customer_id : varchar[10]
+  customer_name : varchar[50]
+  customer_address : varchar[200]
+  customer_tel : varchar[11]
+  charge_branch_id[6]
+  create_date : timestamp
+  update_date : timestamp
+}
+
+
+sales_plan_summary o-- sales_plan_detail
+sales_performance_summary o-- sales_performance_detail
+sales_performance_detail o-- invoice
+
+customer_mst -- branch_mst
+
+hide class methods
+@enduml

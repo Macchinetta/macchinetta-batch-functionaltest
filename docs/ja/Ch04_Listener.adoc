@@ -1,0 +1,856 @@
+= リスナーの機能試験
+:table-caption!:
+:icons: font
+:sectnums!:
+
+== テストケース
+テストケースクラス：jp.co.ntt.fw.macchinetta.batch.functionaltest.ch04.ListenerSpec
+
+[cols="5,25a,70a", options="headers"]
+.テストケース一覧
+|===
+|項番
+|テストケース
+|確認事項
+
+|1
+|<<ScopeInListenerOperatesOnChunk>>
+|チャンクモデルでJob、Step、Tasklet、Chunkのスコープでどのリスナーが動作するかを確認する。
+
+|2
+|<<ScopeInListenerOperatesOnTasklet>>
+|タスクレットモデルでJob、Step、Tasklet、Chunkのスコープでどのリスナーが動作するかを確認する。
+
+|3
+|<<ListenerOnChunkOrientedJobWithAnnotation>>
+|アノテーションベースのリスナー実装で、<<ScopeInListenerOperatesOnChunk>>を行う。
+
+|4
+|<<ListenerOnTaskletOrientedJobWithAnnotation>>
+|アノテーションベースのリスナー実装で、<<ScopeInListenerOperatesOnTasklet>>を行う。
+
+|5
+|<<ScopeInMixedListenerOperatesOnChunk>>
+|チャンクモデルでListnerインターフェース実装とアノテーションベースListenerとの併用した場合の動作を確認する。
+
+|6
+|<<ScopeInMIxedListenerOperatesOnTasklet>>
+|タスクレットモデルでListnerインターフェース実装とアノテーションベースListenerとの併用した場合の動作を確認する。
+
+|7
+|<<ExceptionOccurredInListenerOnChunk>>
+|チャンクモデルの前処理で例外が発生したときにリソースがクローズされることを確認する。
+
+|8
+|<<JobAbortedInListener>>
+|チャンクモデルとタスクレットモデルの前処理でジョブが中断されることを確認する。
+
+|===
+
+== 試験項目一覧
+各試験の項目一覧を示す。
+
+=== 試験実施における共通事項
+リスナーの実装は以下の開発指針に従って作成する
+
+* 共通的な処理を行う場合は、各リスナーのインターフェースを実装する
+** 実際は各リスナーがImplementされたサポートクラスでの拡張になるものもある。
+* ジョブ特有の処理を行う場合は、アノテーションベースでの実装でもよい
+** 基本的にはItemProcessorにビジネスロジックを実装するので、ItemProcessor実装内でアノテーションを利用する。
+
+:sectnums:
+:leveloffset: -1
+
+
+[[ScopeInListenerOperatesOnChunk]]
+=== チャンクモデルでリスナーが動作するスコープのテスト
+チャンクモデルでリスナーが登録されるスコープによってどのリスナーが実行されるかを確認する。
+
+[cols="5,20,25a,25a,25a", options="header"]
+.試験項目一覧
+|===
+|項番
+|観点
+|試験項目
+|試験条件
+|確認内容
+
+|1
+|正常系 +
+同期型起動
+|チャンクモデルでJob、Step、Tasklet、Chunkのスコープでどのリスナーが動作するかを確認する。
+
+|
+* 以下のリスナーを全て実装したリスナーを用意する
+** JobExecutionListener
+** StepExecutionListener
+** ChunkListener
+** ItemReadListener
+** ItemProcessListener
+** ItemWriteListener
+* 各リスナーはログ出力を行う
+
+* 以下のスコープ箇所にリスナーを登録する
+. Job
+. Step
+. Tasklet
+. Chunk
+. 上記すべて
+
+|各スコープで実行されたリスナーを確認する。
+
+. Job
+** JobExecutionListenerのみ
+. Step
+** JobExecutionListener以外すべて
+. Tasklet
+** JobExecutionListener以外すべて
+. Chunk
+** JobExecutionListener以外すべて
+. すべて
+** すべてのリスナー
+** 重複実行はない
+
+* 異常系のリスナーメソッドは実行されない
+
+|2
+|異常系 +
+同期型起動
+|チャンクモデルでJob、Step、Tasklet、Chunkのスコープでどのリスナーが動作するかを確認する。
+
+|
+* 以下のリスナーを全て実装したリスナーを用意する
+** JobExecutionListener
+** StepExecutionListener
+** ChunkListener
+** ItemReadListener
+** ItemProcessListener
+** ItemWriteListener
+* 各リスナーはログ出力を行う
+
+* 以下のスコープ箇所にリスナーを登録する
+. Job
+. Step
+. Tasklet
+. Chunk
+. 上記すべて
+
+* 以下の処理で例外が発生する
+** ItemReader
+** ItemProcessor
+** ItemWriter
+
+|各スコープで実行されたリスナーを確認する。
+
+. Job
+** JobExecutionListenerのみ
+. Step
+** JobExecutionListener以外すべて
+. Tasklet
+** JobExecutionListener以外すべて
+. Chunk
+** JobExecutionListener以外すべて
+. すべて
+** すべてのリスナー
+** 重複実行はない
+
+* 異常系のリスナーメソッドも実行される
+
+|===
+
+[[ScopeInListenerOperatesOnTasklet]]
+=== タスクレットモデルでリスナーが動作するスコープのテスト
+タスクレットモデルでリスナーが登録されるスコープによってどのリスナーが実行されるかを確認する。
+
+[cols="5,20,25a,25a,25a", options="header"]
+.試験項目一覧
+|===
+|項番
+|観点
+|試験項目
+|試験条件
+|確認内容
+
+|1
+|正常系 +
+同期型起動
+|タスクレットデルでJob、Step、Tasklet、Chunkのスコープでどのリスナーが動作するかを確認する。
+
+|
+* 以下のリスナーを全て実装したリスナーを用意する
+** JobExecutionListener
+** StepExecutionListener
+** ChunkListener
+** ItemReadListener
+** ItemProcessListener
+** ItemWriteListener
+* 各リスナーはログ出力を行う
+
+* 以下のスコープ箇所にリスナーを登録する
+. Job
+. Step
+. Tasklet
+. 上記すべて
+
+|各スコープで実行されたリスナーを確認する。
+
+. Job
+** JobExecutionListenerのみ
+. Step
+** JobExecutionListener
+** StepExecutionListener
+** ChunkListener
+. Tasklet
+** JobExecutionListener
+** StepExecutionListener
+** ChunkListener
+. すべて
+** JobExecutionListener
+** StepExecutionListener
+** ChunkListener
+** 重複実行はない
+. 各ケースに共通の事項
+* 異常系のリスナーメソッドは実行されない
+* 以下のリスナーは実行されない
+** ItemReadListener
+** ItemProcessListener
+** ItemWriteListener
+
+|2
+|異常系 +
+同期型起動
+|タスクレットモデルでJob、Step、Tasklet、Chunkのスコープでどのリスナーが動作するかを確認する。
+
+|
+* 以下のリスナーを全て実装したリスナーを用意する
+** JobExecutionListener
+** StepExecutionListener
+** ChunkListener
+** ItemReadListener
+** ItemProcessListener
+** ItemWriteListener
+* 各リスナーはログ出力を行う
+
+* 以下のスコープ箇所にリスナーを登録する
+. Job
+. Step
+. Tasklet
+. 上記すべて
+
+* 以下の処理で例外が発生する
+** Tasklet
+
+|各スコープで実行されたリスナーを確認する。
+
+. Job
+** JobExecutionListenerのみ
+. Step
+** JobExecutionListener
+** StepExecutionListener
+** ChunkListener
+. Tasklet
+** JobExecutionListener
+** StepExecutionListener
+** ChunkListener
+. すべて
+** JobExecutionListener
+** StepExecutionListener
+** ChunkListener
+
+* 異常系のリスナーメソッドも実行される
+
+* 以下のリスナーは実行されない
+** ItemReadListener
+** ItemProcessListener
+** ItemWriteListener
+
+|===
+
+[[ListenerOnChunkOrientedJobWithAnnotation]]
+=== チャンクモデルジョブにおけるリスナーのテスト(アノテーション版)
+チャンクモデルジョブにおけるリスナーの動作を確認する。
+アノテーションによって実装した場合、<<ScopeInListenerOperatesOnChunk>>と同様の挙動となるか確認する。
+
+この試験は、同じリスナーを暗黙的・明示的と2つ定義するため、リスナーの実行回数が不安定になる(5.0.0時点)。
+そのため、実行回数ではなく、実行有無のみで判断する。
+
+[cols="5,20,25a,25a,25a", options="header"]
+.試験項目一覧
+|===
+|項番
+|観点
+|試験項目
+|試験条件
+|確認内容
+
+|1
+|正常系 +
+同期型起動
+|チャンクモデルでJob、Step、Tasklet、Chunkのスコープでどのリスナーが動作するかを確認する。
+
+|
+* 以下のリスナーを全てアノテーションベースで実装したリスナーを用意する（ItemProcessorに実装）
+** JobExecutionListener
+** StepExecutionListener
+** ChunkListener
+** ItemReadListener
+** ItemProcessListener
+** ItemWriteListener
+* 各リスナーはログ出力を行う
+
+* 以下のスコープ箇所にリスナーを登録する
+. Job
+. Step
+. Tasklet
+. Chunk
+. 上記すべて
+. 暗黙的に設定 (Bean定義のリスナー設定を使わない)
+
+|各スコープで実行されたリスナーを確認する。
+
+. Job
+** すべてのリスナー
+** ItemProcessorによりJobExecutionListener以外も暗黙的に登録される
+. Step
+** JobExecutionListener以外すべて
+** ItemProcessorによりJobExecutionListener以外も暗黙的に登録される
+. Tasklet
+** JobExecutionListener以外すべて
+** ItemProcessorによりJobExecutionListener以外も暗黙的に登録される
+. Chunk
+** JobExecutionListener以外すべて
+** ItemProcessorによりJobExecutionListener以外も暗黙的に登録される
+. すべて
+** すべてのリスナー
+. 暗黙的に設定 (Bean定義のリスナー設定を使わない)
+** JobExecutionListener以外すべて
+
+* 異常系のリスナーメソッドは実行されない
+
+|2
+|異常系 +
+同期型起動
+|チャンクモデルでJob、Step、Tasklet、Chunkのスコープでどのリスナーが動作するかを確認する。
+
+|
+* 以下のリスナーを全てアノテーションベースで実装したリスナーを用意する（ItemProcessorに実装）
+** JobExecutionListener
+** StepExecutionListener
+** ChunkListener
+** ItemReadListener
+** ItemProcessListener
+** ItemWriteListener
+* 各リスナーはログ出力を行う
+
+* 以下のスコープ箇所にリスナーを登録する
+. Job
+. Step
+. Tasklet
+. Chunk
+. 上記すべて
+. 暗黙的に設定 (Bean定義のリスナー設定を使わない)
+
+* 以下の処理で例外が発生する
+** ItemReader
+** ItemProcessor
+** ItemWriter
+
+|各スコープで実行されたリスナーを確認する。
+
+. Job
+** すべてのリスナー
+** ItemProcessorによりJobExecutionListener以外も暗黙的に登録される
+** ItemProcessor
+. Step
+** JobExecutionListener以外すべて
+** ItemProcessorによりJobExecutionListener以外も暗黙的に登録される
+. Tasklet
+** JobExecutionListener以外すべて
+** ItemProcessorによりJobExecutionListener以外も暗黙的に登録される
+. Chunk
+** JobExecutionListener以外すべて
+** ItemProcessorによりJobExecutionListener以外も暗黙的に登録される
+. すべて
+** すべてのリスナー
+. 暗黙的に設定 (Bean定義のリスナー設定を使わない)
+** JobExecutionListener以外すべて
+
+* 異常系のリスナーメソッドも実行される
+
+|===
+
+[[ListenerOnTaskletOrientedJobWithAnnotation]]
+=== タスクレットモデルジョブにおけるリスナーのテスト(アノテーション版)
+タスクレットモデルジョブにおけるリスナーの動作を確認する。
+<<ListenerOnTaskletOrientedJob>>のアノテーションでも同様の挙動をすることを確認する。
+アノテーションによって実装した場合、<<ScopeInListenerOperatesOnTasklet>>と同様の挙動となるか確認する。
+
+[cols="5,20,25a,25a,25a", options="header"]
+.試験項目一覧
+|===
+|項番
+|観点
+|試験項目
+|試験条件
+|確認内容
+
+|1
+|正常系 +
+同期型起動
+|タスクレットデルでJob、Step、Tasklet、Chunkのスコープでどのリスナーが動作するかを確認する。
+
+|
+* 以下のリスナーを全てアノテーションベースで実装したリスナーを用意する（Taskletに実装）
+** JobExecutionListener
+** StepExecutionListener
+** ChunkListener
+** ItemReadListener
+** ItemProcessListener
+** ItemWriteListener
+* 各リスナーはログ出力を行う
+
+* 以下のスコープ箇所にリスナーを登録する
+. Job
+. Step
+. Tasklet
+. 上記すべて
+. 暗黙的に設定 (Bean定義のリスナー設定を使わない)
+
+|各スコープで実行されたリスナーを確認する。
+
+. Job
+** JobExecutionListener
+. Step
+** StepExecutionListener
+** ChunkListener
+. Tasklet
+** StepExecutionListener
+** 重複実行はない
+. すべて
+** JobExecutionListener
+** StepExecutionListener
+** ChunkListener
+** 重複実行はない
+. 暗黙的に設定 (Bean定義のリスナー設定を使わない)
+** すべて実行されない
+
+* 異常系のリスナーメソッドは実行されない
+
+* 以下のリスナーは実行されない
+** ItemReadListener
+** ItemProcessListener
+** ItemWriteListener
+
+|2
+|異常系 +
+同期型起動
+|タスクレットモデルでJob、Step、Tasklet、Chunkのスコープでどのリスナーが動作するかを確認する。
+
+|
+* 以下のリスナーを全てアノテーションベースで実装したリスナーを用意する（Taskletに実装）
+** JobExecutionListener
+** StepExecutionListener
+** ChunkListener
+** ItemReadListener
+** ItemProcessListener
+** ItemWriteListener
+* 各リスナーはログ出力を行う
+
+* 以下のスコープ箇所にリスナーを登録する
+. Job
+. Step
+. Tasklet
+. 上記すべて
+. 暗黙的に設定 (Bean定義のリスナー設定を使わない)
+
+* 以下の処理で例外が発生する
+** Tasklet
+
+|各スコープで実行されたリスナーを確認する。
+
+. Job
+** JobExecutionListener
+. Step
+** StepExecutionListener
+** ChunkListener
+** TaskletによりJobExecutionListener以外も暗黙的に登録される
+** 重複実行はない
+. Tasklet
+** StepExecutionListener
+** ChunkListener
+** TaskletによりJobExecutionListener以外も暗黙的に登録される
+** 重複実行はない
+. すべて
+** JobExecutionListener
+** StepExecutionListener
+** ChunkListener
+. 暗黙的に設定 (Bean定義のリスナー設定を使わない)
+** すべて実行されない
+
+* 異常系のリスナーメソッドも実行される
+
+* 以下のリスナーは実行されない
+** ItemReadListener
+** ItemProcessListener
+** ItemWriteListener
+
+|===
+
+[[ScopeInMixedListenerOperatesOnChunk]]
+=== チャンクモデルでリスナー実装の併用が動作するスコープのテスト
+チャンクモデルでリスナーが登録されるスコープによってどのリスナーが実行されるかを確認する。 +
+Listnerインターフェース実装とアノテーションベースListenerとの併用する。
+
+[cols="5,20,25a,25a,25a", options="header"]
+.試験項目一覧
+|===
+|項番
+|観点
+|試験項目
+|試験条件
+|確認内容
+
+|1
+|正常系 +
+同期型起動
+|チャンクモデルでJob、Step、Tasklet、Chunkのスコープでどのリスナーが動作するかを確認する。
+
+|
+以下のリスナーを実装したリスナーを用意する。
+
+.用意すべきリスナー
+* Listenerインタフェースを実装したリスナー
+* 全てアノテーションベースで実装したリスナーを用意する（ItemProcessorに実装）
+
+.実装すべきリスナー
+* JobExecutionListener
+* StepExecutionListener
+* ChunkListener
+* ItemReadListener
+* ItemProcessListener
+* ItemWriteListener
+
+* 各リスナーはログ出力を行う
+
+* 以下のスコープ箇所にリスナーを登録する
+
+.Listenerインタフェースを実装したリスナー
+. Job
+. Step
+. Tasklet
+. Chunk
+. 上記すべて
+
+.全てアノテーションベースで実装したリスナー
+. 暗黙的に設定 (processorへ設定するだけ)
+
+|各スコープで実行されたリスナーを確認する。
+
+.Listenerインタフェースを実装したリスナー
+. Job
+** JobExecutionListenerのみ
+. Step
+** JobExecutionListener以外すべて
+. Tasklet
+** JobExecutionListener以外すべて
+. Chunk
+** JobExecutionListener以外すべて
+. すべて
+** すべてのリスナー
+** 重複実行はない
+
+.全てアノテーションベースで実装したリスナー
+. Job
+** JobExecutionListener以外すべて
+. Step
+** JobExecutionListener以外すべて
+. Tasklet
+** JobExecutionListener以外すべて
+. Chunk
+** JobExecutionListener以外すべて
+. すべて
+** JobExecutionListener以外すべて
+
+* 異常系のリスナーメソッドは実行されない
+
+|2
+|異常系 +
+同期型起動
+|チャンクモデルでJob、Step、Tasklet、Chunkのスコープでどのリスナーが動作するかを確認する。
+
+|
+以下のリスナーを実装したリスナーを用意する。
+
+.用意すべきリスナー
+* Listenerインタフェースを実装したリスナー
+* 全てアノテーションベースで実装したリスナーを用意する（ItemProcessorに実装）
+
+.実装すべきリスナー
+* JobExecutionListener
+* StepExecutionListener
+* ChunkListener
+* ItemReadListener
+* ItemProcessListener
+* ItemWriteListener
+
+* 各リスナーはログ出力を行う
+
+* 以下のスコープ箇所にリスナーを登録する
+
+.Listenerインタフェースを実装したリスナー
+. Job
+. Step
+. Tasklet
+. Chunk
+. 上記すべて
+
+.全てアノテーションベースで実装したリスナーを用意する
+. 暗黙的に設定 (processorへ設定するだけ)
+
+* 以下の処理で例外が発生する
+** ItemReader
+** ItemProcessor
+** ItemWriter
+
+|各スコープで実行されたリスナーを確認する。
+
+.Listenerインタフェースを実装したリスナー
+. Job
+** JobExecutionListenerのみ
+. Step
+** JobExecutionListener以外すべて
+. Tasklet
+** JobExecutionListener以外すべて
+. Chunk
+** JobExecutionListener以外すべて
+. すべて
+** すべてのリスナー
+** 重複実行はない
+
+.全てアノテーションベースで実装したリスナー
+. Job
+** JobExecutionListener以外すべて
+. Step
+** JobExecutionListener以外すべて
+. Tasklet
+** JobExecutionListener以外すべて
+. Chunk
+** JobExecutionListener以外すべて
+. すべて
+** JobExecutionListener以外すべて
+
+* 異常系のリスナーメソッドも実行される
+
+|===
+
+[[ScopeInMIxedListenerOperatesOnTasklet]]
+=== タスクレットモデルでリスナー実装の併用が動作するスコープのテスト
+タスクレットモデルでリスナーが登録されるスコープによってどのリスナーが実行されるかを確認する。 +
+Listnerインターフェース実装とアノテーションベースListenerとの併用する。
+
+[cols="5,20,25a,25a,25a", options="header"]
+.試験項目一覧
+|===
+|項番
+|観点
+|試験項目
+|試験条件
+|確認内容
+
+|1
+|正常系 +
+同期型起動
+|タスクレットモデルでJob、Step、Tasklet、Chunkのスコープでどのリスナーが動作するかを確認する。
+
+|
+以下のリスナーを実装したリスナーを用意する。
+
+.用意すべきリスナー
+* Listenerインタフェースを実装したリスナー
+* 全てアノテーションベースで実装したリスナーを用意する（ItemProcessorに実装）
+
+.実装すべきリスナー
+* JobExecutionListener
+* StepExecutionListener
+* ChunkListener
+* ItemReadListener
+* ItemProcessListener
+* ItemWriteListener
+
+* 各リスナーはログ出力を行う
+
+* 以下のスコープ箇所にリスナーを登録する
+
+.Listenerインタフェースを実装したリスナー
+. Job
+. Step
+. Tasklet
+. 上記すべて
+
+.全てアノテーションベースで実装したリスナー
+. 暗黙的に設定 (processorへ設定するだけ)
+
+
+|各スコープで実行されたリスナーを確認する。
+
+.Listenerインタフェースを実装したリスナー
+. Job
+** JobExecutionListenerのみ
+. Step
+** JobExecutionListener以外すべて
+. Tasklet
+** JobExecutionListener以外すべて
+. すべて
+** すべてのリスナー
+** 重複実行はない
+
+.全てアノテーションベースで実装したリスナー
+. Job
+** すべて実行されない
+. Step
+** すべて実行されない
+. Tasklet
+** すべて実行されない
+. Chunk
+** すべて実行されない
+. すべて
+** すべて実行されない
+
+* 異常系のリスナーメソッドは実行されない
+
+|2
+|異常系 +
+同期型起動
+|タスクレットモデルでJob、Step、Tasklet、Chunkのスコープでどのリスナーが動作するかを確認する。
+
+|
+以下のリスナーを実装したリスナーを用意する。
+
+.用意すべきリスナー
+* Listenerインタフェースを実装したリスナー
+* 全てアノテーションベースで実装したリスナーを用意する（ItemProcessorに実装）
+
+.実装すべきリスナー
+* JobExecutionListener
+* StepExecutionListener
+* ChunkListener
+* ItemReadListener
+* ItemProcessListener
+* ItemWriteListener
+
+* 各リスナーはログ出力を行う
+
+* 以下のスコープ箇所にリスナーを登録する
+
+.Listenerインタフェースを実装したリスナー
+. Job
+. Step
+. Tasklet
+. 上記すべて
+
+.全てアノテーションベースで実装したリスナーを用意する
+. 暗黙的に設定 (processorへ設定するだけ)
+
+* 以下の処理で例外が発生する
+** ItemReader
+** ItemProcessor
+** ItemWriter
+
+|各スコープで実行されたリスナーを確認する。
+
+.Listenerインタフェースを実装したリスナー
+. Job
+** JobExecutionListenerのみ
+. Step
+** JobExecutionListener以外すべて
+. Tasklet
+** JobExecutionListener以外すべて
+. すべて
+** すべてのリスナー
+** 重複実行はない
+
+.全てアノテーションベースで実装したリスナー
+. Job
+** すべて実行されない
+. Step
+** すべて実行されない
+. Tasklet
+** すべて実行されない
+. Chunk
+** すべて実行されない
+. すべて
+** すべて実行されない
+
+* 異常系のリスナーメソッドも実行されない
+*
+|===
+
+[[ExceptionOccurredInListenerOnChunk]]
+=== チャンクモデルの前処理で例外を発生させるテスト
+チャンクモデルの前処理で例外が発生したときにリソースがクローズされることを確認する。
+
+[cols="5,20,25a,25a,25a", options="header"]
+.試験項目一覧
+|===
+|項番
+|観点
+|試験項目
+|試験条件
+|確認内容
+
+|1
+|異常系 +
+同期型起動
+|チャンクモデルのStepExecutionListener#beforeStep()で例外が発生したときにItemReader, ItemWriterのcloseメソッドが呼ばれていることを確認する。
+
+|
+* closeメソッドでログ出力を行うItemReader, ItemWriterを使用するジョブを実行する
+
+* StepExecutionListener#beforeStep()で例外を発生させる
+
+|ログ出力により、ItemReader, ItemWriterのcloseメソッドが呼ばれたことを確認する。
+
+|===
+
+[[JobAbortedInListener]]
+=== チャンクモデルとタスクレットモデルの前処理でジョブを中断させるテスト
+チャンクモデルとタスクレットモデルの前処理でジョブが中断されることを確認する。
+
+[cols="5,20,25a,25a,25a", options="header"]
+.試験項目一覧
+|===
+|項番
+|観点
+|試験項目
+|試験条件
+|確認内容
+
+|1
+|異常系 +
+同期型起動
+|チャンクモデルのStepExecutionListener#beforeStep()でジョブパラメータがジョブの起動条件を満たしておらず、ジョブが中断されることを確認する。
+
+|
+* コマンドライン引数でCommandLineJobRunnerにパラメータを設定する
+
+* StepExecutionListener#beforeStep()でパラメータの妥当性検証を行い、例外を発生させる
+
+|
+* ログ出力により、ItemReader, ItemWriterのopenメソッドが呼ばれていないことを確認する
+
+* ログ出力により、ジョブが中断されたことを確認する
+
+|2
+|異常系 +
+同期型起動
+|タスクレットモデルのStepExecutionListener#beforeStep()でジョブパラメータがジョブの起動条件を満たしておらず、ジョブが中断されることを確認する。
+
+|
+* コマンドライン引数でCommandLineJobRunnerにパラメータを設定する
+
+* StepExecutionListener#beforeStep()でパラメータの妥当性検証を行い、例外を発生させる
+
+|
+* ログ出力により、タスクレットの処理が呼ばれずにジョブが中断されたことを確認する
+
+|===

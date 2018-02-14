@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org/DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="jp.co.ntt.fw.macchinetta.batch.functionaltest.ch08.parallelandmultiple.repository.SalesSummaryRepository">
+
+    <select id="findByYearAndMonth" resultType="jp.co.ntt.fw.macchinetta.batch.functionaltest.app.model.performance.SalesPerformanceSummary">
+        <![CDATA[
+        SELECT
+            branch_id AS branchId, year, month, amount
+        FROM
+            sales_performance_summary
+        WHERE
+            year = #{year} AND month = #{month}
+        ORDER BY
+            branch_id ASC
+        OFFSET #{offset} ROWS
+        FETCH FIRST #{dataSize} ROWS ONLY
+        ]]>
+    </select>
+
+    <select id="countByYearAndMonth" resultType="_int">
+        <![CDATA[
+        SELECT
+            count(*)
+        FROM
+            sales_performance_summary
+        WHERE
+            year = #{year} AND month = #{month}
+        ]]>
+    </select>
+
+    <insert id="create" parameterType="jp.co.ntt.fw.macchinetta.batch.functionaltest.app.model.plan.SalesPlanSummary">
+        <![CDATA[
+        INSERT INTO
+            sales_plan_summary(branch_id, year, month, amount)
+        VALUES (
+            #{branchId}, #{year}, #{month}, #{amount}
+        )
+        ]]>
+    </insert>
+
+</mapper>
+

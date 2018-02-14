@@ -1,0 +1,51 @@
+Header Branch Id : 0001,0,0,,
+Header Year : 2016,0,0,,
+Header Month : 1,0,0,,
+0001,2016,1,C0001,1000
+0001,2016,1,C0002,1000
+0001,2016,1,C0003,1000
+Summary Month : 1,0,0,,3000
+Header Month : 2,0,0,,
+0001,2016,2,C0001,1000
+0001,2016,2,C0002,1000
+0001,2016,2,C0003,1000
+Summary Month : 2,0,0,,3000
+Summary Year : 2016,0,0,,6000
+Header Year : 2015,0,0,,
+Header Month : 2,0,0,,
+0001,2015,2,C0001,1000
+0001,2015,2,C0002,1000
+Summary Month : 2,0,0,,2000
+Header Month : 3,0,0,,
+0001,2015,3,C0003,1000
+Summary Month : 3,0,0,,1000
+Summary Year : 2015,0,0,,3000
+Summary Branch Id : 0001,0,0,,9000
+Header Branch Id : 0002,0,0,,
+Header Year : 2016,0,0,,
+Header Month : 1,0,0,,
+0002,2016,1,C0001,2000
+0002,2016,1,C0002,2000
+0002,2016,1,C0003,2000
+Summary Month : 1,0,0,,6000
+Summary Year : 2016,0,0,,6000
+Summary Branch Id : 0002,0,0,,6000
+Header Branch Id : 0003,0,0,,
+Header Year : 2016,0,0,,
+Header Month : 1,0,0,,
+0003,2016,1,C0001,3000
+Summary Month : 1,0,0,,3000
+Header Month : 2,0,0,,
+0003,2016,2,C0002,3000
+Summary Month : 2,0,0,,3000
+Summary Year : 2016,0,0,,6000
+Summary Branch Id : 0003,0,0,,6000
+Header Branch Id : 0004,0,0,,
+Header Year : 2016,0,0,,
+Header Month : 2,0,0,,
+0004,2016,2,C0003,4000
+0004,2016,2,C0004,4000
+0004,2016,2,C0005,4000
+Summary Month : 2,0,0,,12000
+Summary Year : 2016,0,0,,12000
+Summary Branch Id : 0004,0,0,,12000

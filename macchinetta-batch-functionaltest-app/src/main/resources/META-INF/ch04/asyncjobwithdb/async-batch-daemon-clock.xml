@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+       xmlns:c="http://www.springframework.org/schema/c"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:task="http://www.springframework.org/schema/task"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+            http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc.xsd
+            http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task.xsd
+            http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <import resource="classpath:META-INF/spring/async-batch-daemon.xml"/>
+
+    <!-- Overwrite bean definition -->
+    <bean id="jobRequestPollTask" class="org.terasoluna.batch.async.db.JobRequestPollTask"
+          c:transactionManager-ref="adminTransactionManager"
+          c:jobOperator-ref="jobOperator"
+          c:batchJobRequestRepository-ref="batchJobRequestRepository"
+          c:daemonTaskExecutor-ref="daemonTaskExecutor"
+          c:automaticJobRegistrar-ref="automaticJobRegistrar"
+          p:clock-ref="clock" />
+
+    <bean id="clock" class="java.time.Clock" factory-method="fixed"
+          c:fixedInstant="#{T(java.time.ZonedDateTime).parse('2016-12-31T16:00-08:00[America/Los_Angeles]').toInstant()}"
+          c:zone="#{T(java.time.ZoneId).of('PST', T(java.time.ZoneId).SHORT_IDS)}"/>
+
+</beans>

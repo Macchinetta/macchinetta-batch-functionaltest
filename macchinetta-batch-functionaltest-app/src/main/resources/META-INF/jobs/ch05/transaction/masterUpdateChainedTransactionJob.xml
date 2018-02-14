@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:batch="http://www.springframework.org/schema/batch"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:mybatis="http://mybatis.org/schema/mybatis-spring"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+             http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+             http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch.xsd
+             http://mybatis.org/schema/mybatis-spring http://mybatis.org/schema/mybatis-spring.xsd">
+
+    <import resource="classpath:META-INF/spring/job-base-context.xml"/>
+
+    <context:component-scan base-package="jp.co.ntt.fw.macchinetta.batch.functionaltest.app.common"/>
+    <context:component-scan base-package="jp.co.ntt.fw.macchinetta.batch.functionaltest.ch05.transaction.chain.transaction"/>
+    <context:component-scan base-package="jp.co.ntt.fw.macchinetta.batch.functionaltest.ch05.transaction.listener"/>
+    <mybatis:scan
+            base-package="jp.co.ntt.fw.macchinetta.batch.functionaltest.ch05.transaction.repository.admin"
+            factory-ref="adminSqlSessionFactory"/>
+    <mybatis:scan
+            base-package="jp.co.ntt.fw.macchinetta.batch.functionaltest.ch05.transaction.repository.job"
+            factory-ref="jobSqlSessionFactory"/>
+
+    <bean id="reader" class="org.springframework.batch.item.file.FlatFileItemReader" scope="step"
+          p:resource="file:#{jobParameters['inputFile']}">
+        <property name="lineMapper">
+            <bean class="org.springframework.batch.item.file.mapping.DefaultLineMapper"
+                  p:fieldSetMapper-ref="compositMasterFieldSetMapper">
+                <property name="lineTokenizer">
+                    <bean class="org.springframework.batch.item.file.transform.DelimitedLineTokenizer"
+                          p:names="customerId,customerName,customerAddress,customerTel,branchId,branchName,branchAddress,branchTel"/>
+                </property>
+            </bean>
+        </property>
+    </bean>
+
+    <batch:job id="masterUpdateChainedTransactionJob" job-repository="jobRepository">
+        <batch:step id="masterUpdateChainedTransactionJob.step01">
+            <batch:tasklet transaction-manager="chainedTransactionManager">
+                <batch:chunk reader="reader" writer="compositMasterItemWriter" commit-interval="10"/>
+            </batch:tasklet>
+        </batch:step>
+        <batch:listeners>
+            <batch:listener ref="jobExecutionLoggingListener"/>
+        </batch:listeners>
+    </batch:job>
+
+    <bean id="adminSqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean"
+          p:dataSource-ref="adminDataSource">
+        <property name="configuration">
+            <bean class="org.apache.ibatis.session.Configuration"
+                  p:localCacheScope="STATEMENT"
+                  p:lazyLoadingEnabled="true"
+                  p:aggressiveLazyLoading="false"
+                  p:defaultFetchSize="1000"
+                  p:defaultExecutorType="REUSE"/>
+        </property>
+    </bean>
+
+    <bean id="chainedTransactionManager" class="org.springframework.data.transaction.ChainedTransactionManager">
+        <constructor-arg>
+            <list>
+                <ref bean="adminTransactionManager"/>
+                <ref bean="jobTransactionManager"/>
+            </list>
+        </constructor-arg>
+    </bean>
+
+</beans>

@@ -1,0 +1,367 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>macchinetta-batch-functionaltest</artifactId>
+    <packaging>jar</packaging>
+
+    <parent>
+        <groupId>jp.co.ntt.fw.macchinetta.batch</groupId>
+        <artifactId>macchinetta-batch-functionaltest-build</artifactId>
+        <version>2.0.0.RELEASE</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+
+    <name>test</name>
+    <description>Functionality Test Application using Macchinetta Batch Framework</description>
+    <inceptionYear>2017</inceptionYear>
+    <licenses>
+        <license>
+            <name>Apache License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>manual</distribution>
+        </license>
+    </licenses>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>${maven-compiler-plugin.version}</version>
+                    <configuration>
+                        <compilerId>groovy-eclipse-compiler</compilerId>
+                        <source>${java-version}</source>
+                        <target>${java-version}</target>
+                    </configuration>
+                    <dependencies>
+                        <dependency>
+                            <groupId>org.codehaus.groovy</groupId>
+                            <artifactId>groovy-eclipse-compiler</artifactId>
+                            <version>${groovy-eclipse-compiler.version}</version>
+                        </dependency>
+                        <dependency>
+                            <groupId>org.codehaus.groovy</groupId>
+                            <artifactId>groovy-eclipse-batch</artifactId>
+                            <version>${groovy-eclipse-batch.version}</version>
+                        </dependency>
+                    </dependencies>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-failsafe-plugin</artifactId>
+                    <version>${maven-failsafe-plugin.version}</version>
+                    <configuration>
+                        <includes>
+                            <include>**/*Spec.java</include>
+                        </includes>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <goals>
+                                <goal>integration-test</goal>
+                                <goal>verify</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-resources-plugin</artifactId>
+                    <version>${maven-resources-plugin.version}</version>
+                    <configuration>
+                        <encoding>${encoding}</encoding>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-dependency-plugin</artifactId>
+                    <version>${maven-dependency-plugin.version}</version>
+                    <executions>
+                        <execution>
+                            <id>copy-dependencies</id>
+                            <phase>package</phase>
+                            <goals>
+                                <goal>copy-dependencies</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+
+                <!-- licence and formatter -->
+                <plugin>
+                    <groupId>com.google.code.maven-license-plugin</groupId>
+                    <artifactId>maven-license-plugin</artifactId>
+                    <version>${com.google.code.maven-license-plugin.version}</version>
+                    <configuration>
+                        <header>${project.root.basedir}/../license/header.txt</header>
+                        <includes>
+                            <include>src/**/*.java</include>
+                            <include>src/**/*.groovy</include>
+                        </includes>
+                        <encoding>${encoding}</encoding>
+                        <headerDefinitions>
+                            <headerDefinition>${project.root.basedir}/../license/header-definition.xml
+                            </headerDefinition>
+                        </headerDefinitions>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>net.revelc.code</groupId>
+                    <artifactId>formatter-maven-plugin</artifactId>
+                    <version>${formatter-maven-plugin.version}</version>
+                    <configuration>
+                        <configFile>${project.root.basedir}/../eclipse/formatter.xml
+                        </configFile>
+                        <lineEnding>LF</lineEnding>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>net.revelc.code</groupId>
+                <artifactId>formatter-maven-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>com.google.code.maven-license-plugin</groupId>
+                <artifactId>maven-license-plugin</artifactId>
+            </plugin>
+        </plugins>
+        <!-- Setting the resource according to the test environment -->
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+            </resource>
+            <resource>
+                <directory>${project.root.basedir}/${project.config.resource.directory.rdbms}</directory>
+            </resource>
+            <resource>
+                <directory>${project.root.basedir}/${project.config.resource.directory.mongo}</directory>
+            </resource>
+        </resources>
+    </build>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>io.spring.platform</groupId>
+                <artifactId>platform-bom</artifactId>
+                <version>${io.spring.platform.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>jp.co.ntt.fw.macchinetta.batch</groupId>
+                <artifactId>macchinetta-batch-functionaltest-app</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>jp.co.ntt.fw.macchinetta.batch</groupId>
+                <artifactId>macchinetta-batch-functionaltest-util</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.athaydes</groupId>
+                <artifactId>spock-reports</artifactId>
+                <version>${com.athaydes.spock-reports.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.dbunit</groupId>
+                <artifactId>dbunit</artifactId>
+                <version>${org.dbunit.dbunit.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.codehaus.groovy.modules.http-builder</groupId>
+                <artifactId>http-builder</artifactId>
+                <version>${org.codehaus.groovy.modules.http-builder.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.mongodb</groupId>
+                <artifactId>mongo-java-driver</artifactId>
+                <version>${mongo-java-driver.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.oracle.jdbc</groupId>
+                <artifactId>ojdbc8</artifactId>
+                <version>${oracle.jdbc.version}</version>
+            </dependency>
+
+        </dependencies>
+    </dependencyManagement>
+
+    <dependencies>
+
+        <dependency>
+            <groupId>jp.co.ntt.fw.macchinetta.batch</groupId>
+            <artifactId>macchinetta-batch-functionaltest-app</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>jp.co.ntt.fw.macchinetta.batch</groupId>
+            <artifactId>macchinetta-batch-functionaltest-util</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.codehaus.groovy</groupId>
+            <artifactId>groovy-all</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.spockframework</groupId>
+            <artifactId>spock-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.spockframework</groupId>
+            <artifactId>spock-spring</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.athaydes</groupId>
+            <artifactId>spock-reports</artifactId>
+            <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>*</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>org.dbunit</groupId>
+            <artifactId>dbunit</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.codehaus.groovy.modules.http-builder</groupId>
+            <artifactId>http-builder</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+    </dependencies>
+
+    <properties>
+        <maven-compiler-plugin.version>3.5.1</maven-compiler-plugin.version>
+        <groovy-eclipse-compiler.version>2.9.2-01</groovy-eclipse-compiler.version>
+        <groovy-eclipse-batch.version>2.4.3-01</groovy-eclipse-batch.version>
+        <maven-failsafe-plugin.version>2.19.1</maven-failsafe-plugin.version>
+        <maven-resources-plugin.version>3.0.1</maven-resources-plugin.version>
+        <maven-dependency-plugin.version>2.10</maven-dependency-plugin.version>
+        <com.google.code.maven-license-plugin.version>1.4.0</com.google.code.maven-license-plugin.version>
+        <formatter-maven-plugin.version>0.5.2</formatter-maven-plugin.version>
+        <io.spring.platform.version>Brussels-SR5</io.spring.platform.version>
+
+        <com.athaydes.spock-reports.version>1.2.12</com.athaydes.spock-reports.version>
+
+        <org.dbunit.dbunit.version>2.5.3</org.dbunit.dbunit.version>
+
+        <org.codehaus.groovy.modules.http-builder.version>0.7.1</org.codehaus.groovy.modules.http-builder.version>
+
+        <mongo-java-driver.version>2.13.3</mongo-java-driver.version>
+
+        <oracle.jdbc.version>12.2.0.1</oracle.jdbc.version>
+
+        <project.root.basedir>${project.basedir}</project.root.basedir>
+    </properties>
+
+    <profiles>
+        <profile>
+            <id>postgresql9-local</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>org.postgresql</groupId>
+                    <artifactId>postgresql</artifactId>
+                    <scope>runtime</scope>
+                </dependency>
+            </dependencies>
+            <properties>
+                <project.config.resource.directory.rdbms>config/rdbms/postgresql9/local</project.config.resource.directory.rdbms>
+                <project.config.resource.directory.mongo>config/mongo/local</project.config.resource.directory.mongo>
+            </properties>
+        </profile>
+        <profile>
+            <id>postgresql9-it</id>
+            <dependencies>
+                <dependency>
+                    <groupId>org.postgresql</groupId>
+                    <artifactId>postgresql</artifactId>
+                    <scope>runtime</scope>
+                </dependency>
+            </dependencies>
+            <properties>
+                <project.config.resource.directory.rdbms>config/rdbms/postgresql9/it</project.config.resource.directory.rdbms>
+                <project.config.resource.directory.mongo>config/mongo/it</project.config.resource.directory.mongo>
+            </properties>
+        </profile>
+        <profile>
+            <id>oracle12c-local</id>
+            <dependencies>
+                <dependency>
+                    <groupId>com.oracle.jdbc</groupId>
+                    <artifactId>ojdbc8</artifactId>
+                    <scope>runtime</scope>
+                </dependency>
+            </dependencies>
+            <properties>
+                <project.config.resource.directory.rdbms>config/rdbms/oracle12c/local</project.config.resource.directory.rdbms>
+                <project.config.resource.directory.mongo>config/mongo/local</project.config.resource.directory.mongo>
+            </properties>
+        </profile>
+        <profile>
+            <id>oracle12c-it</id>
+            <dependencies>
+                <dependency>
+                    <groupId>com.oracle.jdbc</groupId>
+                    <artifactId>ojdbc8</artifactId>
+                    <scope>runtime</scope>
+                </dependency>
+            </dependencies>
+            <properties>
+                <project.config.resource.directory.rdbms>config/rdbms/oracle12c/it</project.config.resource.directory.rdbms>
+                <project.config.resource.directory.mongo>config/mongo/it</project.config.resource.directory.mongo>
+            </properties>
+        </profile>
+    </profiles>
+</project>

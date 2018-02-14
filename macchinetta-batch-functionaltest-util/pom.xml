@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>macchinetta-batch-functionaltest-util</artifactId>
+    <packaging>jar</packaging>
+
+    <parent>
+        <groupId>jp.co.ntt.fw.macchinetta.batch</groupId>
+        <artifactId>macchinetta-batch-functionaltest-build</artifactId>
+        <version>2.0.0.RELEASE</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+
+    <name>util</name>
+    <description>Utilities for test application on Macchinetta Batch Framework</description>
+    <inceptionYear>2017</inceptionYear>
+    <licenses>
+        <license>
+            <name>Apache License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>manual</distribution>
+        </license>
+    </licenses>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>${maven-compiler-plugin.version}</version>
+                    <configuration>
+                        <compilerId>groovy-eclipse-compiler</compilerId>
+                        <source>${java-version}</source>
+                        <target>${java-version}</target>
+                    </configuration>
+                    <dependencies>
+                        <dependency>
+                            <groupId>org.codehaus.groovy</groupId>
+                            <artifactId>groovy-eclipse-compiler</artifactId>
+                            <version>${groovy-eclipse-compiler.version}</version>
+                        </dependency>
+                        <dependency>
+                            <groupId>org.codehaus.groovy</groupId>
+                            <artifactId>groovy-eclipse-batch</artifactId>
+                            <version>${groovy-eclipse-batch.version}</version>
+                        </dependency>
+                    </dependencies>
+                </plugin>
+
+                <!-- licence and formatter -->
+                <plugin>
+                    <groupId>com.google.code.maven-license-plugin</groupId>
+                    <artifactId>maven-license-plugin</artifactId>
+                    <version>${com.google.code.maven-license-plugin.version}</version>
+                    <configuration>
+                        <header>${project.root.basedir}/../license/header.txt</header>
+                        <includes>
+                            <include>src/**/*.java</include>
+                            <include>src/**/*.groovy</include>
+                        </includes>
+                        <encoding>${encoding}</encoding>
+                        <headerDefinitions>
+                            <headerDefinition>${project.root.basedir}/../license/header-definition.xml
+                            </headerDefinition>
+                        </headerDefinitions>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>net.revelc.code</groupId>
+                    <artifactId>formatter-maven-plugin</artifactId>
+                    <version>${formatter-maven-plugin.version}</version>
+                    <configuration>
+                        <configFile>${project.root.basedir}/../eclipse/formatter.xml
+                        </configFile>
+                        <lineEnding>LF</lineEnding>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>net.revelc.code</groupId>
+                <artifactId>formatter-maven-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>com.google.code.maven-license-plugin</groupId>
+                <artifactId>maven-license-plugin</artifactId>
+            </plugin>
+
+        </plugins>
+    </build>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>io.spring.platform</groupId>
+                <artifactId>platform-bom</artifactId>
+                <version>${io.spring.platform.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.dbunit</groupId>
+                <artifactId>dbunit</artifactId>
+                <version>${org.dbunit.dbunit.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.codehaus.groovy.modules.http-builder</groupId>
+                <artifactId>http-builder</artifactId>
+                <version>${org.codehaus.groovy.modules.http-builder.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.gmongo</groupId>
+                <artifactId>gmongo</artifactId>
+                <version>${com.gmongo.verson}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.codehaus.groovy</groupId>
+                        <artifactId>groovy</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+
+            <dependency>
+                <groupId>org.terasoluna.batch</groupId>
+                <artifactId>terasoluna-batch</artifactId>
+                <version>${terasoluna-batch.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.mongodb</groupId>
+                <artifactId>mongo-java-driver</artifactId>
+                <version>${mongo-java-driver.version}</version>
+            </dependency>
+
+        </dependencies>
+    </dependencyManagement>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.terasoluna.batch</groupId>
+            <artifactId>terasoluna-batch</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-test</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.codehaus.groovy</groupId>
+            <artifactId>groovy-all</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.dbunit</groupId>
+            <artifactId>dbunit</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.codehaus.groovy.modules.http-builder</groupId>
+            <artifactId>http-builder</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.gmongo</groupId>
+            <artifactId>gmongo</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-dbcp2</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+    </dependencies>
+
+    <properties>
+        <maven-compiler-plugin.version>3.5.1</maven-compiler-plugin.version>
+        <groovy-eclipse-compiler.version>2.9.2-01</groovy-eclipse-compiler.version>
+        <groovy-eclipse-batch.version>2.4.3-01</groovy-eclipse-batch.version>
+        <com.google.code.maven-license-plugin.version>1.4.0</com.google.code.maven-license-plugin.version>
+        <formatter-maven-plugin.version>0.5.2</formatter-maven-plugin.version>
+
+        <io.spring.platform.version>Brussels-SR5</io.spring.platform.version>
+
+        <org.dbunit.dbunit.version>2.5.3</org.dbunit.dbunit.version>
+
+        <terasoluna-batch.version>5.1.0.RELEASE</terasoluna-batch.version>
+
+        <ch.qos.logback.contrib.version>0.1.5</ch.qos.logback.contrib.version>
+
+        <org.codehaus.groovy.modules.http-builder.version>0.7.1</org.codehaus.groovy.modules.http-builder.version>
+
+        <com.gmongo.verson>1.5</com.gmongo.verson>
+
+        <mongo-java-driver.version>2.13.3</mongo-java-driver.version>
+
+        <project.root.basedir>${project.basedir}</project.root.basedir>
+    </properties>
+</project>

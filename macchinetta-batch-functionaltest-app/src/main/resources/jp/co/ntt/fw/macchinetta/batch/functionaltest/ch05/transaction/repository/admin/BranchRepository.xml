@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org/DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="jp.co.ntt.fw.macchinetta.batch.functionaltest.ch05.transaction.repository.admin.BranchRepository">
+
+    <select id="findOne" resultType="jp.co.ntt.fw.macchinetta.batch.functionaltest.app.model.mst.Branch">
+        <![CDATA[
+        SELECT
+            branch_id AS branchId,
+            branch_name AS branchName,
+            branch_address AS branchAddress,
+            branch_tel AS branchTel,
+            create_date AS createDate,
+            update_date AS updateDate
+        FROM
+            branch_mst
+        WHERE
+            branch_id = #{branchId}
+        ]]>
+    </select>
+
+    <select id="findAll" resultType="jp.co.ntt.fw.macchinetta.batch.functionaltest.app.model.mst.Branch">
+        <![CDATA[
+        SELECT
+            branch_id AS branchId,
+            branch_name AS branchName,
+            branch_address AS branchAddress,
+            branch_tel AS branchTel,
+            create_date AS createDate,
+            update_date AS updateDate
+        FROM
+            branch_mst
+        ORDER BY
+            branch_id
+        ]]>
+    </select>
+
+    <insert id="create" parameterType="jp.co.ntt.fw.macchinetta.batch.functionaltest.app.model.mst.Branch">
+        <![CDATA[
+        INSERT INTO branch_mst (
+            branch_id,
+            branch_name,
+            branch_address,
+            branch_tel,
+            create_date )
+        VALUES (
+            #{branchId},
+            #{branchName},
+            #{branchAddress},
+            #{branchTel},
+            #{createDate} )
+        ]]>
+    </insert>
+</mapper>
+

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:batch="http://www.springframework.org/schema/batch"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:task="http://www.springframework.org/schema/task"
+       xmlns:mybatis="http://mybatis.org/schema/mybatis-spring"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+             http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+             http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch.xsd
+             http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task.xsd
+             http://mybatis.org/schema/mybatis-spring http://mybatis.org/schema/mybatis-spring.xsd">
+
+    <import resource="classpath:META-INF/spring/job-base-context.xml"/>
+
+    <context:component-scan base-package="jp.co.ntt.fw.macchinetta.batch.functionaltest.app.common"/>
+    <context:component-scan base-package="jp.co.ntt.fw.macchinetta.batch.functionaltest.ch08.parallelandmultiple.listener"/>
+    <context:component-scan base-package="jp.co.ntt.fw.macchinetta.batch.functionaltest.ch08.parallelandmultiple.multiple"/>
+    <mybatis:scan
+            base-package="jp.co.ntt.fw.macchinetta.batch.functionaltest.ch08.parallelandmultiple.repository;jp.co.ntt.fw.macchinetta.batch.functionaltest.app.repository.performance"
+            factory-ref="jobSqlSessionFactory"/>
+
+    <bean id="reader" class="org.mybatis.spring.batch.MyBatisCursorItemReader" scope="step"
+          p:queryId="jp.co.ntt.fw.macchinetta.batch.functionaltest.app.repository.performance.InvoiceRepository.summarizeInvoice"
+          p:sqlSessionFactory-ref="jobSqlSessionFactory">
+        <property name="parameterValues">
+            <map>
+                <entry key="branchId" value="#{stepExecutionContext['branchId']}"/>
+            </map>
+        </property>
+    </bean>
+
+    <bean id="writer" class="org.mybatis.spring.batch.MyBatisBatchItemWriter"
+          p:statementId="jp.co.ntt.fw.macchinetta.batch.functionaltest.app.repository.performance.SalesPerformanceDetailRepository.create"
+          p:sqlSessionTemplate-ref="batchModeSqlSessionTemplate"/>
+
+    <batch:step id="multipleInvoiceSummarizeJob.slave">
+        <batch:tasklet transaction-manager="jobTransactionManager">
+            <batch:chunk reader="reader" writer="writer" commit-interval="10"/>
+            <batch:listeners>
+                <batch:listener ref="stepExecutionLoggingListener"/>
+            </batch:listeners>
+        </batch:tasklet>
+    </batch:step>
+
+    <batch:job id="multipleInvoiceSummarizeJob" job-repository="jobRepository">
+        <batch:step id="multipleInvoiceSummarizeJob.master">
+            <batch:partition partitioner="branchPartitioner" step="multipleInvoiceSummarizeJob.slave">
+                <batch:handler grid-size="${grid.size}" task-executor="parallelTaskExecutor"/>
+            </batch:partition>
+        </batch:step>
+        <batch:listeners>
+            <batch:listener ref="jobExecutionLoggingListener"/>
+        </batch:listeners>
+    </batch:job>
+
+    <task:executor id="parallelTaskExecutor" pool-size="${thread.size}" queue-capacity="10"/>
+
+</beans>

@@ -1,0 +1,232 @@
+= データベースアクセスの機能試験
+:table-caption!:
+:icons: font
+:sectnums!:
+
+== テストケース
+テストケースクラス：jp.co.ntt.fw.macchinetta.batch.functionaltest.ch05.DBAsccessSpec
+
+[cols="5,25a,70a", options="headers"]
+.テストケース一覧
+|===
+|項番
+|テストケース
+|確認事項
+
+|1
+|<<configuration>>
+|
+* 以下の項目は、基本的にはMyBatisを利用するための設定の話であるため、試験は不要と考える。
+** データソースの設定
+** MyBatis3の設定
+** MapperXMLの定義
+
+* 以下の項目は、Batch特有の確認が必要なため試験する
+** MyBatis-Springの設定
+*** MapperI/Fと関連付けをすることで、ItemReader/ItemWriterでもMapperに定義されたSQLが利用できることを確認
+
+|2
+|ItemReaderにおけるデータベースアクセス
+|
+* MyBatisCursorItemReaderによるデータアクセス
+** 項番1で利用するため、試験不要
+
+|3
+|<<itemWriter>>
+|
+* MyBatisBatchItemWriterによるデータアクセス
+** 項番1で利用するため、正常系は試験不要
+** Batchモードでの更新
+*** 設定の確認だけとする。
+
+|4
+|<<itemProcessorAndListener>>
+|
+* Mapperインタフェースが利用できることの確認
+** ItemListenerではMapperインタフェースによりDBデータ取得を行う
+*** マスタデータを一括で取得し、以降の処理ではその取得結果を参照することでI/Oを低減するケースを想定する。
+** ItemProcessorではMapperインタフェースによりDBデータ取得を行う
+*** 業務データを入力レコードに応じて都度で取得するケースを想定する。
+** ItemWriterではMyBatisBatchItemWriterによるデータ更新を行う
+
+|5
+|<<compositeItemWriter>>
+|
+* 複数テーブルの更新を確認する。
+
+|===
+
+== 試験項目一覧
+各試験の項目一覧を示す。
+
+:sectnums:
+:leveloffset: -1
+
+[[configuration]]
+=== 設定のテスト
+データベースアクセスの設定を確認する。
+
+[cols="5,20,25a,25a,25a", options="header"]
+.試験項目一覧
+|===
+|項番
+|観点
+|試験項目
+|試験条件
+|確認内容
+
+|1
+|正常系 +
+同期型起動
+|MapperFactoryBeanによる登録
+|
+* MapperFactoryBeanを利用して、SQLMapperとインタフェースを関連付けをする
+* SQLMapperに定義されているSQLを利用する
+** MyBatisCursorItemReader
+** MyBatisBatchItemWriter
+|
+* ログ出力により、SQLが利用されていること
+* DBにより、データ取得と更新が行われたこと
+
+|2
+|正常系 +
+同期型起動
+|MapperFactoryBeanによる登録
+|
+* mybatis:scanを利用して、SQLMapperとインタフェースを関連付けをする
+* SQLMapperに定義されているSQLを利用する
+** MyBatisCursorItemReader
+** MyBatisBatchItemWriter
+|
+* ログ出力により、SQLが利用されていること
+* DBにより、データ取得と更新が行われたこと
+
+|===
+
+[[itemWriter]]
+=== ItemWriterにおけるデータベースアクセスのテスト
+ItemWriterにおけるデータベースアクセスを確認する。
+
+[cols="5,20,25a,25a,25a", options="header"]
+.試験項目一覧
+|===
+|項番
+|観点
+|試験項目
+|試験条件
+|確認内容
+
+|1
+|異常系 +
+同期型起動
+|Batchモードでの更新になることを確認する
+|
+* MyBatisBatchItemWriterに設定するSqlSessionTemplateをバッチモード以外にする
+** executorType="BATCH"以外
+|
+* ログ出力により、Batchモードではない例外が発生していること
+
+
+|===
+
+
+[[itemProcessorAndListener]]
+=== ItemProcessorや各種Listenerにおけるデータベースアクセス
+ItemProcessorとItemWriterを併用するデータベースアクセスを確認する。
+
+[cols="5,20,25a,25a,25a", options="header"]
+.試験項目一覧
+|===
+|項番
+|観点
+|試験項目
+|試験条件
+|確認内容
+
+|1
+|正常系 +
+同期型起動
+|Readerで取得したデータをもとに、Processorで追加取得したデータで加工できること
+|
+* ItemProcessorではMapperインタフェースによるデータアクセスを行う
+* ItemWriterではMyBatisBatchItemWriterによるDB更新を行う
+|
+* ItemProcessorによるDBデータ取得が行われていること
+* ItemProcessorで追加取得/加工したデータがwriterに引き継がれること
+* ItemWriterによるDBデータ更新が行われていること
+
+|2
+|正常系 +
+同期型起動
+|Listenerで一括取得したデータをもとに、Processorで入力データを加工できること
+|
+* StepExecutionListenerではMapperインタフェースによるデータアクセスを行う
+* ItemWriterではMyBatisBatchItemWriterによるDB更新を行う
+|
+* StepExecutionListenerによるDBデータ取得が行われていること
+* StepExecutionListenerで取得したデータがwriterに引き継がれること
+* ItemWriterによるDBデータ更新が行われていること
+
+|3
+|異常系 +
+同期起動型
+|ItemProcessorでのデータ更新
+|
+* BATCHモードのMyBatisBatchItemWriterとREUSEモードのMapperインタフェースの併用
+** 更新するSQLはそれぞれ異なる。
+|
+* ジョブが異常終了すること
+* 同一トランザクションでExecutorTypeを変更できないという例外が発生する
+
+|4
+|異常系 +
+同期起動型
+|ItemProcessorでのデータ更新
+|
+* BATCHモードのMyBatisBatchItemWriterとBATCHモードのMapperインタフェースの併用
+** 更新するSQLはそれぞれ異なる。
+|
+* ジョブが異常終了すること
+* ItemWriter以外でBatch更新が行われたという例外が発生する
+
+
+|===
+
+[[compositeItemWriter]]
+=== CompositeItemWriterにおけるデータベースアクセス
+CompositeItemWriterによる複数テーブルを更新できることを確認する。
+
+[cols="5,20,25a,25a,25a", options="header"]
+.試験項目一覧
+|===
+|項番
+|観点
+|試験項目
+|試験条件
+|確認内容
+
+|1
+|正常系 +
+同期型起動
+|CompositeItemWriterによる複数テーブルを更新
+|
+* CompositeItemWriterによる複数テーブルを更新する
+** MyBatisBatchItemWriterによるDB更新を行う
+|
+* ジョブが正常終了すること
+* 複数テーブルのデータ更新が行われていること
+
+|2
+|異常系 +
+同期型起動
+|CompositeItemWriterによる複数テーブルを更新
+|
+* CompositeItemWriterによる複数テーブルを更新する
+** MyBatisBatchItemWriterによるDB更新を行う
+* 任意の１つのテーブルの更新に失敗する。
+|
+* ジョブが異常終了すること
+* 更新に失敗する前のチャンク分のデータは、複数テーブルのデータ更新が行われていること
+* 更新に失敗するデータを含むチャンク以降は、複数テーブルのデータ更新が行われていないこと
+
+|===

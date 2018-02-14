@@ -1,0 +1,156 @@
+= 同期実行の際にJobRepositoryはH2、業務データは外部DB(PostgreSQL,Oracle等)を使用した場合の機能試験
+:table-caption!:
+:icons: font
+
+== テストケース
+
+同期実行の際にJobRepositoryはH2、業務データは外部DB(PostgreSQL,Oracle等)を使用した場合に各機能が期待通り動作することを確認する。
+
+テストケースクラス：jp.co.ntt.fw.macchinetta.batch.functionaltest.ch07.SyncJobUsingEmbeddedDBSpec
+
+[cols="5,25,70a", options="headers"]
+.テストケース一覧
+|===
+|項番
+|テストケース
+|確認事項
+
+|1
+|<<JobParameter>>
+|H2でジョブパラメータの正常系の試験が正常に動作することを確認する。 +
+同期実行の確認はこのテストケースで確認したものとする。
+
+|2
+|<<Transaction>>
+|H2でトランザクション制御の正常系の試験が正常に動作することを確認する。 +
+データベースアクセスの確認はこのテストケースで確認したものとする。
+
+|3
+|<<DBAccess>>
+|H2でデータベースアクセスの正常系の試験が正常に動作することを確認する。
+
+|4
+|<<ReProcessing>>
+|H2で処理の再実行の状態ベースリスタートの試験が正常に動作することを確認する。
+
+|5
+|<<FlowControll>>
+|H2でフロー制御の正常系/異常系の試験が正常に動作することを確認する。
+
+|6
+|<<ParallelAndMultiple>>
+|H2で並列処理と多重処理の試験が正常に動作することを確認する。
+|===
+
+== 試験項目一覧
+各試験の項目一覧を示す。
+
+:sectnums:
+:leveloffset: -1
+
+[[JobParameter]]
+=== ジョブパラメータのテスト
+
+[cols="10,30,60a", options="header"]
+.試験項目一覧
+|===
+|項番
+|観点
+|試験項目
+
+|1
+|正常系
+|<<Ch04_JobParameter.adoc#combinationParametersAndProperties,ジョブ起動パラメータの機能試験 項番 4.1>>
+|===
+
+[[Transaction]]
+=== トランザクション制御のテスト
+
+[cols="10,30,60a", options="header"]
+.試験項目一覧
+|===
+|項番
+|観点
+|試験項目
+
+|1
+|正常系
+|<<Ch05_Transaction.adoc#chunkModel,トランザクション制御の機能試験 項番 1.1.1>>
+
+* ジョブ実行後の``StepExecution``の内容の検証は実施不可のため省略する。
+|===
+
+[[DBAccess]]
+=== データベースアクセス制御のテスト
+
+[cols="10,30,60a", options="header"]
+.試験項目一覧
+|===
+|項番
+|観点
+|試験項目
+
+|1
+|正常系
+|<<Ch05_DBAccess.adoc#itemProcessorAndListener,= データベースアクセスの機能試験 項番 3.1>>
+|===
+
+[[ReProcessing]]
+=== 処理の再実行のテスト
+
+[cols="10,30,60a", options="header"]
+.試験項目一覧
+|===
+|項番
+|観点
+|試験項目
+
+|1
+|正常系 +
+状態態ベースリスタート
+|<<Ch06_ReProcessing.adoc#restart,処理の再実行の機能試験 項番 2.2>>
+|===
+
+[[FlowControll]]
+=== フロー制御のテスト
+
+[cols="10,30,60a", options="header"]
+.試験項目一覧
+|===
+|項番
+|観点
+|試験項目
+
+|1
+|正常系
+|<<Ch08_FlowControl.adoc#PassingDataToFutureSteps,フロー制御の機能試験 項番 4.1>>
+
+|2
+|異常系
+|<<Ch08_FlowControl.adoc#ConditionalFlow,フロー制御の機能試験 項番 2.1-3>>
+
+* 項番2.4はリスタートによる回復の検証であり実施不可のため省略する。
+|===
+
+[[ParallelAndMultiple]]
+=== 並列処理と多重処理のテスト
+
+[cols="10,30,60a", options="header"]
+.試験項目一覧
+|===
+|項番
+|観点
+|試験項目
+
+|1
+|並列処理
+|<<Ch08_ParallelAndMultiple.adoc#ParallelStep,並列処理と多重処理の機能試験 項番 1.3>>
+
+* ジョブ実行後の``StepExecution``の内容の検証は実施不可のため省略する。
+
+|2
+|多重処理
+|<<Ch08_ParallelAndMultiple.adoc#combinationParametersAndProperties,並列処理と多重処理の機能試験 項番 2.1-2>>
+
+* ジョブ実行後の``StepExecution``の内容の検証は実施不可のため省略する。
+|===
