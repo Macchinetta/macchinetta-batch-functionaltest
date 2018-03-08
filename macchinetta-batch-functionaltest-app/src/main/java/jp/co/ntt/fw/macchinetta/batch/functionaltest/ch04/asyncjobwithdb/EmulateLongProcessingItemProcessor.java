@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 NTT Corporation
+ * Copyright (C) 2018 NTT Corporation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,8 @@
  */
 package jp.co.ntt.fw.macchinetta.batch.functionaltest.ch04.asyncjobwithdb;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.batch.item.ItemProcessor;
 
 import java.util.concurrent.TimeUnit;
@@ -25,6 +27,11 @@ import java.util.concurrent.TimeUnit;
  * @since 5.0.0
  */
 public class EmulateLongProcessingItemProcessor implements ItemProcessor<Object, Object> {
+
+    /**
+     * Logger.
+     */
+    private static final Logger logger = LoggerFactory.getLogger(EmulateLongProcessingItemProcessor.class);
 
     /**
      * Sleeping time (milliseconds).
@@ -45,6 +52,8 @@ public class EmulateLongProcessingItemProcessor implements ItemProcessor<Object,
     public Object process(Object item) throws Exception {
 
         TimeUnit.MILLISECONDS.sleep(sleepTime);
+
+        logger.info("Long Process emulated.");
 
         return item;
     }

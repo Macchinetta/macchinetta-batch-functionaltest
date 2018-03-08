@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 NTT Corporation
+ * Copyright (C) 2018 NTT Corporation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,6 +33,8 @@ import spock.lang.Narrative
 import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Stepwise
+
+import java.util.concurrent.TimeUnit
 
 /**
  * Function test of asynchronous execution (Web container).
@@ -356,7 +358,13 @@ class AsyncJobWithWebContainerSpec extends Specification {
 
         setup:
         mongoUtil.deleteAll()
-        dbUnitUtil.dropAndCreateTable()
+        try {
+            dbUnitUtil.dropAndCreateTable()
+        } catch (Exception e) {
+            // retry
+            TimeUnit.SECONDS.sleep(5L)
+            dbUnitUtil.dropAndCreateTable()
+        }
 
         when:
         // Send signal to reset.

@@ -10,7 +10,7 @@
     <parent>
         <groupId>jp.co.ntt.fw.macchinetta.batch</groupId>
         <artifactId>macchinetta-batch-functionaltest-build</artifactId>
-        <version>2.0.0.RELEASE</version>
+        <version>2.0.1.RELEASE</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     
@@ -29,7 +29,8 @@
         <jdk.version>1.8</jdk.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <io.spring.platform.version>Brussels-SR5</io.spring.platform.version>
-        <terasoluna-batch.version>5.1.0.RELEASE</terasoluna-batch.version>
+        <spring-framework-bom.version>4.3.14.RELEASE</spring-framework-bom.version>
+        <terasoluna-batch.version>5.1.1.RELEASE</terasoluna-batch.version>
         <mongo-java-driver.version>2.13.3</mongo-java-driver.version>
 
         <maven-compiler-plugin.version>3.5.1</maven-compiler-plugin.version>
@@ -47,6 +48,14 @@
 
     <dependencyManagement>
         <dependencies>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-framework-bom</artifactId>
+                <version>${spring-framework-bom.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
             <dependency>
                 <groupId>io.spring.platform</groupId>
                 <artifactId>platform-bom</artifactId>

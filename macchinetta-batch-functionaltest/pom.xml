@@ -10,7 +10,7 @@
     <parent>
         <groupId>jp.co.ntt.fw.macchinetta.batch</groupId>
         <artifactId>macchinetta-batch-functionaltest-build</artifactId>
-        <version>2.0.0.RELEASE</version>
+        <version>2.0.1.RELEASE</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -165,6 +165,14 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-framework-bom</artifactId>
+                <version>${spring-framework-bom.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <dependency>
                 <groupId>io.spring.platform</groupId>
                 <artifactId>platform-bom</artifactId>
                 <version>${io.spring.platform.version}</version>
@@ -289,6 +297,7 @@
         <com.google.code.maven-license-plugin.version>1.4.0</com.google.code.maven-license-plugin.version>
         <formatter-maven-plugin.version>0.5.2</formatter-maven-plugin.version>
         <io.spring.platform.version>Brussels-SR5</io.spring.platform.version>
+        <spring-framework-bom.version>4.3.14.RELEASE</spring-framework-bom.version>
 
         <com.athaydes.spock-reports.version>1.2.12</com.athaydes.spock-reports.version>
 

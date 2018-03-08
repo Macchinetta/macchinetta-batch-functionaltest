@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 NTT Corporation
+ * Copyright (C) 2018 NTT Corporation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ import org.junit.Rule
 import org.junit.rules.TestName
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler
 import org.terasoluna.batch.async.db.AsyncBatchDaemon
+import jp.co.ntt.fw.macchinetta.batch.functionaltest.ch04.asyncjobwithdb.EmulateLongProcessingItemProcessor
 import jp.co.ntt.fw.macchinetta.batch.functionaltest.util.DBUnitUtil
 import jp.co.ntt.fw.macchinetta.batch.functionaltest.util.JobLauncher
 import jp.co.ntt.fw.macchinetta.batch.functionaltest.util.JobRequest
@@ -734,6 +735,13 @@ class AsyncJobWithDBSpec extends Specification {
         mongoUtil.waitForOutputLog(new LogCondition(message: 'job started. [JobName:asyncJobEmulateLongProcessing]'))
 
         def runningJobExecutionId = adminDB.createQueryTable("running_job", runningJobSql).getValue(0, "job_execution_id")
+
+        // wait for started 1st long process emulation.
+        mongoUtil.waitForOutputLog(new LogCondition(
+                message: 'Long Process emulated.',
+                logger: EmulateLongProcessingItemProcessor.class.name,
+                level: 'INFO'
+        ))
 
         def exitValue = launcher.syncJob(new JobRequest(
                 jobFilePath: 'META-INF/jobs/ch04/asyncjobwithdb/asyncJobEmulateLongProcessing.xml',
