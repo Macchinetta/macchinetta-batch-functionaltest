@@ -10,7 +10,7 @@
     <parent>
         <groupId>jp.co.ntt.fw.macchinetta.batch</groupId>
         <artifactId>macchinetta-batch-functionaltest-build</artifactId>
-        <version>2.0.1.RELEASE</version>
+        <version>2.1.0.RELEASE</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -102,14 +102,6 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>org.springframework</groupId>
-                <artifactId>spring-framework-bom</artifactId>
-                <version>${spring-framework-bom.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-
-            <dependency>
                 <groupId>io.spring.platform</groupId>
                 <artifactId>platform-bom</artifactId>
                 <version>${io.spring.platform.version}</version>
@@ -152,7 +144,6 @@
                 <artifactId>mongo-java-driver</artifactId>
                 <version>${mongo-java-driver.version}</version>
             </dependency>
-
         </dependencies>
     </dependencyManagement>
 
@@ -192,31 +183,37 @@
             <artifactId>commons-dbcp2</artifactId>
             <scope>provided</scope>
         </dependency>
-
     </dependencies>
 
     <properties>
-        <maven-compiler-plugin.version>3.5.1</maven-compiler-plugin.version>
+        <!-- == Maven Plugin Versions == -->
+        <maven-compiler-plugin.version>3.8.0</maven-compiler-plugin.version>
         <groovy-eclipse-compiler.version>2.9.2-01</groovy-eclipse-compiler.version>
         <groovy-eclipse-batch.version>2.4.3-01</groovy-eclipse-batch.version>
         <com.google.code.maven-license-plugin.version>1.4.0</com.google.code.maven-license-plugin.version>
         <formatter-maven-plugin.version>0.5.2</formatter-maven-plugin.version>
 
-        <io.spring.platform.version>Brussels-SR5</io.spring.platform.version>
-        <spring-framework-bom.version>4.3.14.RELEASE</spring-framework-bom.version>
+        <!-- == Dependency Versions == -->
+        <!-- == Spring IO Platform == -->
+        <io.spring.platform.version>Cairo-SR3</io.spring.platform.version>
 
-        <org.dbunit.dbunit.version>2.5.3</org.dbunit.dbunit.version>
+        <!-- == TERASOLUNA Batch == -->
+        <terasoluna-batch.version>5.2.0.RC1</terasoluna-batch.version>
 
-        <terasoluna-batch.version>5.1.1.RELEASE</terasoluna-batch.version>
+        <!-- == DBUnit == -->
+        <org.dbunit.dbunit.version>2.5.4</org.dbunit.dbunit.version>
 
+        <!-- == Logback Contrib == -->
         <ch.qos.logback.contrib.version>0.1.5</ch.qos.logback.contrib.version>
 
+        <!-- == Groovy == -->
         <org.codehaus.groovy.modules.http-builder.version>0.7.1</org.codehaus.groovy.modules.http-builder.version>
 
+        <!-- == Mongo == -->
         <com.gmongo.verson>1.5</com.gmongo.verson>
+        <mongo-java-driver.version>2.14.3</mongo-java-driver.version>
 
-        <mongo-java-driver.version>2.13.3</mongo-java-driver.version>
-
+        <!-- == Project Properties == -->
         <project.root.basedir>${project.basedir}</project.root.basedir>
     </properties>
 </project>

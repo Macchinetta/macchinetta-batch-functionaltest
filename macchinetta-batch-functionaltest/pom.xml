@@ -10,7 +10,7 @@
     <parent>
         <groupId>jp.co.ntt.fw.macchinetta.batch</groupId>
         <artifactId>macchinetta-batch-functionaltest-build</artifactId>
-        <version>2.0.1.RELEASE</version>
+        <version>2.1.0.RELEASE</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -165,14 +165,6 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>org.springframework</groupId>
-                <artifactId>spring-framework-bom</artifactId>
-                <version>${spring-framework-bom.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-
-            <dependency>
                 <groupId>io.spring.platform</groupId>
                 <artifactId>platform-bom</artifactId>
                 <version>${io.spring.platform.version}</version>
@@ -190,6 +182,18 @@
                 <groupId>jp.co.ntt.fw.macchinetta.batch</groupId>
                 <artifactId>macchinetta-batch-functionaltest-util</artifactId>
                 <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.spockframework</groupId>
+                <artifactId>spock-core</artifactId>
+                <version>${org.spockframework.spock-core.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.spockframework</groupId>
+                <artifactId>spock-spring</artifactId>
+                <version>${org.spockframework.spock-spring.version}</version>
             </dependency>
 
             <dependency>
@@ -221,12 +225,10 @@
                 <artifactId>ojdbc8</artifactId>
                 <version>${oracle.jdbc.version}</version>
             </dependency>
-
         </dependencies>
     </dependencyManagement>
 
     <dependencies>
-
         <dependency>
             <groupId>jp.co.ntt.fw.macchinetta.batch</groupId>
             <artifactId>macchinetta-batch-functionaltest-app</artifactId>
@@ -255,6 +257,7 @@
             <artifactId>spock-core</artifactId>
             <scope>test</scope>
         </dependency>
+
         <dependency>
             <groupId>org.spockframework</groupId>
             <artifactId>spock-spring</artifactId>
@@ -284,40 +287,44 @@
             <artifactId>http-builder</artifactId>
             <scope>test</scope>
         </dependency>
-
     </dependencies>
 
     <properties>
-        <maven-compiler-plugin.version>3.5.1</maven-compiler-plugin.version>
+    <!-- == Maven Plugin Versions == -->
+        <maven-compiler-plugin.version>3.8.0</maven-compiler-plugin.version>
         <groovy-eclipse-compiler.version>2.9.2-01</groovy-eclipse-compiler.version>
         <groovy-eclipse-batch.version>2.4.3-01</groovy-eclipse-batch.version>
-        <maven-failsafe-plugin.version>2.19.1</maven-failsafe-plugin.version>
-        <maven-resources-plugin.version>3.0.1</maven-resources-plugin.version>
-        <maven-dependency-plugin.version>2.10</maven-dependency-plugin.version>
+        <maven-failsafe-plugin.version>2.22.0</maven-failsafe-plugin.version>
+        <maven-resources-plugin.version>3.1.0</maven-resources-plugin.version>
+        <maven-dependency-plugin.version>3.1.1</maven-dependency-plugin.version>
         <com.google.code.maven-license-plugin.version>1.4.0</com.google.code.maven-license-plugin.version>
         <formatter-maven-plugin.version>0.5.2</formatter-maven-plugin.version>
-        <io.spring.platform.version>Brussels-SR5</io.spring.platform.version>
-        <spring-framework-bom.version>4.3.14.RELEASE</spring-framework-bom.version>
 
-        <com.athaydes.spock-reports.version>1.2.12</com.athaydes.spock-reports.version>
+        <!-- == Dependency Versions == -->
+        <!-- == Spring IO Platform == -->
+        <io.spring.platform.version>Cairo-SR3</io.spring.platform.version>
 
-        <org.dbunit.dbunit.version>2.5.3</org.dbunit.dbunit.version>
+        <!-- == Spock == -->
+        <org.spockframework.spock-core.version>1.2-groovy-2.4</org.spockframework.spock-core.version>
+        <org.spockframework.spock-spring.version>1.2-groovy-2.4</org.spockframework.spock-spring.version>
+        <com.athaydes.spock-reports.version>1.6.1</com.athaydes.spock-reports.version>
 
+        <!-- == DBUnit == -->
+        <org.dbunit.dbunit.version>2.5.4</org.dbunit.dbunit.version>
+
+        <!-- == Groovy == -->
         <org.codehaus.groovy.modules.http-builder.version>0.7.1</org.codehaus.groovy.modules.http-builder.version>
 
-        <mongo-java-driver.version>2.13.3</mongo-java-driver.version>
+        <!-- == Mongo Java Driver == -->
+        <mongo-java-driver.version>2.14.3</mongo-java-driver.version>
 
-        <oracle.jdbc.version>12.2.0.1</oracle.jdbc.version>
-
+        <!-- == Project Properties == -->
         <project.root.basedir>${project.basedir}</project.root.basedir>
     </properties>
 
     <profiles>
         <profile>
             <id>postgresql9-local</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
             <dependencies>
                 <dependency>
                     <groupId>org.postgresql</groupId>
@@ -344,6 +351,39 @@
                 <project.config.resource.directory.mongo>config/mongo/it</project.config.resource.directory.mongo>
             </properties>
         </profile>
+
+        <profile>
+            <id>postgresql10-local</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>org.postgresql</groupId>
+                    <artifactId>postgresql</artifactId>
+                    <scope>runtime</scope>
+                </dependency>
+            </dependencies>
+            <properties>
+                <project.config.resource.directory.rdbms>config/rdbms/postgresql10/local</project.config.resource.directory.rdbms>
+                <project.config.resource.directory.mongo>config/mongo/local</project.config.resource.directory.mongo>
+            </properties>
+        </profile>
+        <profile>
+            <id>postgresql10-it</id>
+            <dependencies>
+                <dependency>
+                    <groupId>org.postgresql</groupId>
+                    <artifactId>postgresql</artifactId>
+                    <scope>runtime</scope>
+                </dependency>
+            </dependencies>
+            <properties>
+                <project.config.resource.directory.rdbms>config/rdbms/postgresql10/it</project.config.resource.directory.rdbms>
+                <project.config.resource.directory.mongo>config/mongo/it</project.config.resource.directory.mongo>
+            </properties>
+        </profile>
+
         <profile>
             <id>oracle12c-local</id>
             <dependencies>
@@ -354,6 +394,7 @@
                 </dependency>
             </dependencies>
             <properties>
+                <oracle.jdbc.version>12.2.0.1</oracle.jdbc.version>
                 <project.config.resource.directory.rdbms>config/rdbms/oracle12c/local</project.config.resource.directory.rdbms>
                 <project.config.resource.directory.mongo>config/mongo/local</project.config.resource.directory.mongo>
             </properties>
@@ -368,7 +409,39 @@
                 </dependency>
             </dependencies>
             <properties>
+                <oracle.jdbc.version>12.2.0.1</oracle.jdbc.version>
                 <project.config.resource.directory.rdbms>config/rdbms/oracle12c/it</project.config.resource.directory.rdbms>
+                <project.config.resource.directory.mongo>config/mongo/it</project.config.resource.directory.mongo>
+            </properties>
+        </profile>
+
+        <profile>
+            <id>oracle18c-local</id>
+            <dependencies>
+                <dependency>
+                    <groupId>com.oracle.jdbc</groupId>
+                    <artifactId>ojdbc8</artifactId>
+                    <scope>runtime</scope>
+                </dependency>
+            </dependencies>
+            <properties>
+                <oracle.jdbc.version>18.3.0.0</oracle.jdbc.version>
+                <project.config.resource.directory.rdbms>config/rdbms/oracle18c/local</project.config.resource.directory.rdbms>
+                <project.config.resource.directory.mongo>config/mongo/local</project.config.resource.directory.mongo>
+            </properties>
+        </profile>
+        <profile>
+            <id>oracle18c-it</id>
+            <dependencies>
+                <dependency>
+                    <groupId>com.oracle.jdbc</groupId>
+                    <artifactId>ojdbc8</artifactId>
+                    <scope>runtime</scope>
+                </dependency>
+            </dependencies>
+            <properties>
+                <oracle.jdbc.version>18.3.0.0</oracle.jdbc.version>
+                <project.config.resource.directory.rdbms>config/rdbms/oracle18c/it</project.config.resource.directory.rdbms>
                 <project.config.resource.directory.mongo>config/mongo/it</project.config.resource.directory.mongo>
             </properties>
         </profile>

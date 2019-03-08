@@ -1,1 +1,0 @@
-# terasoluna-batch-functionaltest-app

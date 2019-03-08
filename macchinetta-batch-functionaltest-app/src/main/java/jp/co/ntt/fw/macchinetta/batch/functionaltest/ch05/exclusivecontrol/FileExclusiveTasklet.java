@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 NTT Corporation
+ * Copyright (C) 2017 NTT Corporation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,7 +45,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * Tasklet for exclusive control of files.
  *
- * @since 5.0.0
+ * @since 2.0.1
  */
 @Component
 @Scope("step")
@@ -117,7 +117,8 @@ public class FileExclusiveTasklet implements Tasklet {
                 try {
                     TimeUnit.SECONDS.sleep(3L);
                 } catch (InterruptedException e) {
-                    // ignore.
+                    logger.warn("Interrupt occurred");
+                    throw e;
                 }
             }
 

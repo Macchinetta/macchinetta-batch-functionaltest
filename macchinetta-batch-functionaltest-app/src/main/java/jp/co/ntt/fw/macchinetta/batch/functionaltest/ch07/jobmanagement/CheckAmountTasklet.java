@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 NTT Corporation
+ * Copyright (C) 2017 NTT Corporation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,7 +38,7 @@ import java.util.List;
  * Check the amount, skip the data executing in case of an error.
  * </p>
  *
- * @since 5.1.0
+ * @since 2.0.1
  */
 @Component
 @Scope("step")

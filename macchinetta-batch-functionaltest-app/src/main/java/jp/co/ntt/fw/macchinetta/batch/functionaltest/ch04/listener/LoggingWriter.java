@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 NTT Corporation
+ * Copyright (C) 2017 NTT Corporation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package jp.co.ntt.fw.macchinetta.batch.functionaltest.ch04.listener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.item.ExecutionContext;
+import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.ItemStreamWriter;
 import org.springframework.core.io.Resource;
@@ -28,7 +29,7 @@ import java.util.List;
 /**
  * Writer to get log.
  *
- * @since 5.1.0
+ * @since 2.0.1
  */
 @Component
 public class LoggingWriter implements ItemStreamWriter {

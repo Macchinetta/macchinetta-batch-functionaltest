@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 NTT Corporation
+ * Copyright (C) 2017 NTT Corporation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ import org.springframework.stereotype.Component;
  * Tasks to make sure customized tables and SQL are available. Confirm that the customized SQL has been executed by logging the
  * registration group id.
  *
- * @since 5.0.0
+ * @since 2.0.1
  */
 @Component
 public class CustomizedBatchJobRequestWithQueryParamConfirmTask implements Tasklet {

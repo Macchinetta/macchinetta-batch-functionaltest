@@ -10,10 +10,10 @@
     <parent>
         <groupId>jp.co.ntt.fw.macchinetta.batch</groupId>
         <artifactId>macchinetta-batch-functionaltest-build</artifactId>
-        <version>2.0.1.RELEASE</version>
+        <version>2.1.0.RELEASE</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
-    
+
     <name>app</name>
     <description>Functionality Test Sample Application using Macchinetta Batch Framework</description>
     <inceptionYear>2017</inceptionYear>
@@ -26,36 +26,34 @@
     </licenses>
 
     <properties>
-        <jdk.version>1.8</jdk.version>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <io.spring.platform.version>Brussels-SR5</io.spring.platform.version>
-        <spring-framework-bom.version>4.3.14.RELEASE</spring-framework-bom.version>
-        <terasoluna-batch.version>5.1.1.RELEASE</terasoluna-batch.version>
-        <mongo-java-driver.version>2.13.3</mongo-java-driver.version>
-
-        <maven-compiler-plugin.version>3.5.1</maven-compiler-plugin.version>
-        <maven-jar-plugin.version>3.0.2</maven-jar-plugin.version>
-        <maven-resources-plugin.version>3.0.1</maven-resources-plugin.version>
+        <!-- == Maven Plugin Versions == -->
+        <maven-compiler-plugin.version>3.8.0</maven-compiler-plugin.version>
+        <maven-jar-plugin.version>3.1.0</maven-jar-plugin.version>
+        <maven-resources-plugin.version>3.1.0</maven-resources-plugin.version>
         <com.google.code.maven-license-plugin.version>1.4.0</com.google.code.maven-license-plugin.version>
         <formatter-maven-plugin.version>0.5.2</formatter-maven-plugin.version>
 
+        <!-- == Dependency Versions == -->
+        <!-- == Spring IO Platform == -->
+        <io.spring.platform.version>Cairo-SR3</io.spring.platform.version>
+
+        <!-- == TERASOLUNA Batch == -->
+        <terasoluna-batch.version>5.2.0.RC1</terasoluna-batch.version>
+
+        <!-- == Mongo Java Driver == -->
+        <mongo-java-driver.version>2.14.3</mongo-java-driver.version>
+
+        <!-- == Logback Contrib == -->
         <ch.qos.logback.contrib.version>0.1.5</ch.qos.logback.contrib.version>
 
-        <oracle.jdbc.version>12.2.0.1</oracle.jdbc.version>
-
+        <!-- == Project Properties == -->
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <jdk.version>1.8</jdk.version>
         <project.root.basedir>${project.basedir}</project.root.basedir>
     </properties>
 
     <dependencyManagement>
         <dependencies>
-            <dependency>
-                <groupId>org.springframework</groupId>
-                <artifactId>spring-framework-bom</artifactId>
-                <version>${spring-framework-bom.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-
             <dependency>
                 <groupId>io.spring.platform</groupId>
                 <artifactId>platform-bom</artifactId>
@@ -63,21 +61,25 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
+
             <dependency>
                 <groupId>org.terasoluna.batch</groupId>
                 <artifactId>terasoluna-batch</artifactId>
                 <version>${terasoluna-batch.version}</version>
             </dependency>
+
             <dependency>
                 <groupId>ch.qos.logback.contrib</groupId>
                 <artifactId>logback-mongodb-classic</artifactId>
                 <version>${ch.qos.logback.contrib.version}</version>
             </dependency>
+
             <dependency>
                 <groupId>org.mongodb</groupId>
                 <artifactId>mongo-java-driver</artifactId>
                 <version>${mongo-java-driver.version}</version>
             </dependency>
+
             <dependency>
                 <groupId>com.oracle.jdbc</groupId>
                 <artifactId>ojdbc8</artifactId>
@@ -134,7 +136,6 @@
             <groupId>org.springframework</groupId>
             <artifactId>spring-oxm</artifactId>
         </dependency>
-
     </dependencies>
 
     <build>
@@ -263,9 +264,6 @@
 
         <profile>
             <id>postgresql9-local</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
             <dependencies>
                 <dependency>
                     <groupId>org.postgresql</groupId>
@@ -292,6 +290,39 @@
                 <project.config.resource.directory.mongo>config/mongo/it</project.config.resource.directory.mongo>
             </properties>
         </profile>
+
+        <profile>
+            <id>postgresql10-local</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>org.postgresql</groupId>
+                    <artifactId>postgresql</artifactId>
+                    <scope>runtime</scope>
+                </dependency>
+            </dependencies>
+            <properties>
+                <project.config.resource.directory.rdbms>config/rdbms/postgresql10/local</project.config.resource.directory.rdbms>
+                <project.config.resource.directory.mongo>config/mongo/local</project.config.resource.directory.mongo>
+            </properties>
+        </profile>
+        <profile>
+            <id>postgresql10-it</id>
+            <dependencies>
+                <dependency>
+                    <groupId>org.postgresql</groupId>
+                    <artifactId>postgresql</artifactId>
+                    <scope>runtime</scope>
+                </dependency>
+            </dependencies>
+            <properties>
+                <project.config.resource.directory.rdbms>config/rdbms/postgresql10/it</project.config.resource.directory.rdbms>
+                <project.config.resource.directory.mongo>config/mongo/it</project.config.resource.directory.mongo>
+            </properties>
+        </profile>
+
         <profile>
             <id>oracle12c-local</id>
             <dependencies>
@@ -302,6 +333,7 @@
                 </dependency>
             </dependencies>
             <properties>
+                <oracle.jdbc.version>12.2.0.1</oracle.jdbc.version>
                 <project.config.resource.directory.rdbms>config/rdbms/oracle12c/local</project.config.resource.directory.rdbms>
                 <project.config.resource.directory.mongo>config/mongo/local</project.config.resource.directory.mongo>
             </properties>
@@ -316,11 +348,42 @@
                 </dependency>
             </dependencies>
             <properties>
+                <oracle.jdbc.version>12.2.0.1</oracle.jdbc.version>
                 <project.config.resource.directory.rdbms>config/rdbms/oracle12c/it</project.config.resource.directory.rdbms>
                 <project.config.resource.directory.mongo>config/mongo/it</project.config.resource.directory.mongo>
             </properties>
         </profile>
 
+        <profile>
+            <id>oracle18c-local</id>
+            <dependencies>
+                <dependency>
+                    <groupId>com.oracle.jdbc</groupId>
+                    <artifactId>ojdbc8</artifactId>
+                    <scope>runtime</scope>
+                </dependency>
+            </dependencies>
+            <properties>
+                <oracle.jdbc.version>18.3.0.0</oracle.jdbc.version>
+                <project.config.resource.directory.rdbms>config/rdbms/oracle18c/local</project.config.resource.directory.rdbms>
+                <project.config.resource.directory.mongo>config/mongo/local</project.config.resource.directory.mongo>
+            </properties>
+        </profile>
+        <profile>
+            <id>oracle18c-it</id>
+            <dependencies>
+                <dependency>
+                    <groupId>com.oracle.jdbc</groupId>
+                    <artifactId>ojdbc8</artifactId>
+                    <scope>runtime</scope>
+                </dependency>
+            </dependencies>
+            <properties>
+                <oracle.jdbc.version>18.3.0.0</oracle.jdbc.version>
+                <project.config.resource.directory.rdbms>config/rdbms/oracle18c/it</project.config.resource.directory.rdbms>
+                <project.config.resource.directory.mongo>config/mongo/it</project.config.resource.directory.mongo>
+            </properties>
+        </profile>
     </profiles>
 
 </project>

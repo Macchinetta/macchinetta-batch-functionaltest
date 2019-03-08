@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 NTT Corporation
+ * Copyright (C) 2017 NTT Corporation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,7 +39,7 @@ import java.nio.file.Files
 /**
  * Function test of re-processing.
  *
- * @since 5.0.0
+ * @since 2.0.1
  */
 @Slf4j
 @Narrative("""
@@ -232,8 +232,8 @@ class ReProcessingSpec extends Specification {
         failedStepExecution.getValue(0, 'write_count') == 10
         failedStepExecution.getValue(0, 'rollback_count') == 1
         def failedShortContext = failedStepExecutionContext.getValue(0, 'short_context')
-        failedShortContext ==~ /.*read\.count","int":10.*/
-        failedShortContext ==~ /.*Writer\.written","long":10.*/
+        failedShortContext ==~ /.*read\.count":10.*/
+        failedShortContext ==~ /.*Writer\.written":\["java.lang.Long",10].*/
 
         completedJobExecution.rowCount == 2
         failedJobExecution.getValue(0, 'job_instance_id') != completedJobExecution.getValue(1, 'job_instance_id') // Confirm that restarted as another job
@@ -252,11 +252,11 @@ class ReProcessingSpec extends Specification {
         completedtepExecution.getValue(1, 'write_count') == 14
         completedtepExecution.getValue(1, 'rollback_count') == 0
         def completedShortContext0 = completedtepExecutionContext.getValue(0, 'short_context')
-        completedShortContext0 ==~ /.*read\.count","int":10.*/
-        completedShortContext0 ==~ /.*Writer\.written","long":10.*/
+        completedShortContext0 ==~ /.*read\.count":10.*/
+        completedShortContext0 ==~ /.*Writer\.written":\["java.lang.Long",10].*/
         def completedShortContext1 = completedtepExecutionContext.getValue(1, 'short_context')
-        completedShortContext1 ==~ /.*read\.count","int":15.*/
-        completedShortContext1 ==~ /.*Writer\.written","long":14.*/
+        completedShortContext1 ==~ /.*read\.count":15.*/
+        completedShortContext1 ==~ /.*Writer\.written":\["java.lang.Long",14].*/
 
         cleanup:
         Files.deleteIfExists(outputFile.toPath())

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 NTT Corporation
+ * Copyright (C) 2017 NTT Corporation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,15 +15,16 @@
  */
 package jp.co.ntt.fw.macchinetta.batch.functionaltest.app.repository.mst;
 
-import jp.co.ntt.fw.macchinetta.batch.functionaltest.app.model.mst.Customer;
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.cursor.Cursor;
+import jp.co.ntt.fw.macchinetta.batch.functionaltest.app.model.mst.Customer;
 
 import java.util.List;
 
 /**
  * Repository of customer master.
  *
- * @since 5.0.0
+ * @since 2.0.1
  */
 public interface CustomerRepository {
     /**
@@ -40,6 +41,13 @@ public interface CustomerRepository {
      * @return All Customer master data.
      */
     List<Customer> findAll();
+
+    /**
+     * Get customer master data cursor.
+     *
+     * @return Customer master data cursor.
+     */
+    Cursor<Customer> cursor();
 
     /**
      * Find customer master data by branch.

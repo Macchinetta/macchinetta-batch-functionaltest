@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 NTT Corporation
+ * Copyright (C) 2017 NTT Corporation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ import jp.co.ntt.fw.macchinetta.batch.functionaltest.ch05.exclusivecontrol.model
 /**
  * Add process name to sales plan details.
  *
- * @since 5.0.0
+ * @since 2.0.1
  */
 @Component
 public class AddProcessNameItemPorcessor implements ItemProcessor<SalesPlanDetail, SalesPlanDetailWithProcessName> {

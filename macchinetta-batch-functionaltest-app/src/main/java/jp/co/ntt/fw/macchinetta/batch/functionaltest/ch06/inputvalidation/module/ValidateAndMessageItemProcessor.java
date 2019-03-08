@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 NTT Corporation
+ * Copyright (C) 2017 NTT Corporation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,9 +30,9 @@ import org.springframework.validation.FieldError;
 import javax.inject.Inject;
 
 /**
- * Item processror that perform input check and if an error occurs, log output and continue processing.
+ * Item processor that perform input check and if an error occurs, log output and continue processing.
  *
- * @since 5.0.0
+ * @since 2.0.1
  */
 @Component
 public class ValidateAndMessageItemProcessor implements ItemProcessor<VerificationSalesPlanDetail, SalesPlanDetail> {

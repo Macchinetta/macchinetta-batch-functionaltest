@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 NTT Corporation
+ * Copyright (C) 2017 NTT Corporation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,10 +15,43 @@
  */
 package jp.co.ntt.fw.macchinetta.batch.functionaltest.ch05.fileaccess.model.jaxb;
 
+import javax.xml.bind.annotation.XmlType;
+import javax.xml.bind.annotation.XmlValue;
+
 /**
  * Model of PhoneNumber.
  *
- * @since 5.0.0
+ * @since 2.0.1
  */
+@XmlType(name = "phone-number")
 public class PhoneNumber {
+
+    /**
+     * Phone number.
+     */
+    private String phoneNumber;
+
+    /**
+     * Phone number.
+     *
+     * @return The current phone number.
+     */
+    @XmlValue
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    /**
+     * Phone number.
+     *
+     * @param phoneNumber New phone number.
+     */
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
+
+    @Override
+    public String toString() {
+        return phoneNumber;
+    }
 }

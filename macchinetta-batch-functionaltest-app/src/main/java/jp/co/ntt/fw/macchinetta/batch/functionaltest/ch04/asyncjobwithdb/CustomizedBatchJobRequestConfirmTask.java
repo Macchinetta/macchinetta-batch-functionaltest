@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 NTT Corporation
+ * Copyright (C) 2017 NTT Corporation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,7 +29,7 @@ import java.util.Map;
  * Tasks to make sure customized tables and SQL are available. Confirm that the customized SQL has been executed by logging the
  * registration order and execution order set for the job parameters.
  *
- * @since 5.0.0
+ * @since 2.0.1
  */
 @Component
 public class CustomizedBatchJobRequestConfirmTask implements Tasklet {

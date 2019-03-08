@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 NTT Corporation
+ * Copyright (C) 2017 NTT Corporation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  */
 package jp.co.ntt.fw.macchinetta.batch.functionaltest.ch05.dbaccess.repository;
 
+import org.apache.ibatis.cursor.Cursor;
 import jp.co.ntt.fw.macchinetta.batch.functionaltest.app.model.plan.SalesPlanDetail;
 import jp.co.ntt.fw.macchinetta.batch.functionaltest.ch05.dbaccess.SalesDTO;
 
@@ -23,7 +24,7 @@ import java.util.List;
 /**
  * Repository of sales in database access.
  *
- * @since 5.0.1
+ * @since 2.0.1
  */
 public interface SalesRepository {
 
@@ -33,6 +34,13 @@ public interface SalesRepository {
      * @return all detail of sales plan.
      **/
     List<SalesPlanDetail> findAll();
+
+    /**
+     * Fetch sales plan by cursor.
+     *
+     * @return cursor for sales plan.
+     */
+    Cursor<SalesPlanDetail> cursor();
 
     /**
      * Update detail of sales plan.

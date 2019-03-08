@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 NTT Corporation
+ * Copyright (C) 2017 NTT Corporation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ import java.io.IOException;
 /**
  * StaxWriterCallback that writing footer record.
  *
- * @since 5.0.0
+ * @since 2.0.1
  */
 @Component
 public class WriteFooterStaxWriterCallback implements StaxWriterCallback {
@@ -36,7 +36,7 @@ public class WriteFooterStaxWriterCallback implements StaxWriterCallback {
         try {
             writer.add(factory.createComment(" Customer list footer "));
         } catch (XMLStreamException e) {
-            throw new RuntimeException(e);
+            throw new IOException(e);
         }
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 NTT Corporation
+ * Copyright (C) 2017 NTT Corporation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,6 @@
  */
 package jp.co.ntt.fw.macchinetta.batch.functionaltest.ch05.transaction.component;
 
-import jp.co.ntt.fw.macchinetta.batch.functionaltest.app.repository.plan.SalesPlanDetailRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.StepContribution;
@@ -26,9 +25,11 @@ import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 import jp.co.ntt.fw.macchinetta.batch.functionaltest.app.model.plan.SalesPlanDetail;
+import jp.co.ntt.fw.macchinetta.batch.functionaltest.app.repository.plan.SalesPlanDetailRepository;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -42,7 +43,7 @@ import javax.inject.Named;
  * Control of transaction control by itself.
  * </p>
  *
- * @since 5.0.0
+ * @since 2.0.1
  */
 @Component()
 @Scope("step")
@@ -101,7 +102,7 @@ public class SalesPlanChunkTranTask implements Tasklet {
             transactionManager.rollback(status);
             throw e;
         } finally {
-            if (!status.isCompleted()) {
+            if (status != null && !status.isCompleted()) {
                 transactionManager.commit(status);
             }
             itemReader.close();

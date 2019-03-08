@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 NTT Corporation
+ * Copyright (C) 2017 NTT Corporation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ import org.springframework.batch.core.launch.support.CommandLineJobRunner
 import org.springframework.batch.core.step.AbstractStep
 import org.springframework.dao.InvalidDataAccessResourceUsageException
 import org.springframework.dao.TransientDataAccessResourceException
+import jp.co.ntt.fw.macchinetta.batch.functionaltest.ch05.dbaccess.SalesPlanCursorTasklet
 import jp.co.ntt.fw.macchinetta.batch.functionaltest.util.DBUnitUtil
 import jp.co.ntt.fw.macchinetta.batch.functionaltest.util.JobLauncher
 import jp.co.ntt.fw.macchinetta.batch.functionaltest.util.JobRequest
@@ -34,7 +35,7 @@ import spock.lang.Specification
 /**
  * Function test of database access.
  *
- * @since 5.0.0
+ * @since 2.0.1
  */
 @Slf4j
 @Narrative("""
@@ -51,6 +52,8 @@ Case3: To confirm DB access by using ItemProcessor and ItemListener.
 Case4 : To confirm DB access by using CompositeItemWriter.
     No.1: [Normal] Two tables update success.
     No.2: [Error] Two tables rollback together.
+Case5 : To confirm DB access by Mapper IF.
+    No.1: [Normal] Using Cursor for implementation method of mapper interface.
 """)
 class DBAccessSpec extends Specification {
 
@@ -394,4 +397,36 @@ class DBAccessSpec extends Specification {
                 jobDB.getTable("sales_performance_detail"))
     }
 
+    // Testcase 5 No.1
+    def "DB access by Mapper IF using Cursor."() {
+
+        setup:
+        jobDB.insert(expectSalesPLanDetailDataSet)
+
+        when:
+        def exitCode = launcher.syncJob(new JobRequest(
+                jobFilePath: 'META-INF/jobs/ch05/dbaccess/jobSalesPlanCursorTasklet.xml',
+                jobName: 'jobSalesPlanCursorTasklet'
+        ))
+
+        then:
+        exitCode == 0
+
+        def cursorFind = mongoUtil.find(
+                new LogCondition(
+                        logger: SalesPlanCursorTasklet.class.name,
+                        level: 'INFO'
+                ))
+        cursorFind.size() == 5
+
+        cursorFind.any {
+            it.message == "Read item: SalesPlanDetail{branchId='01', year=2017, month=1, customerId='1000000000', amount=1000}"
+        }
+        cursorFind.any {
+            it.message == "Read item: SalesPlanDetail{branchId='02', year=2017, month=1, customerId='2000000000', amount=1000}"
+        }
+        cursorFind.any {
+            it.message == "Read item: SalesPlanDetail{branchId='03', year=2017, month=1, customerId='3000000000', amount=1000}"
+        }
+    }
 }

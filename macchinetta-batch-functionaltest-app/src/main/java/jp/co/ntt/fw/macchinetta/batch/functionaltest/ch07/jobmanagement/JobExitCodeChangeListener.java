@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 NTT Corporation
+ * Copyright (C) 2017 NTT Corporation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,7 +29,7 @@ import org.springframework.stereotype.Component;
  * If the end state of the step includes "STEP COPLETED WITH SKIPS", put "JOB COPLETED WITH SKIPS" in the end state of the job.
  * </p>
  *
- * @since 5.0.0
+ * @since 2.0.1
  */
 @Component
 public class JobExitCodeChangeListener extends JobExecutionListenerSupport {

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 NTT Corporation
+ * Copyright (C) 2017 NTT Corporation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,13 +22,14 @@ import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
  * Tasklet to output the field to the log
  *
- * @since 5.0.0
+ * @since 2.0.1
  */
 public class RefWithDateTypeInXmlTasklet implements Tasklet {
 
@@ -70,7 +71,7 @@ public class RefWithDateTypeInXmlTasklet implements Tasklet {
         this.num = num;
     }
 
-    public void setDate(String date) throws Exception {
+    public void setDate(String date) throws ParseException {
         this.date = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss").parse(date);
     }
 }
