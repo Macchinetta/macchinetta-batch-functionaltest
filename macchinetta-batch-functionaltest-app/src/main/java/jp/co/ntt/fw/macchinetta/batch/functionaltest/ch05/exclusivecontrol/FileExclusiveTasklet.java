@@ -20,6 +20,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.ItemStreamReader;
 import org.springframework.batch.item.ItemStreamWriter;
@@ -34,6 +35,7 @@ import jp.co.ntt.fw.macchinetta.batch.functionaltest.ch05.exclusivecontrol.model
 
 import javax.inject.Inject;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
@@ -92,22 +94,20 @@ public class FileExclusiveTasklet implements Tasklet {
     @Override
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 
-        FileChannel fc = null;
-        FileLock fileLock = null;
+        File file = new File(targetPath);
+        if(!file.exists()){
+            logger.error("Lock file not Found. [LockFile={}]", targetPath);
+            throw new FileNotFoundException("Lock file not Found.");
+        }
 
-        try {
-            // check file lock.
-            try {
-                File file = new File(targetPath);
-                fc = FileChannel.open(file.toPath(), StandardOpenOption.WRITE, StandardOpenOption.CREATE,
-                        StandardOpenOption.APPEND);
-                fileLock = fc.tryLock();
-            } catch (IOException e) {
-                logger.error("Failure other than lock acquisition", e);
-                throw new FailedOtherAcquireLockException("Failure other than lock acquisition", e);
-            }
+        try (FileChannel fc = FileChannel.open(file.toPath(),
+                StandardOpenOption.WRITE,
+                StandardOpenOption.CREATE,
+                StandardOpenOption.APPEND);
+                FileLock fileLock = fc.tryLock()) {
+
             if (fileLock == null) {
-                logger.error("Failed to acquire lock. [processName={}]", processName);
+                logger.error("Failed to acquire lock. [lockFile={}] [processName={}]", targetPath, processName);
                 throw new FailedAcquireLockException("Failed to acquire lock");
             } else {
                 logger.info("Acquire lock. [processName={}]", processName);
@@ -122,8 +122,9 @@ public class FileExclusiveTasklet implements Tasklet {
                 }
             }
 
-            reader.open(chunkContext.getStepContext().getStepExecution().getExecutionContext());
-            writer.open(chunkContext.getStepContext().getStepExecution().getExecutionContext());
+            ExecutionContext executionContext = chunkContext.getStepContext().getStepExecution().getExecutionContext();
+            reader.open(executionContext);
+            writer.open(executionContext);
 
             SalesPlanDetail item;
             List<SalesPlanDetailWithProcessName> items = new ArrayList<>();
@@ -141,21 +142,11 @@ public class FileExclusiveTasklet implements Tasklet {
                 writer.write(items);
             }
 
+        } catch (IOException e) {
+            logger.error("Failure other than lock acquisition. [lockFile={}]", targetPath, e);
+            throw new FailedOtherAcquireLockException("Failure other than lock acquisition", e);
+
         } finally {
-            if (fileLock != null) {
-                try {
-                    fileLock.release();
-                } catch (IOException e) {
-                    logger.warn("Lock release failed.", e);
-                }
-            }
-            if (fc != null) {
-                try {
-                    fc.close();
-                } catch (IOException e) {
-                    // ignore
-                }
-            }
             try {
                 writer.close();
             } catch (ItemStreamException e) {
@@ -176,7 +167,7 @@ public class FileExclusiveTasklet implements Tasklet {
      *
      * @param targetPath New file path to check lock.
      */
-    @Value("#{jobParameters['outputFile']}")
+    @Value("#{jobParameters['lockFile']}")
     public void setTargetPath(String targetPath) {
         this.targetPath = targetPath;
     }

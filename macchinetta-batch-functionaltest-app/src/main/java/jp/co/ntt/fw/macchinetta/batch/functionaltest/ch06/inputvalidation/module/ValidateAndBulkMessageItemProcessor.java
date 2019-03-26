@@ -52,6 +52,8 @@ public class ValidateAndBulkMessageItemProcessor implements ItemProcessor<Verifi
      */
     private static final Logger logger = LoggerFactory.getLogger(ValidateAndBulkMessageItemProcessor.class);
 
+    private static final String ERROR_MESSAGE_KEY = "errorMessageList";
+
     private StepExecution stepExecution;
 
     @Inject
@@ -72,9 +74,9 @@ public class ValidateAndBulkMessageItemProcessor implements ItemProcessor<Verifi
         } catch (ValidationException e) {
 
             List<String> errorMessageList = new ArrayList<>();
-            if (stepExecution.getExecutionContext().containsKey("errorMessageList")) {
-                errorMessageList = (List<String>) stepExecution.getExecutionContext().get("errorMessageList");
-                stepExecution.getExecutionContext().remove("errorMessageList");
+            if (stepExecution.getExecutionContext().containsKey(ERROR_MESSAGE_KEY)) {
+                errorMessageList = (List<String>) stepExecution.getExecutionContext().get(ERROR_MESSAGE_KEY);
+                stepExecution.getExecutionContext().remove(ERROR_MESSAGE_KEY);
             }
 
             BindException errors = (BindException) e.getCause();
@@ -87,7 +89,7 @@ public class ValidateAndBulkMessageItemProcessor implements ItemProcessor<Verifi
                 errorMessageList.add(message);
             }
 
-            stepExecution.getExecutionContext().put("errorMessageList", errorMessageList);
+            stepExecution.getExecutionContext().put(ERROR_MESSAGE_KEY, errorMessageList);
 
             return null; // skipping item
         }
@@ -101,7 +103,7 @@ public class ValidateAndBulkMessageItemProcessor implements ItemProcessor<Verifi
     public void afterStep(StepExecution stepExecution) {
         ExecutionContext executionContext = stepExecution.getExecutionContext();
 
-        List<String> errorMessageList = (List<String>) executionContext.get("errorMessageList");
+        List<String> errorMessageList = (List<String>) executionContext.get(ERROR_MESSAGE_KEY);
         for (String errorMessage : errorMessageList) {
             logger.warn(errorMessage);
         }

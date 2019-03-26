@@ -101,9 +101,6 @@ class ListenerSpec extends Specification {
                 jobName: "chunkJobWithListenerWithin${scope}Scope",
                 jobParameter: "inputFile=${inputFileName}"
         ))
-        mongoUtil.waitForOutputLog(new LogCondition(
-                message: ~/Closing org.springframework.context.support.ClassPathXmlApplicationContext/
-        ))
 
         then:
         exitValue == 0
@@ -170,9 +167,6 @@ class ListenerSpec extends Specification {
                 jobFilePath: 'META-INF/jobs/ch04/listener/chunkJobWithListener.xml',
                 jobName: "chunkJobWithListenerWithin${scope}Scope",
                 jobParameter: "inputFile=${inputFileName}"
-        ))
-        mongoUtil.waitForOutputLog(new LogCondition(
-                message: ~/Closing org.springframework.context.support.ClassPathXmlApplicationContext/
         ))
 
         then:
@@ -251,9 +245,6 @@ class ListenerSpec extends Specification {
                 jobName: "taskletJobWithListenerWithin${scope}Scope",
                 jobParameter: "inputFile=${inputFileName}"
         ))
-        mongoUtil.waitForOutputLog(new LogCondition(
-                message: ~/Closing org.springframework.context.support.ClassPathXmlApplicationContext/
-        ))
 
         then:
         exitValue == 0
@@ -319,9 +310,6 @@ class ListenerSpec extends Specification {
                 jobFilePath: 'META-INF/jobs/ch04/listener/taskletJobWithListener.xml',
                 jobName: "taskletJobWithListenerWithin${scope}Scope",
                 jobParameter: "inputFile=${inputFileName}"
-        ))
-        mongoUtil.waitForOutputLog(new LogCondition(
-                message: ~/Closing org.springframework.context.support.ClassPathXmlApplicationContext/
         ))
 
         then:
@@ -397,9 +385,6 @@ class ListenerSpec extends Specification {
                 jobName: "chunkJobWithListenerAnnotationWithin${scope}Scope",
                 jobParameter: "inputFile=${inputFileName}"
         ))
-        mongoUtil.waitForOutputLog(new LogCondition(
-                message: ~/Closing org.springframework.context.support.ClassPathXmlApplicationContext/
-        ))
 
         then:
         exitValue == 0
@@ -467,9 +452,6 @@ class ListenerSpec extends Specification {
                 jobFilePath: 'META-INF/jobs/ch04/listener/chunkJobWithListenerAnnotation.xml',
                 jobName: "chunkJobWithListenerAnnotationWithin${scope}Scope",
                 jobParameter: "inputFile=${inputFileName}"
-        ))
-        mongoUtil.waitForOutputLog(new LogCondition(
-                message: ~/Closing org.springframework.context.support.ClassPathXmlApplicationContext/
         ))
 
         then:
@@ -551,9 +533,6 @@ class ListenerSpec extends Specification {
                 jobName: "taskletJobWithListenerAnnotationWithin${scope}Scope",
                 jobParameter: "inputFile=${inputFileName}"
         ))
-        mongoUtil.waitForOutputLog(new LogCondition(
-                message: ~/Closing org.springframework.context.support.ClassPathXmlApplicationContext/
-        ))
 
         then:
         exitValue == 0
@@ -620,9 +599,6 @@ class ListenerSpec extends Specification {
                 jobFilePath: 'META-INF/jobs/ch04/listener/taskletJobWithListenerAnnotation.xml',
                 jobName: "taskletJobWithListenerAnnotationWithin${scope}Scope",
                 jobParameter: "inputFile=${inputFileName}"
-        ))
-        mongoUtil.waitForOutputLog(new LogCondition(
-                message: ~/Closing org.springframework.context.support.ClassPathXmlApplicationContext/
         ))
 
         then:
@@ -700,9 +676,6 @@ class ListenerSpec extends Specification {
                 jobFilePath: 'META-INF/jobs/ch04/listener/chunkJobWithMixedListener.xml',
                 jobName: "chunkJobWithMixedListenerWithin${scope}Scope",
                 jobParameter: "inputFile=${inputFileName}"
-        ))
-        mongoUtil.waitForOutputLog(new LogCondition(
-                message: ~/Closing org.springframework.context.support.ClassPathXmlApplicationContext/
         ))
 
         then:
@@ -815,9 +788,6 @@ class ListenerSpec extends Specification {
                 jobFilePath: 'META-INF/jobs/ch04/listener/chunkJobWithMixedListener.xml',
                 jobName: "chunkJobWithMixedListenerWithin${scope}Scope",
                 jobParameter: "inputFile=${inputFileName}"
-        ))
-        mongoUtil.waitForOutputLog(new LogCondition(
-                message: ~/Closing org.springframework.context.support.ClassPathXmlApplicationContext/
         ))
 
         then:
@@ -942,9 +912,6 @@ class ListenerSpec extends Specification {
                 jobName: "taskletJobWithMixedListenerWithin${scope}Scope",
                 jobParameter: "inputFile=${inputFileName}"
         ))
-        mongoUtil.waitForOutputLog(new LogCondition(
-                message: ~/Closing org.springframework.context.support.ClassPathXmlApplicationContext/
-        ))
 
         then:
         exitValue == 0
@@ -1055,9 +1022,6 @@ class ListenerSpec extends Specification {
                 jobFilePath: 'META-INF/jobs/ch04/listener/taskletJobWithMixedListener.xml',
                 jobName: "taskletJobWithMixedListenerWithin${scope}Scope",
                 jobParameter: "inputFile=${inputFileName}"
-        ))
-        mongoUtil.waitForOutputLog(new LogCondition(
-                message: ~/Closing org.springframework.context.support.ClassPathXmlApplicationContext/
         ))
 
         then:

@@ -6,7 +6,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>jp.co.ntt.fw.macchinetta.batch</groupId>
     <artifactId>macchinetta-batch-functionaltest-build</artifactId>
-    <version>2.1.0.RELEASE</version>
+    <version>2.1.1.RELEASE</version>
     <packaging>pom</packaging>
 
     <name>root</name>
@@ -51,6 +51,19 @@
                 <updatePolicy>always</updatePolicy>
             </releases>
         </pluginRepository>
+
+        <!-- === Groovy Maven Repository === -->
+        <pluginRepository>
+            <id>bintray</id>
+            <name>Groovy Bintray</name>
+            <url>https://dl.bintray.com/groovy/maven</url>
+            <releases>
+                <updatePolicy>never</updatePolicy>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </pluginRepository>
     </pluginRepositories>
 
     <properties>
@@ -60,6 +73,18 @@
         <encoding>UTF-8</encoding>
         <java-version>1.8</java-version>
     </properties>
+
+    <profiles>
+        <profile>
+            <id>jdk11</id>
+            <activation>
+                <jdk>11</jdk>
+            </activation>
+            <properties>
+                <java-version>11</java-version>
+            </properties>
+        </profile>
+    </profiles>
 
     <modules>
         <module>macchinetta-batch-functionaltest-app</module>
