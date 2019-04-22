@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 NTT Corporation
+ * Copyright (C) 2017 NTT Corporation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 package jp.co.ntt.fw.macchinetta.batch.functionaltest.ch05.fileaccess.model.jaxb;
 
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +26,7 @@ import java.util.List;
  *
  * @since 5.0.0
  */
-@XmlRootElement
+@XmlRootElement(name = "customer")
 public class Customer {
 
     /**
@@ -43,6 +44,7 @@ public class Customer {
      *
      * @return The current name.
      */
+    @XmlElement
     public String getName() {
         return name;
     }
@@ -62,6 +64,7 @@ public class Customer {
      * @return The current phone numbers.
      */
     @XmlElement(name = "phone-number")
+    @XmlElementWrapper(name = "phoneNumbers")
     public List<PhoneNumber> getPhoneNumbers() {
         return phoneNumbers;
     }

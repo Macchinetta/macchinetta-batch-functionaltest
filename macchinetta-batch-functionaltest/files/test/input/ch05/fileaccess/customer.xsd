@@ -1,20 +1,24 @@
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
     <xs:element name="customer">
         <xs:complexType>
             <xs:sequence>
-                <xs:element name="name" type="stringMaxSize5"/>
-                <xs:element ref="phone-number" maxOccurs="2"/>
+                <xs:element name="name" type="stringMaxSize"/>
+                <xs:element name="phoneNumbers" type="phoneNumberList"/>
             </xs:sequence>
         </xs:complexType>
     </xs:element>
-    <xs:element name="phone-number">
-        <xs:complexType>
-            <xs:sequence/>
-        </xs:complexType>
-    </xs:element>
-    <xs:simpleType name="stringMaxSize5">
+
+    <xs:simpleType name="stringMaxSize">
         <xs:restriction base="xs:string">
-            <xs:maxLength value="5"/>
+            <xs:maxLength value="10"/>
         </xs:restriction>
     </xs:simpleType>
+
+    <xs:complexType name="phoneNumberList">
+        <xs:sequence>
+            <xs:element name="phone-number" minOccurs="1" maxOccurs="2"/>
+        </xs:sequence>
+    </xs:complexType>
+
 </xs:schema>

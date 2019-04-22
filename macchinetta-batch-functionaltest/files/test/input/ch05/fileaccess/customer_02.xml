@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<records>
+    <customer>
+        <name>Data Taro</name>
+        <phoneNumbers>
+            <phone-number>01234567890</phone-number>
+        </phoneNumbers>
+    </customer>
+    <customer>
+        <name>Data Jiro</name>
+        <phoneNumbers>
+            <phone-number>01234567891</phone-number>
+            <phone-number>01234567892</phone-number>
+        </phoneNumbers>
+    </customer>
+    <customer>
+        <name>Data Hanako</name>
+        <phoneNumbers>
+            <phone-number>01234567893</phone-number>
+            <phone-number>01234567894</phone-number>
+        </phoneNumbers>
+    </customer>
+</records>

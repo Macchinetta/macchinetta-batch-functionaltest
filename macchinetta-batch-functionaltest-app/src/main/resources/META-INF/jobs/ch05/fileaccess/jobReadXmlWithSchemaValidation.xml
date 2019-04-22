@@ -14,10 +14,7 @@
 
     <context:component-scan base-package="jp.co.ntt.fw.macchinetta.batch.functionaltest.app.common"/>
     <context:component-scan base-package="jp.co.ntt.fw.macchinetta.batch.functionaltest.ch05.fileaccess.module"/>
-    <context:component-scan base-package="jp.co.ntt.fw.macchinetta.batch.functionaltest.ch05.fileaccess.jaxb.customer"/>
-    <mybatis:scan
-            base-package="jp.co.ntt.fw.macchinetta.batch.functionaltest.app.repository.plan"
-            factory-ref="jobSqlSessionFactory"/>
+    <context:component-scan base-package="jp.co.ntt.fw.macchinetta.batch.functionaltest.ch05.fileaccess.jaxb"/>
 
     <bean id="reader" class="org.springframework.batch.item.xml.StaxEventItemReader" scope="step"
           p:resource="file:#{jobParameters['inputFile']}"

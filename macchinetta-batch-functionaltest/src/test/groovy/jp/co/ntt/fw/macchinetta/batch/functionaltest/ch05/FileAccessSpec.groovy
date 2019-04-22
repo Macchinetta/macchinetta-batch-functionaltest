@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 NTT Corporation
+ * Copyright (C) 2017 NTT Corporation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,12 +30,10 @@ import jp.co.ntt.fw.macchinetta.batch.functionaltest.util.JobLauncher
 import jp.co.ntt.fw.macchinetta.batch.functionaltest.util.JobRequest
 import jp.co.ntt.fw.macchinetta.batch.functionaltest.util.LogCondition
 import jp.co.ntt.fw.macchinetta.batch.functionaltest.util.MongoUtil
-import org.xml.sax.SAXParseException
 import spock.lang.Narrative
 import spock.lang.Shared
 import spock.lang.Specification
 
-import javax.xml.bind.UnmarshalException
 import java.nio.file.Files
 import java.util.concurrent.TimeUnit
 /**
@@ -85,7 +83,8 @@ A list of test cases is shown below.
 6.1 Input using JAXB.
 6.2 Output using JAXB.
 6.3 Output header and footer.
-6.4 Error, Schema validation.
+6.4 Schema validation.
+6.5 Error, Schema validation.
 7. Test of multi layout file.
 7.1 Multi layout file input, Record pattern : (Header->Data->Trailer)*N->Footer, Each record has a different format.
 7.2 Multi layout file output, Record pattern : (Header->Data->Trailer)*N->Footer, Each record has a different format.
@@ -971,6 +970,36 @@ class FileAccessSpec extends Specification {
                 jobParameter: "inputFile=files/test/input/ch05/fileaccess/customer_01.xml"))
 
         then:
+        exitCode == 0
+
+        def cursorFind = mongoUtil.find(
+                new LogCondition(
+                        logger: LoggingItemReaderListener.class.name,
+                        level: 'INFO'
+                ))
+
+        cursorFind.size() == 3
+
+        cursorFind.any {
+            it.message == "Read item: Customer{name='Data Taro', phoneNumbers='[01234567890]'}"
+        }
+        cursorFind.any {
+            it.message == "Read item: Customer{name='Data Jiro', phoneNumbers='[01234567891, 01234567892]'}"
+        }
+        cursorFind.any {
+            it.message == "Read item: Customer{name='Data Kazuo', phoneNumbers='[01234567893, 01234567894]'}"
+        }
+    }
+
+    // 6.5
+    def "Reading Error XML file with schema validation using JAXB."() {
+        when:
+        int exitCode = jobLauncher.syncJob(new JobRequest(
+                jobFilePath: 'META-INF/jobs/ch05/fileaccess/jobReadXmlWithSchemaValidation.xml',
+                jobName: 'jobReadXmlWithSchemaValidation',
+                jobParameter: "inputFile=files/test/input/ch05/fileaccess/customer_02.xml"))
+
+        then:
         exitCode == 255
 
         def throwableCursor = mongoUtil.findOne(
@@ -982,19 +1011,8 @@ class FileAccessSpec extends Specification {
         throwableCursor.message == "Exception occurred while reading."
 
         throwableCursor.throwable._class == UnmarshallingFailureException
-        throwableCursor.throwable.message.contains("JAXB unmarshalling exception; nested exception is " +
-                "javax.xml.bind.UnmarshalException\n - with linked exception:\n" +
-                "[org.xml.sax.SAXParseException; lineNumber: 2; columnNumber: 27;")
+        throwableCursor.throwable.message.contains("Value 'Data Hanako' with length = '11' is not facet-valid with respect to maxLength '10' for type 'stringMaxSize'.")
         throwableCursor.throwable.stackTrace.size() > 0
-
-        throwableCursor.throwable.cause._class == UnmarshalException
-        throwableCursor.throwable.cause.message == null
-        throwableCursor.throwable.cause.stackTrace.size() > 0
-
-        throwableCursor.throwable.cause.cause._class == SAXParseException
-        throwableCursor.throwable.cause.cause.message == "cvc-maxLength-valid: Value 'Data Tato' with length = '9' " +
-                "is not facet-valid with respect to maxLength '5' for type 'stringMaxSize5'."
-        throwableCursor.throwable.cause.cause.stackTrace.size() > 0
     }
 
     // 7.1

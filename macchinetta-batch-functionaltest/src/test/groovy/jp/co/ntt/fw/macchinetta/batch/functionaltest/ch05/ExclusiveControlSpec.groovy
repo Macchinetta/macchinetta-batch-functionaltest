@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 NTT Corporation
+ * Copyright (C) 2017 NTT Corporation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -110,8 +110,12 @@ class ExclusiveControlSpec extends Specification {
         Files.deleteIfExists(outputFile.toPath())
         Files.createDirectories(outputFile.parentFile.toPath())
 
+        def lockFileName = "./files/test/output/ch05/exclusivecontorol/exclusiveFile.lock"
+        def lockFile = new File(lockFileName)
+        lockFile.createNewFile()
+
         def command = "java -cp target/dependency/* ${CommandLineJobRunner.class.name} " +
-                "${jobFilePath} ${jobName} outputFile=${outputFileName}"
+                "${jobFilePath} ${jobName} outputFile=${outputFileName} lockFile=${lockFileName}"
 
         when:
 
@@ -143,12 +147,12 @@ class ExclusiveControlSpec extends Specification {
         )).size() == 0
 
         mongoUtil.find(new LogCondition(
-                message: "Failed to acquire lock. [processName=${lockedProcess}]",
+                message: "Failed to acquire lock. [lockFile=${lockFileName}] [processName=${lockedProcess}]",
                 logger: loggerName,
                 level: 'ERROR'
         )).size() == 0
         mongoUtil.find(new LogCondition(
-                message: "Failed to acquire lock. [processName=${exclusiveProcess}]",
+                message: "Failed to acquire lock. [lockFile=${lockFileName}] [processName=${exclusiveProcess}]",
                 logger: loggerName,
                 level: 'ERROR'
         )).size() == 1
@@ -156,6 +160,7 @@ class ExclusiveControlSpec extends Specification {
 
         cleanup:
         Files.deleteIfExists(outputFile.toPath())
+        Files.deleteIfExists(lockFile.toPath())
 
         where:
         testcase  | jobFilePath                                                  | jobName              || loggerName

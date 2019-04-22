@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 NTT Corporation
+ * Copyright (C) 2017 NTT Corporation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -129,7 +129,7 @@ class AsyncJobWithDBSpec extends Specification {
 
         // daemon log
         def daemonLaunchLog = mongoUtil.findOne(message: 'Async Batch Daemon start.')
-        def schedulerStartLog = mongoUtil.findOne(new LogCondition(message: "Initializing ExecutorService  'daemonTaskScheduler'", logger: ThreadPoolTaskScheduler.class.name))
+        def schedulerStartLog = mongoUtil.findOne(new LogCondition(message: "Initializing ExecutorService 'daemonTaskScheduler'", logger: ThreadPoolTaskScheduler.class.name))
         def pollingLog = mongoUtil.find(new LogCondition(message: 'Polling processing.')).sort {l,r -> l.timestamp <=> r.timestamp}
         def findStopFileLog = mongoUtil.findOne(message: 'Async Batch Daemon has detected the polling stop file, and then shutdown now!')
         def daemonStopLog = mongoUtil.findOne(message: 'Async Batch Daemon stopped after all jobs completed.')

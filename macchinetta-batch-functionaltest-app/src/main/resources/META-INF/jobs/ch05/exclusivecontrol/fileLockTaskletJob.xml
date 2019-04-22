@@ -30,7 +30,7 @@
 
     <bean id="writer" class="org.springframework.batch.item.file.FlatFileItemWriter" scope="step"
           p:resource="file:#{jobParameters['outputFile']}"
-          p:appendAllowed="true">
+          p:transactional="false">
         <property name="lineAggregator">
             <bean class="org.springframework.batch.item.file.transform.DelimitedLineAggregator">
                 <property name="fieldExtractor">
