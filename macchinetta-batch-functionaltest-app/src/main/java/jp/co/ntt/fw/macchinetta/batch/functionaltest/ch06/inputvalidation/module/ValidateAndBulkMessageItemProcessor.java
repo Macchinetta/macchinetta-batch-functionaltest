@@ -17,7 +17,6 @@ package jp.co.ntt.fw.macchinetta.batch.functionaltest.ch06.inputvalidation.modul
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.annotation.AfterStep;
 import org.springframework.batch.core.annotation.BeforeStep;
@@ -75,12 +74,13 @@ public class ValidateAndBulkMessageItemProcessor implements ItemProcessor<Verifi
 
             List<String> errorMessageList = new ArrayList<>();
             if (stepExecution.getExecutionContext().containsKey(ERROR_MESSAGE_KEY)) {
-                errorMessageList = (List<String>) stepExecution.getExecutionContext().get(ERROR_MESSAGE_KEY);
-                stepExecution.getExecutionContext().remove(ERROR_MESSAGE_KEY);
+
+                @SuppressWarnings("unchecked")
+                List<String> errorMessages = (List<String>) stepExecution.getExecutionContext().get(ERROR_MESSAGE_KEY);
+                errorMessageList = errorMessages;
             }
 
             BindException errors = (BindException) e.getCause();
-
             for (FieldError fieldError : errors.getFieldErrors()) {
                 String message = MessageFormat
                         .format("{0} Skipping item because exception occurred in input validation at the {1}. [message:{2}]",
@@ -103,6 +103,7 @@ public class ValidateAndBulkMessageItemProcessor implements ItemProcessor<Verifi
     public void afterStep(StepExecution stepExecution) {
         ExecutionContext executionContext = stepExecution.getExecutionContext();
 
+        @SuppressWarnings("unchecked")
         List<String> errorMessageList = (List<String>) executionContext.get(ERROR_MESSAGE_KEY);
         for (String errorMessage : errorMessageList) {
             logger.warn(errorMessage);

@@ -5,10 +5,10 @@
        xmlns:batch="http://www.springframework.org/schema/batch"
        xmlns:c="http://www.springframework.org/schema/c"
        xmlns:util="http://www.springframework.org/schema/util"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-             http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
-             http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch.xsd
-             http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+       xsi:schemaLocation="http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd
+             http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd
+             http://www.springframework.org/schema/batch https://www.springframework.org/schema/batch/spring-batch.xsd
+             http://www.springframework.org/schema/util https://www.springframework.org/schema/util/spring-util.xsd">
 
     <import resource="classpath:META-INF/spring/job-base-context.xml"/>
 

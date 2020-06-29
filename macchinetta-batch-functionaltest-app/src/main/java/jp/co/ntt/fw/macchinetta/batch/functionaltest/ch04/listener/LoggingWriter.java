@@ -18,7 +18,6 @@ package jp.co.ntt.fw.macchinetta.batch.functionaltest.ch04.listener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.item.ExecutionContext;
-import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.ItemStreamWriter;
 import org.springframework.core.io.Resource;

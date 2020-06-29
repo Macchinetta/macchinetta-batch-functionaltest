@@ -27,8 +27,8 @@ import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
 import java.math.BigDecimal;
+import java.security.SecureRandom;
 import java.util.Date;
-import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -61,7 +61,7 @@ public class SingleTranTask implements Tasklet {
     @Override
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 
-        Random random = new Random();
+        SecureRandom random = new SecureRandom();
 
         for (int i = 0; i < 1000; i++) {
             Invoice invoice = new Invoice();

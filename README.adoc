@@ -18,7 +18,7 @@ Currently, support language is Japanese only. (Will translate to English as soon
 
 == Tested environments at the time of release
 
-Tested environments are managed at https://github.com/Macchinetta/batch-functionaltest/wiki/Tested-Environment[wiki page].
+Tested environments are managed at https://github.com/Macchinetta/macchinetta-batch-functionaltest/wiki/Tested-Environment[wiki page].
 
 == How to perform functional test
 
@@ -72,7 +72,7 @@ Clone the ``Macchinetta/batch-functionaltest`` repository into local machine.
 
 [source, text]
 ----
-$ git clone https://github.com/Macchinetta/batch-functionaltest.git
+$ git clone https://github.com/Macchinetta/macchinetta-batch-functionaltest.git
 ----
 
 === [Step 4] Run functional tests

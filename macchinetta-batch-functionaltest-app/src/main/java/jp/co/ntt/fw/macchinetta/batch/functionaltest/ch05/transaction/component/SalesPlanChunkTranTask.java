@@ -25,7 +25,6 @@ import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 import jp.co.ntt.fw.macchinetta.batch.functionaltest.app.model.plan.SalesPlanDetail;
@@ -45,7 +44,7 @@ import javax.inject.Named;
  *
  * @since 2.0.1
  */
-@Component()
+@Component
 @Scope("step")
 public class SalesPlanChunkTranTask implements Tasklet {
 

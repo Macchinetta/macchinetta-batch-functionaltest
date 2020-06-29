@@ -6,10 +6,10 @@
        xmlns:p="http://www.springframework.org/schema/p"
        xmlns:task="http://www.springframework.org/schema/task"
        xmlns:mybatis="http://mybatis.org/schema/mybatis-spring"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-             http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
-             http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch.xsd
-             http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task.xsd
+       xsi:schemaLocation="http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd
+             http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd
+             http://www.springframework.org/schema/batch https://www.springframework.org/schema/batch/spring-batch.xsd
+             http://www.springframework.org/schema/task https://www.springframework.org/schema/task/spring-task.xsd
              http://mybatis.org/schema/mybatis-spring http://mybatis.org/schema/mybatis-spring.xsd">
 
     <import resource="classpath:META-INF/spring/job-base-context.xml"/>
@@ -35,7 +35,7 @@
           p:statementId="jp.co.ntt.fw.macchinetta.batch.functionaltest.app.repository.performance.SalesPerformanceDetailRepository.create"
           p:sqlSessionTemplate-ref="batchModeSqlSessionTemplate"/>
 
-    <batch:step id="multipleInvoiceSummarizeJob.slave">
+    <batch:step id="multipleInvoiceSummarizeJob.worker">
         <batch:tasklet transaction-manager="jobTransactionManager">
             <batch:chunk reader="reader" writer="writer" commit-interval="10"/>
             <batch:listeners>
@@ -45,8 +45,8 @@
     </batch:step>
 
     <batch:job id="multipleInvoiceSummarizeJob" job-repository="jobRepository">
-        <batch:step id="multipleInvoiceSummarizeJob.master">
-            <batch:partition partitioner="branchPartitioner" step="multipleInvoiceSummarizeJob.slave">
+        <batch:step id="multipleInvoiceSummarizeJob.manager">
+            <batch:partition partitioner="branchPartitioner" step="multipleInvoiceSummarizeJob.worker">
                 <batch:handler grid-size="${grid.size}" task-executor="parallelTaskExecutor"/>
             </batch:partition>
         </batch:step>

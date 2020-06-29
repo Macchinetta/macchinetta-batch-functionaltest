@@ -201,8 +201,8 @@ class SyncJobUsingEmbeddedDBSpec extends Specification {
         setupIncorrectDataOnCondition()
 
         // expect files
-        def expectBefore = new File("./files/expect/output/ch06/reprocrssing/plan_data_on_condition_expect_before_restart.csv")
-        def expectAfter = new File("./files/expect/output/ch06/reprocrssing/plan_data_on_condition_expect_after_restart.csv")
+        def expectBefore = new File("./files/expect/output/ch06/reprocessing/plan_data_on_condition_expect_before_restart.csv")
+        def expectAfter = new File("./files/expect/output/ch06/reprocessing/plan_data_on_condition_expect_after_restart.csv")
 
         def jobRequest = new JobRequest(
                 jobFilePath: 'META-INF/jobs/ch06/reprocessing/restartOnConditionBasisJob.xml',
@@ -418,8 +418,8 @@ class SyncJobUsingEmbeddedDBSpec extends Specification {
                 "0002" | 2016 | 12 | "C0015" | 1400
             }
         })
-        def planInputFile = './files/test/input/ch08/paralleandmultiple/planData.csv'
-        def performanceInputFile = './files/test/input/ch08/paralleandmultiple/performanceData.csv'
+        def planInputFile = './files/test/input/ch08/parallelandmultiple/planData.csv'
+        def performanceInputFile = './files/test/input/ch08/parallelandmultiple/performanceData.csv'
 
         when:
         def exitValue = jobLauncher.syncJob(new JobRequest(
@@ -538,11 +538,11 @@ class SyncJobUsingEmbeddedDBSpec extends Specification {
 
         DBUnitUtil.assertEquals(expectData.getTable("sales_performance_detail"), jobDBUnitUtil.getTable("sales_performance_detail"))
 
-        def slaveStepLog = mongoUtil.find(new LogCondition(message: ~/step started./))
-        slaveStepLog.size() == divisionNum
-        slaveStepLog.any { it.thread == 'parallelTaskExecutor-1' } == thead1exists
-        slaveStepLog.any { it.thread == 'parallelTaskExecutor-2' } == thead2exists
-        slaveStepLog.any { it.thread == 'parallelTaskExecutor-3' } == thead3exists
+        def workerStepLog = mongoUtil.find(new LogCondition(message: ~/step started./))
+        workerStepLog.size() == divisionNum
+        workerStepLog.any { it.thread == 'parallelTaskExecutor-1' } == thead1exists
+        workerStepLog.any { it.thread == 'parallelTaskExecutor-2' } == thead2exists
+        workerStepLog.any { it.thread == 'parallelTaskExecutor-3' } == thead3exists
 
         // Deleted results verification using JobRepository.
 

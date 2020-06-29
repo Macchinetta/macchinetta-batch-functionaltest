@@ -10,7 +10,7 @@
     <parent>
         <groupId>jp.co.ntt.fw.macchinetta.batch</groupId>
         <artifactId>macchinetta-batch-functionaltest-build</artifactId>
-        <version>2.1.1.RELEASE</version>
+        <version>2.2.0.RELEASE</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -275,8 +275,8 @@
             </dependency>
 
             <dependency>
-                <groupId>com.oracle.jdbc</groupId>
-                <artifactId>ojdbc8</artifactId>
+                <groupId>com.oracle.ojdbc</groupId>
+                <artifactId>${oracle.ojdbc}</artifactId>
                 <version>${oracle.jdbc.version}</version>
             </dependency>
         </dependencies>
@@ -354,24 +354,24 @@
 
     <properties>
         <!-- == Maven Plugin Versions == -->
-        <maven-compiler-plugin.version>3.8.0</maven-compiler-plugin.version>
-        <groovy-eclipse-compiler.version>3.0.0-01</groovy-eclipse-compiler.version>
-        <groovy-eclipse-batch.version>2.5.4-01</groovy-eclipse-batch.version>
+        <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
+        <groovy-eclipse-compiler.version>3.6.0-02</groovy-eclipse-compiler.version>
+        <groovy-eclipse-batch.version>2.5.8-02</groovy-eclipse-batch.version>
         <maven-failsafe-plugin.version>2.22.0</maven-failsafe-plugin.version>
         <maven-resources-plugin.version>3.1.0</maven-resources-plugin.version>
         <com.google.code.maven-license-plugin.version>1.4.0</com.google.code.maven-license-plugin.version>
         <formatter-maven-plugin.version>0.5.2</formatter-maven-plugin.version>
-        <maven-war-plugin.version>3.2.2</maven-war-plugin.version>
-        <org.codehaus.cargo.cargo-maven2-plugin.version>1.6.9</org.codehaus.cargo.cargo-maven2-plugin.version>
+        <maven-war-plugin.version>3.2.3</maven-war-plugin.version>
+        <org.codehaus.cargo.cargo-maven2-plugin.version>1.7.9</org.codehaus.cargo.cargo-maven2-plugin.version>
 
         <!-- == Dependency Versions == -->
         <!-- == Spring Boot Dependencies == -->
-        <org.springframework.boot.version>2.1.2.RELEASE</org.springframework.boot.version>
+        <org.springframework.boot.version>2.2.4.RELEASE</org.springframework.boot.version>
 
         <!-- == Spock == -->
-        <org.spockframework.spock-core.version>1.2-groovy-2.4</org.spockframework.spock-core.version>
-        <org.spockframework.spock-spring.version>1.2-groovy-2.4</org.spockframework.spock-spring.version>
-        <com.athaydes.spock-reports.version>1.6.1</com.athaydes.spock-reports.version>
+        <org.spockframework.spock-core.version>1.3-groovy-2.4</org.spockframework.spock-core.version>
+        <org.spockframework.spock-spring.version>1.3-groovy-2.4</org.spockframework.spock-spring.version>
+        <com.athaydes.spock-reports.version>1.6.2</com.athaydes.spock-reports.version>
 
         <!-- == DBUnit == -->
         <org.dbunit.dbunit.version>2.5.4</org.dbunit.dbunit.version>
@@ -384,31 +384,6 @@
     </properties>
 
     <profiles>
-        <profile>
-            <id>tomcat8-local</id>
-            <build>
-                <pluginManagement>
-                    <plugins>
-                        <plugin>
-                            <groupId>org.codehaus.cargo</groupId>
-                            <artifactId>cargo-maven2-plugin</artifactId>
-                            <configuration>
-                                <container>
-                                    <containerId>tomcat8x</containerId>
-                                </container>
-                            </configuration>
-                        </plugin>
-                    </plugins>
-                </pluginManagement>
-            </build>
-            <properties>
-                <remote.hostname>localhost</remote.hostname>
-                <servlet.port>8088</servlet.port>
-                <remote.username>admin</remote.username>
-                <remote.password/>
-                <project.config.resource.directory.web>config/web/tomcat8/local</project.config.resource.directory.web>
-            </properties>
-        </profile>
         <profile>
             <id>tomcat9-local</id>
             <activation>
@@ -438,79 +413,6 @@
             </properties>
         </profile>
         <profile>
-            <id>postgresql9-local</id>
-            <properties>
-                <project.config.resource.directory.rdbms>config/rdbms/postgresql9/local</project.config.resource.directory.rdbms>
-                <project.config.resource.directory.mongo>config/mongo/local</project.config.resource.directory.mongo>
-            </properties>
-        </profile>
-        <profile>
-            <id>postgresql10-local</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
-            <properties>
-                <project.config.resource.directory.rdbms>config/rdbms/postgresql10/local</project.config.resource.directory.rdbms>
-                <project.config.resource.directory.mongo>config/mongo/local</project.config.resource.directory.mongo>
-            </properties>
-        </profile>
-        <profile>
-            <id>oracle12c-local</id>
-            <dependencies>
-                <dependency>
-                    <groupId>com.oracle.jdbc</groupId>
-                    <artifactId>ojdbc8</artifactId>
-                    <scope>runtime</scope>
-                </dependency>
-            </dependencies>
-            <properties>
-                <oracle.jdbc.version>12.2.0.1</oracle.jdbc.version>
-                <project.config.resource.directory.rdbms>config/rdbms/oracle12c/local</project.config.resource.directory.rdbms>
-                <project.config.resource.directory.mongo>config/mongo/local</project.config.resource.directory.mongo>
-            </properties>
-        </profile>
-        <profile>
-            <id>oracle18c-local</id>
-            <dependencies>
-                <dependency>
-                    <groupId>com.oracle.jdbc</groupId>
-                    <artifactId>ojdbc8</artifactId>
-                    <scope>runtime</scope>
-                </dependency>
-            </dependencies>
-            <properties>
-                <oracle.jdbc.version>18.3.0.0</oracle.jdbc.version>
-                <project.config.resource.directory.rdbms>config/rdbms/oracle18c/local</project.config.resource.directory.rdbms>
-                <project.config.resource.directory.mongo>config/mongo/local</project.config.resource.directory.mongo>
-            </properties>
-        </profile>
-
-        <profile>
-            <id>tomcat8-it</id>
-            <build>
-                <pluginManagement>
-                    <plugins>
-                        <plugin>
-                            <groupId>org.codehaus.cargo</groupId>
-                            <artifactId>cargo-maven2-plugin</artifactId>
-                            <configuration>
-                                <container>
-                                    <containerId>tomcat8x</containerId>
-                                </container>
-                            </configuration>
-                        </plugin>
-                    </plugins>
-                </pluginManagement>
-            </build>
-            <properties>
-                <remote.hostname>tomcat</remote.hostname>
-                <servlet.port>8080</servlet.port>
-                <remote.username>tomcat</remote.username>
-                <remote.password>tomcat</remote.password>
-                <project.config.resource.directory.web>config/web/tomcat8/it</project.config.resource.directory.web>
-            </properties>
-        </profile>
-        <profile>
             <id>tomcat9-it</id>
             <build>
                 <pluginManagement>
@@ -535,47 +437,66 @@
                 <project.config.resource.directory.web>config/web/tomcat9/it</project.config.resource.directory.web>
             </properties>
         </profile>
+
         <profile>
-            <id>postgresql9-it</id>
-            <properties>
-                <project.config.resource.directory.rdbms>config/rdbms/postgresql9/it</project.config.resource.directory.rdbms>
-                <project.config.resource.directory.mongo>config/mongo/it</project.config.resource.directory.mongo>
-            </properties>
-        </profile>
-        <profile>
-            <id>postgresql10-it</id>
-            <properties>
-                <project.config.resource.directory.rdbms>config/rdbms/postgresql10/it</project.config.resource.directory.rdbms>
-                <project.config.resource.directory.mongo>config/mongo/it</project.config.resource.directory.mongo>
-            </properties>
-        </profile>
-        <profile>
-            <id>oracle12c-it</id>
+            <id>postgresql11-local</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
             <dependencies>
                 <dependency>
-                    <groupId>com.oracle.jdbc</groupId>
-                    <artifactId>ojdbc8</artifactId>
+                    <groupId>org.postgresql</groupId>
+                    <artifactId>postgresql</artifactId>
                     <scope>runtime</scope>
                 </dependency>
             </dependencies>
             <properties>
-                <oracle.jdbc.version>12.2.0.1</oracle.jdbc.version>
-                <project.config.resource.directory.rdbms>config/rdbms/oracle12c/it</project.config.resource.directory.rdbms>
-                <project.config.resource.directory.mongo>config/mongo/it</project.config.resource.directory.mongo>
+                <project.config.resource.directory.rdbms>config/rdbms/postgresql11/local</project.config.resource.directory.rdbms>
+                <project.config.resource.directory.mongo>config/mongo/local</project.config.resource.directory.mongo>
             </properties>
         </profile>
         <profile>
-            <id>oracle18c-it</id>
+            <id>postgresql11-it</id>
             <dependencies>
                 <dependency>
-                    <groupId>com.oracle.jdbc</groupId>
-                    <artifactId>ojdbc8</artifactId>
+                    <groupId>org.postgresql</groupId>
+                    <artifactId>postgresql</artifactId>
                     <scope>runtime</scope>
                 </dependency>
             </dependencies>
             <properties>
-                <oracle.jdbc.version>18.3.0.0</oracle.jdbc.version>
-                <project.config.resource.directory.rdbms>config/rdbms/oracle18c/it</project.config.resource.directory.rdbms>
+                <project.config.resource.directory.rdbms>config/rdbms/postgresql11/it</project.config.resource.directory.rdbms>
+                <project.config.resource.directory.mongo>config/mongo/it</project.config.resource.directory.mongo>
+            </properties>
+        </profile>
+
+        <profile>
+            <id>oracle19c-local</id>
+            <dependencies>
+                <dependency>
+                    <groupId>com.oracle.ojdbc</groupId>
+                    <artifactId>${oracle.ojdbc}</artifactId>
+                    <scope>runtime</scope>
+                </dependency>
+            </dependencies>
+            <properties>
+                <oracle.jdbc.version>19.3.0.0</oracle.jdbc.version>
+                <project.config.resource.directory.rdbms>config/rdbms/oracle19c/local</project.config.resource.directory.rdbms>
+                <project.config.resource.directory.mongo>config/mongo/local</project.config.resource.directory.mongo>
+            </properties>
+        </profile>
+        <profile>
+            <id>oracle19c-it</id>
+            <dependencies>
+                <dependency>
+                    <groupId>com.oracle.ojdbc</groupId>
+                    <artifactId>${oracle.ojdbc}</artifactId>
+                    <scope>runtime</scope>
+                </dependency>
+            </dependencies>
+            <properties>
+                <oracle.jdbc.version>19.3.0.0</oracle.jdbc.version>
+                <project.config.resource.directory.rdbms>config/rdbms/oracle19c/it</project.config.resource.directory.rdbms>
                 <project.config.resource.directory.mongo>config/mongo/it</project.config.resource.directory.mongo>
             </properties>
         </profile>

@@ -41,7 +41,7 @@ import javax.inject.Named;
  *
  * @since 2.0.1
  */
-@Component()
+@Component
 @Scope("step")
 public class SalesPlanSingleTranTask implements Tasklet {
 

@@ -22,7 +22,7 @@ import java.math.BigDecimal;
  *
  * @since 2.0.1
  */
-public class SalesPlanDetailEnd extends SalesPlanDetailMultiLayoutRecord {
+public class SalesPlanDetailEnd extends SalesPlanDetailMultiFormatRecord {
 
     /**
      * Number of header.

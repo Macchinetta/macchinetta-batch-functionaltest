@@ -205,15 +205,9 @@ class AsyncJobWithDBSpec extends Specification {
         def env = ["async-batch-daemon.job-concurrency-num=5", "async-batch-daemon.polling-interval=5000"] as String[]
         def p = launcher.startAsyncBatchDaemon(env)
 
-        def count = 0
-        while (count < 30) {
-            def pollingLog = mongoUtil.find(new LogCondition(message: 'Polling processing.'))
-            if (pollingLog.size() > 1) {
-                break
-            }
-            count++
-            sleep(1000L)
-        }
+        mongoUtil.waitForOutputLog(new LogCondition(message: 'Initializing ExecutorService \'daemonTaskScheduler\''))
+        waitForOutputLog(new LogCondition(message: 'Polling processing.'), 1)
+
         def jobRequestSql = "SELECT * FROM batch_job_request WHERE polling_status = 'POLLED' ORDER BY job_seq_id ASC"
         def jobRequestTable = adminDB.createQueryTable("jobRequest", jobRequestSql)
 
@@ -221,7 +215,6 @@ class AsyncJobWithDBSpec extends Specification {
         launcher.stopAsyncBatchDaemon(p)
 
         then:
-        count < 30
         jobRequestTable.rowCount == 5
         for (int i in 0..<jobRequestTable.rowCount) {
             assert jobRequestTable.getValue(i, "job_seq_id") == jobSeqIds.get(i)
@@ -279,32 +272,14 @@ class AsyncJobWithDBSpec extends Specification {
         def p = launcher.startAsyncBatchDaemon(env)
 
         // first polled job are executing.
-        def count = 0
-        while (count < 30) {
-            def pollingLog = mongoUtil.find(new LogCondition(message: 'Polling processing.'))
-            if (pollingLog.size() > 1) {
-                break
-            }
-            count++
-            sleep(1000L)
-        }
-        assert count != 30
+        waitForOutputLog(new LogCondition(message: 'Polling processing.'), 1)
         def polledJobRequestTable = adminDB.getTable("batch_job_request")
 
         launcher.waitAsyncJob(adminDB, jobSeqIds.get(0) as long, 180L, TimeUnit.SECONDS)
 
         // second polled job are executing.
         def pollingCount = mongoUtil.find(new LogCondition(message: 'Polling processing.')).size()
-        count = 0
-        while (count < 30) {
-            def pollingLog = mongoUtil.find(new LogCondition(message: 'Polling processing.'))
-            if (pollingLog.size() > pollingCount + 1) {
-                break
-            }
-            count++
-            sleep(1000L)
-        }
-        assert count != 30
+        waitForOutputLog(new LogCondition(message: 'Polling processing.'), pollingCount + 1)
         def executedJobRequestTable = adminDB.getTable("batch_job_request")
         launcher.waitAsyncJob(adminDB, jobSeqIds.get(5) as long, 180L, TimeUnit.SECONDS)
 
@@ -316,11 +291,11 @@ class AsyncJobWithDBSpec extends Specification {
 
         then:
         countByPollingStatus(initJobRequestTable, 'INIT') == 20
-        countByPollingStatus(polledJobRequestTable, 'POLLED') == 5
-        countByPollingStatus(executedJobRequestTable, 'POLLED') == 5
         countByPollingStatus(polledJobRequestTable, 'INIT') == 15
-        countByPollingStatus(executedJobRequestTable, 'INIT') == 10
+        countByPollingStatus(polledJobRequestTable, 'POLLED') == 5
         countByPollingStatus(polledJobRequestTable, 'EXECUTED') == 0
+        countByPollingStatus(executedJobRequestTable, 'INIT') == 10
+        countByPollingStatus(executedJobRequestTable, 'POLLED') == 5
         countByPollingStatus(executedJobRequestTable, 'EXECUTED') == 5
 
         // Confirm transition of polling status
@@ -341,19 +316,9 @@ class AsyncJobWithDBSpec extends Specification {
         when:
         def p = launcher.startAsyncBatchDaemon()
         // wait polled job
-        def count = 0
-        while (count < 30) {
-            def pollingLog = mongoUtil.find(new LogCondition(message: 'Polling processing.'))
-            if (pollingLog.size() > 1) {
-                break
-            }
-            count++
-            sleep(500L)
-        }
-        then:
-        count < 30
+        mongoUtil.waitForOutputLog(new LogCondition(message: 'Initializing ExecutorService \'daemonTaskScheduler\''))
+        waitForOutputLog(new LogCondition(message: 'Polling processing.'), 1)
 
-        when:
         launcher.stopAsyncBatchDaemon(p, 180, TimeUnit.SECONDS)
 
         mongoUtil.waitForOutputLog(new LogCondition(message: 'job finished.[JobName:asyncJobLongTermTask][ExitStatus:COMPLETED]'))
@@ -416,19 +381,9 @@ class AsyncJobWithDBSpec extends Specification {
         when:
         def p = launcher.startAsyncBatchDaemon()
         // wait polled job
-        def count = 0
-        while (count < 30) {
-            def pollingLog = mongoUtil.find(new LogCondition(message: 'Polling processing.'))
-            if (pollingLog.size() > 1) {
-                break
-            }
-            count++
-            sleep(500L)
-        }
-        then:
-        count < 30
+        mongoUtil.waitForOutputLog(new LogCondition(message: 'Initializing ExecutorService \'daemonTaskScheduler\''))
+        waitForOutputLog(new LogCondition(message: 'Polling processing.'), 1)
 
-        when:
         def signalProcess = launcher.executeProcess(command)
         signalProcess.waitForOrKill(TimeUnit.SECONDS.toMillis(10L))
 
@@ -460,19 +415,8 @@ class AsyncJobWithDBSpec extends Specification {
         when:
         def p = launcher.startAsyncBatchDaemon()
         // wait polled job
-        def count = 0
-        while (count < 30) {
-            def pollingLog = mongoUtil.find(new LogCondition(message: 'Polling processing.'))
-            if (pollingLog.size() > 1) {
-                break
-            }
-            count++
-            sleep(500L)
-        }
-        then:
-        count < 30
+        waitForOutputLog(new LogCondition(message: 'Polling processing.'), 1)
 
-        when:
         def result = 0
 
         Files.createDirectory(stopFile.toPath())
@@ -581,15 +525,7 @@ class AsyncJobWithDBSpec extends Specification {
         adminDB.executeSqlScript(adminDB.conf.ch04.defaultDropSqlsFilePaths as String[])
 
         // Wait until the third poll is confirmed in the faulty environment.
-        def count = 0
-        while (count < 30) {
-            def pollingLog = mongoUtil.find(new LogCondition(message: 'Polling processing.'))
-            if (pollingLog.size() > 3) {
-                break
-            }
-            count++
-            sleep(500L)
-        }
+        waitForOutputLog(new LogCondition(message: 'Polling processing.'), 3)
 
         // Create job request table.
         adminDB.executeSqlScript(adminDB.conf.ch04.defaultCreateSqlFilePaths as String[])
@@ -605,7 +541,7 @@ class AsyncJobWithDBSpec extends Specification {
 
         def jobStartLog = mongoUtil.findOne(message: 'job started. [JobName:jobSalesPerformance02]')
         def jobRequestTable = adminDB.getTable('batch_job_request')
-        def errorLog = mongoUtil.find(new LogCondition(message: 'Unexpected error occurred in scheduled task.'))
+        def errorLog = mongoUtil.find(new LogCondition(message: 'Unexpected error occurred in scheduled task'))
 
         then:
         jobStartLog != null
@@ -951,16 +887,8 @@ class AsyncJobWithDBSpec extends Specification {
             p2 = launcher.startAsyncBatchDaemon(["app.daemonName=daemon02", env_interval] as String[])
 
             // Wait until the third poll is confirmed in the faulty environment.
-            while (count < timeoutCount) {
-                def pollingLog = mongoUtil.find(new LogCondition(
-                        message: ~/Preparing: UPDATE batch_job_request SET polling_status/))
-                if (pollingLog.size() >= 2) {
-                    break
-                }
-                count++
-                sleep(500L)
-            }
-            sleep(1000L)
+            def condition = new LogCondition(message: ~/Preparing: UPDATE batch_job_request SET polling_status/)
+            waitForOutputLog(condition, 1)
         }
 
         launcher.waitAsyncJob(adminDB, jobSeqId)
@@ -1074,5 +1002,25 @@ class AsyncJobWithDBSpec extends Specification {
         }
 
         keyValues
+    }
+
+    def waitForOutputLog(condition, count, waitTime = 3, TimeUnit timeUnit = TimeUnit.MINUTES) {
+
+        def startTime = System.currentTimeMillis()
+        def timeout = timeUnit.toMillis(waitTime)
+        while (true) {
+
+            def logs = mongoUtil.find(condition)
+            def logSize = logs.size()
+            if (logSize > count) {
+                break
+            }
+
+            long currentTime = System.currentTimeMillis()
+            long progressTime = currentTime - startTime
+            if (progressTime > timeUnit.toMillis(timeout)) {
+                throw new TimeoutException("*** exceeded waiting time: ${timeUnit.toMillis(timeout)} starttime: ${startTime}")
+            }
+        }
     }
 }

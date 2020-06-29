@@ -22,7 +22,7 @@ import java.math.BigDecimal;
  *
  * @since 2.0.1
  */
-public class SalesPlanDetailData extends SalesPlanDetailMultiLayoutRecord {
+public class SalesPlanDetailData extends SalesPlanDetailMultiFormatRecord {
 
     /**
      * Branch ID.

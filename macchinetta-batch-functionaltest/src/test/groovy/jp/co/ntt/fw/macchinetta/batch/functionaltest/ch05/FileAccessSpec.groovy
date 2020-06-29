@@ -85,9 +85,9 @@ A list of test cases is shown below.
 6.3 Output header and footer.
 6.4 Schema validation.
 6.5 Error, Schema validation.
-7. Test of multi layout file.
-7.1 Multi layout file input, Record pattern : (Header->Data->Trailer)*N->Footer, Each record has a different format.
-7.2 Multi layout file output, Record pattern : (Header->Data->Trailer)*N->Footer, Each record has a different format.
+7. Test of multi format file.
+7.1 Multi format file input, Record pattern : (Header->Data->Trailer)*N->Footer, Each record has a different format.
+7.2 Multi format file output, Record pattern : (Header->Data->Trailer)*N->Footer, Each record has a different format.
 8. Control break.
 """)
 class FileAccessSpec extends Specification {
@@ -1016,11 +1016,11 @@ class FileAccessSpec extends Specification {
     }
 
     // 7.1
-    def "Reading multi layout CSV file."() {
+    def "Reading multi format CSV file."() {
         when:
         int exitCode = jobLauncher.syncJob(new JobRequest(
-                jobFilePath: 'META-INF/jobs/ch05/fileaccess/jobReadMultiLayoutCsv.xml',
-                jobName: 'jobReadMultiLayoutCsv',
+                jobFilePath: 'META-INF/jobs/ch05/fileaccess/jobReadMultiFormatCsv.xml',
+                jobName: 'jobReadMultiFormatCsv',
                 jobParameter: "inputFile=files/test/input/ch05/fileaccess/sales_plan_detail_17.csv"))
 
         then:
@@ -1055,14 +1055,14 @@ class FileAccessSpec extends Specification {
     }
 
     // 7.2
-    def "Writing multi layout CSV file."() {
+    def "Writing multi format CSV file."() {
         setup:
         def outputPath = outputDir + "/sales_plan_detail.csv"
 
         when:
         int exitCode = jobLauncher.syncJob(new JobRequest(
-                jobFilePath: 'META-INF/jobs/ch05/fileaccess/jobWriteMultiLayoutCsv.xml',
-                jobName: 'jobWriteMultiLayoutCsv',
+                jobFilePath: 'META-INF/jobs/ch05/fileaccess/jobWriteMultiFormatCsv.xml',
+                jobName: 'jobWriteMultiFormatCsv',
                 jobParameter: "inputFile=files/test/input/ch05/fileaccess/sales_plan_detail_17.csv " +
                         "outputFile=" + outputPath))
 

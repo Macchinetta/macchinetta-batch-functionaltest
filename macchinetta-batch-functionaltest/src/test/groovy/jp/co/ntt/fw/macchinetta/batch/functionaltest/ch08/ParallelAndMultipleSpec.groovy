@@ -16,6 +16,7 @@
 package jp.co.ntt.fw.macchinetta.batch.functionaltest.ch08
 
 import groovy.util.logging.Slf4j
+import org.apache.commons.collections.ListUtils
 import org.junit.Rule
 import org.junit.rules.TestName
 import jp.co.ntt.fw.macchinetta.batch.functionaltest.util.DBUnitUtil
@@ -306,8 +307,8 @@ class ParallelAndMultipleSpec extends Specification {
                 "0002"    | 2016 | 12    | "C0015"     | 1400
             }
         })
-        def planInputFile = './files/test/input/ch08/paralleandmultiple/planData.csv'
-        def performanceInputFile = './files/test/input/ch08/paralleandmultiple/performanceData.csv'
+        def planInputFile = './files/test/input/ch08/parallelandmultiple/planData.csv'
+        def performanceInputFile = './files/test/input/ch08/parallelandmultiple/performanceData.csv'
 
         when:
         def exitValue = launcher.syncJob(new JobRequest(
@@ -444,11 +445,11 @@ class ParallelAndMultipleSpec extends Specification {
 
         DBUnitUtil.assertEquals(expectData.getTable("sales_performance_detail"), jobDB.getTable("sales_performance_detail"))
 
-        def slaveStepLog = mongoUtil.find(new LogCondition(message: ~/step started./))
-        slaveStepLog.size() == divisionNum
-        slaveStepLog.any { it.thread == 'parallelTaskExecutor-1'} == thead1exists
-        slaveStepLog.any { it.thread == 'parallelTaskExecutor-2'} == thead2exists
-        slaveStepLog.any { it.thread == 'parallelTaskExecutor-3'} == thead3exists
+        def workerStepLog = mongoUtil.find(new LogCondition(message: ~/step started./))
+        workerStepLog.size() == divisionNum
+        workerStepLog.any { it.thread == 'parallelTaskExecutor-1'} == thead1exists
+        workerStepLog.any { it.thread == 'parallelTaskExecutor-2'} == thead2exists
+        workerStepLog.any { it.thread == 'parallelTaskExecutor-3'} == thead3exists
 
         def stepExecution = adminDB.getTable("batch_step_execution")
         stepExecution.rowCount == divisionNum + 1
@@ -517,11 +518,11 @@ class ParallelAndMultipleSpec extends Specification {
 
         DBUnitUtil.assertEquals(expectData.getTable("sales_plan_summary"), jobDB.getTable("sales_plan_summary"))
 
-        def slaveStepLog = mongoUtil.find(new LogCondition(message: ~/step started./))
-        slaveStepLog.size() == gridSize
-        slaveStepLog.any { it.thread == 'parallelTaskExecutor-1'} == thead1exists
-        slaveStepLog.any { it.thread == 'parallelTaskExecutor-2'} == thead2exists
-        slaveStepLog.any { it.thread == 'parallelTaskExecutor-3'} == thead3exists
+        def workerStepLog = mongoUtil.find(new LogCondition(message: ~/step started./))
+        workerStepLog.size() == gridSize
+        workerStepLog.any { it.thread == 'parallelTaskExecutor-1'} == thead1exists
+        workerStepLog.any { it.thread == 'parallelTaskExecutor-2'} == thead2exists
+        workerStepLog.any { it.thread == 'parallelTaskExecutor-3'} == thead3exists
 
         def stepExecution = adminDB.getTable("batch_step_execution")
         stepExecution.rowCount == gridSize + 1
@@ -581,11 +582,11 @@ class ParallelAndMultipleSpec extends Specification {
         then:
         exitValue == 0
 
-        def slaveStepLog = mongoUtil.find(new LogCondition(message: ~/step started./))
-        slaveStepLog.size() == 3
-        slaveStepLog.any { it.thread == 'parallelTaskExecutor-1'}
-        slaveStepLog.any { it.thread == 'parallelTaskExecutor-2'}
-        slaveStepLog.any { it.thread == 'parallelTaskExecutor-3'}
+        def workerStepLog = mongoUtil.find(new LogCondition(message: ~/step started./))
+        workerStepLog.size() == 3
+        workerStepLog.any { it.thread == 'parallelTaskExecutor-1'}
+        workerStepLog.any { it.thread == 'parallelTaskExecutor-2'}
+        workerStepLog.any { it.thread == 'parallelTaskExecutor-3'}
 
         expectFileNames.every {it ->
             def file = new File(outputDir, "Evaluation_${it}.csv")
@@ -603,5 +604,48 @@ class ParallelAndMultipleSpec extends Specification {
             Files.deleteIfExists(file.toPath())
         }
 
+    }
+
+    // Testcase 2, test no.6
+    @Unroll
+    def "Execute a job that processes multiple files for each file. (#description)"() {
+        setup:
+        def inputDir = "./files/test/input/ch08/parallelandmultiple"
+
+        when:
+        def exitValue = launcher.syncJob { JobLauncher.SyncJobArg arg ->
+            arg.jobRequest = new JobRequest(
+                    jobFilePath: 'META-INF/jobs/ch08/parallelandmultiple/multiplePartitioninglStepFileJob.xml',
+                    jobName: 'multiplePartitioninglStepFileJob',
+                    jobParameter: "inputdir=${inputDir}"
+            )
+            arg.env = ["thread.size=${threadSize}"] as String[]
+        }
+
+        then:
+        exitValue == 0
+
+        def workerTotalThread = []
+        def workerStepLog = mongoUtil.find(new LogCondition(message: ~/parallelTaskExecutor-/))
+        workerStepLog.each { workerTotalThread << it.thread }
+        workerTotalThread.unique().size() == useThreadSize
+
+        def workerThread01 = []
+        def workerStepLog01 = mongoUtil.find(new LogCondition(message: ~/customerId='0000000001'/))
+        workerStepLog01.each { workerThread01 << it.thread }
+        workerThread01.unique().size() == 1
+
+        def workerThread02 = []
+        def workerStepLog02 = mongoUtil.find(new LogCondition(message: ~/customerId='0000000002'/))
+        workerStepLog02.each { workerThread02 << it.thread }
+        workerThread02.unique().size() == 1
+
+        ListUtils.intersection(workerThread01, workerThread02).isEmpty() == intersection
+
+        where:
+        description                         |inputFile | threadSize || useThreadSize | intersection
+        "inputFile is more than threadSize" | 2        | 1          || 1             | false
+        "inputFile is equal to threadSize"  | 2        | 2          || 2             | true
+        "inputFile is less than threadSize" | 2        | 3          || 2             | true
     }
 }

@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:batch="http://www.springframework.org/schema/batch"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:mybatis="http://mybatis.org/schema/mybatis-spring"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd
+             http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd
+             http://www.springframework.org/schema/batch https://www.springframework.org/schema/batch/spring-batch.xsd
+             http://mybatis.org/schema/mybatis-spring http://mybatis.org/schema/mybatis-spring.xsd">
+
+    <import resource="classpath:META-INF/spring/job-base-context.xml"/>
+
+    <context:component-scan base-package="jp.co.ntt.fw.macchinetta.batch.functionaltest.app.common"/>
+    <context:component-scan base-package="jp.co.ntt.fw.macchinetta.batch.functionaltest.ch05.fileaccess.module"/>
+    <mybatis:scan
+            base-package="jp.co.ntt.fw.macchinetta.batch.functionaltest.app.repository.plan"
+            factory-ref="jobSqlSessionFactory"/>
+
+    <bean id="headerDelimitedLineTokenizer" class="org.springframework.batch.item.file.transform.DelimitedLineTokenizer"
+          p:names="record,description"/>
+
+    <bean id="dataDelimitedLineTokenizer" class="org.springframework.batch.item.file.transform.DelimitedLineTokenizer"
+          p:names="record,branchId,year,month,customerId,amount"/>
+
+    <bean id="trailerDelimitedLineTokenizer"
+          class="org.springframework.batch.item.file.transform.DelimitedLineTokenizer"
+          p:names="record,branchId,number,total"/>
+
+    <bean id="endDelimitedLineTokenizer" class="org.springframework.batch.item.file.transform.DelimitedLineTokenizer"
+          p:names="record,headNum,trailerNum,total"/>
+
+    <bean id="headerBeanWrapperFieldSetMapper"
+          class="org.springframework.batch.item.file.mapping.BeanWrapperFieldSetMapper"
+          p:targetType="jp.co.ntt.fw.macchinetta.batch.functionaltest.ch05.fileaccess.model.plan.SalesPlanDetailHeader"/>
+
+    <bean id="dataBeanWrapperFieldSetMapper"
+          class="org.springframework.batch.item.file.mapping.BeanWrapperFieldSetMapper"
+          p:targetType="jp.co.ntt.fw.macchinetta.batch.functionaltest.ch05.fileaccess.model.plan.SalesPlanDetailData"/>
+
+    <bean id="trailerBeanWrapperFieldSetMapper"
+          class="org.springframework.batch.item.file.mapping.BeanWrapperFieldSetMapper"
+          p:targetType="jp.co.ntt.fw.macchinetta.batch.functionaltest.ch05.fileaccess.model.plan.SalesPlanDetailTrailer"/>
+
+    <bean id="endBeanWrapperFieldSetMapper"
+          class="org.springframework.batch.item.file.mapping.BeanWrapperFieldSetMapper"
+          p:targetType="jp.co.ntt.fw.macchinetta.batch.functionaltest.ch05.fileaccess.model.plan.SalesPlanDetailEnd"/>
+
+    <bean id="reader" class="org.springframework.batch.item.file.FlatFileItemReader" scope="step"
+          p:resource="file:#{jobParameters['inputFile']}">
+        <property name="lineMapper">
+            <bean class="org.springframework.batch.item.file.mapping.PatternMatchingCompositeLineMapper">
+                <property name="tokenizers">
+                    <map>
+                        <entry key="H*" value-ref="headerDelimitedLineTokenizer"/>
+                        <entry key="D*" value-ref="dataDelimitedLineTokenizer"/>
+                        <entry key="T*" value-ref="trailerDelimitedLineTokenizer"/>
+                        <entry key="E*" value-ref="endDelimitedLineTokenizer"/>
+                    </map>
+                </property>
+                <property name="fieldSetMappers">
+                    <map>
+                        <entry key="H*" value-ref="headerBeanWrapperFieldSetMapper"/>
+                        <entry key="D*" value-ref="dataBeanWrapperFieldSetMapper"/>
+                        <entry key="T*" value-ref="trailerBeanWrapperFieldSetMapper"/>
+                        <entry key="E*" value-ref="endBeanWrapperFieldSetMapper"/>
+                    </map>
+                </property>
+            </bean>
+        </property>
+    </bean>
+
+    <bean id="multiFormatItemProcessor"
+          class="jp.co.ntt.fw.macchinetta.batch.functionaltest.ch05.fileaccess.module.MultiFormatItemProcessor"/>
+
+    <bean id="headerDelimitedLineAggregator"
+          class="org.springframework.batch.item.file.transform.DelimitedLineAggregator">
+        <property name="fieldExtractor">
+            <bean class="org.springframework.batch.item.file.transform.BeanWrapperFieldExtractor"
+                  p:names="record,description"/>
+        </property>
+    </bean>
+
+    <bean id="dataDelimitedLineAggregator"
+          class="org.springframework.batch.item.file.transform.DelimitedLineAggregator">
+        <property name="fieldExtractor">
+            <bean class="org.springframework.batch.item.file.transform.BeanWrapperFieldExtractor"
+                  p:names="record,branchId,year,month,customerId,amount"/>
+        </property>
+    </bean>
+
+    <bean id="trailerDelimitedLineAggregator"
+          class="org.springframework.batch.item.file.transform.DelimitedLineAggregator">
+        <property name="fieldExtractor">
+            <bean class="org.springframework.batch.item.file.transform.BeanWrapperFieldExtractor"
+                  p:names="record,branchId,number,total"/>
+        </property>
+    </bean>
+
+    <bean id="endDelimitedLineAggregator"
+          class="org.springframework.batch.item.file.transform.DelimitedLineAggregator">
+        <property name="fieldExtractor">
+            <bean class="org.springframework.batch.item.file.transform.BeanWrapperFieldExtractor"
+                  p:names="record,headNum,trailerNum,total"/>
+        </property>
+    </bean>
+
+
+    <bean id="writer" class="org.springframework.batch.item.file.FlatFileItemWriter" scope="step"
+          p:resource="file:#{jobParameters['outputFile']}">
+        <property name="lineAggregator">
+            <bean class="org.springframework.batch.item.file.transform.PassThroughLineAggregator"/>
+        </property>
+    </bean>
+
+    <batch:job id="jobWriteMultiFormatCsv" job-repository="jobRepository">
+        <batch:step id="jobWriteMultiFormatCsv.step01">
+            <batch:tasklet transaction-manager="jobTransactionManager">
+                <batch:chunk reader="reader" processor="multiFormatItemProcessor"
+                             writer="writer" commit-interval="10"/>
+                <batch:listeners>
+                    <batch:listener ref="loggingItemReaderListener"/>
+                </batch:listeners>
+            </batch:tasklet>
+        </batch:step>
+        <batch:listeners>
+            <batch:listener ref="jobExecutionLoggingListener"/>
+        </batch:listeners>
+    </batch:job>
+
+</beans>

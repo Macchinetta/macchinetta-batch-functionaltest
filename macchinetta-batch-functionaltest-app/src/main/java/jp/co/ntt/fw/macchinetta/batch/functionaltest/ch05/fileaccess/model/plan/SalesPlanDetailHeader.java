@@ -20,7 +20,7 @@ package jp.co.ntt.fw.macchinetta.batch.functionaltest.ch05.fileaccess.model.plan
  *
  * @since 2.0.1
  */
-public class SalesPlanDetailHeader extends SalesPlanDetailMultiLayoutRecord {
+public class SalesPlanDetailHeader extends SalesPlanDetailMultiFormatRecord {
 
     /**
      * Description.

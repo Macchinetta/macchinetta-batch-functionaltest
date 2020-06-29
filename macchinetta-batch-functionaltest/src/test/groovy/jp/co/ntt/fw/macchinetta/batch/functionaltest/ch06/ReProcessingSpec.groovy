@@ -91,8 +91,8 @@ class ReProcessingSpec extends Specification {
         setupIncorrectDataOnNumber()
 
         // expect files
-        def expectBefore = new File("./files/expect/output/ch06/reprocrssing/plan_data_on_number_expect_before_restart.csv")
-        def expectAfter = new File("./files/expect/output/ch06/reprocrssing/plan_data_on_number_expect_after_restart.csv")
+        def expectBefore = new File("./files/expect/output/ch06/reprocessing/plan_data_on_number_expect_before_restart.csv")
+        def expectAfter = new File("./files/expect/output/ch06/reprocessing/plan_data_on_number_expect_after_restart.csv")
 
         when:
         def exitValue1 = launcher.syncJob(new JobRequest(
@@ -178,8 +178,8 @@ class ReProcessingSpec extends Specification {
         setupIncorrectDataOnCondition()
 
         // expect files
-        def expectBefore = new File("./files/expect/output/ch06/reprocrssing/plan_data_on_condition_expect_before_restart.csv")
-        def expectAfter = new File("./files/expect/output/ch06/reprocrssing/plan_data_on_condition_expect_after_restart.csv")
+        def expectBefore = new File("./files/expect/output/ch06/reprocessing/plan_data_on_condition_expect_before_restart.csv")
+        def expectAfter = new File("./files/expect/output/ch06/reprocessing/plan_data_on_condition_expect_after_restart.csv")
 
         def jobRequest = new JobRequest(
                 jobFilePath: 'META-INF/jobs/ch06/reprocessing/restartOnConditionBasisJob.xml',
@@ -275,8 +275,8 @@ class ReProcessingSpec extends Specification {
         setupIncorrectDataOnNumber()
 
         // expect files
-        def expectBefore = new File("./files/expect/output/ch06/reprocrssing/plan_data_on_number_expect_before_restart.csv")
-        def expectAfter = new File("./files/expect/output/ch06/reprocrssing/plan_data_on_number_expect_after_restart.csv")
+        def expectBefore = new File("./files/expect/output/ch06/reprocessing/plan_data_on_number_expect_before_restart.csv")
+        def expectAfter = new File("./files/expect/output/ch06/reprocessing/plan_data_on_number_expect_after_restart.csv")
 
         ApplicationContext context = new ClassPathXmlApplicationContext('META-INF/jobs/ch06/reprocessing/restartOnNumberOfItemsJob.xml')
         def jobOperator = (JobOperator) context.getBean("jobOperator")

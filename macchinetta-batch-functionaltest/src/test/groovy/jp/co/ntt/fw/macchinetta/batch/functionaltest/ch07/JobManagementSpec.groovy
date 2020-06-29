@@ -271,7 +271,7 @@ class JobManagementSpec extends Specification {
         adminDB.dropAndCreateTable() // Reconstruct to simplify the verification procedure.
         setupInitialData()
         def command = "java -cp target/dependency/* ${CommandLineJobRunner.class.name} " +
-                "META-INF/jobs/ch07/jobmanagement/jobSalesPlan02WithLongTermTask.xml jobSalesPlan02WithLongTermTask"
+                "META-INF/jobs/ch07/jobmanagement/jobSalesPlan02WithLongTermTask.xml jobSalesPlan02WithLongTermTask interval=10000"
 
         when:
         def p = JobLauncher.executeProcess(command)
@@ -306,7 +306,7 @@ class JobManagementSpec extends Specification {
         jobLauncher.setTaskExecutor(taskExecutor)
 
         when:
-        def jobExecutionId = jobOperator.start("jobSalesPlan02WithLongTermTask", null)
+        def jobExecutionId = jobOperator.start("jobSalesPlan02WithLongTermTask", "interval=10000")
         mongoUtil.waitForOutputLog(new LogCondition(message: 'job started. [JobName:jobSalesPlan02WithLongTermTask]'))
         sleep(1000)
 
@@ -539,7 +539,7 @@ class JobManagementSpec extends Specification {
         setup:
         setupInitialData()
         def command = "java -cp target/dependency/* ${CommandLineJobRunner.class.name} " +
-                "META-INF/jobs/ch07/jobmanagement/customizedJobExitCodeChunkJob.xml customizedJobExitCodeChunkJob"
+                "META-INF/jobs/ch07/jobmanagement/customizedJobExitCodeChunkJob.xml customizedJobExitCodeChunkJob interval=10000"
 
         when:
         def p = JobLauncher.executeProcess(command)
