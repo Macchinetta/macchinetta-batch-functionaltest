@@ -184,3 +184,6 @@ build/
 
 ### Evidence ###
 macchinetta-batch-functionaltest/files/test/output/
+*.doc*
+*.ppt*
+*.xls*
