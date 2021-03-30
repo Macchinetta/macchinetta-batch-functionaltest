@@ -32,6 +32,7 @@ import jp.co.ntt.fw.macchinetta.batch.functionaltest.util.LogCondition
 import jp.co.ntt.fw.macchinetta.batch.functionaltest.util.MongoUtil
 import spock.lang.Narrative
 import spock.lang.Shared
+import spock.lang.Requires
 import spock.lang.Specification
 
 import java.nio.file.Files
@@ -895,6 +896,61 @@ class FileAccessSpec extends Specification {
         def expect5 = new File("files/expect/output/ch05/fileaccess/customer_list_09.csv").readLines()
         actual5 == expect5
     }
+    // 5.3
+    def "Writing multiple CSV files when commit-interval is less than itemCountLimitPerResource."() {
+        setup:
+        def initCustomerMstDataSet = DBUnitUtil.createDataSet {
+            customer_mst {
+                customer_id | customer_name | customer_address | customer_tel | charge_branch_id | create_date | update_date
+                "001" | "CustomerName001" | "CustomerAddress001" | "11111111111" | "001" | "[now]" | "[now]"
+                "002" | "CustomerName002" | "CustomerAddress002" | "11111111111" | "002" | "[now]" | "[now]"
+                "003" | "CustomerName003" | "CustomerAddress003" | "11111111111" | "003" | "[now]" | "[now]"
+                "004" | "CustomerName004" | "CustomerAddress004" | "11111111111" | "004" | "[now]" | "[now]"
+                "005" | "CustomerName005" | "CustomerAddress005" | "11111111111" | "005" | "[now]" | "[now]"
+                "006" | "CustomerName006" | "CustomerAddress006" | "11111111111" | "006" | "[now]" | "[now]"
+                "007" | "CustomerName007" | "CustomerAddress007" | "11111111111" | "007" | "[now]" | "[now]"
+                "008" | "CustomerName008" | "CustomerAddress008" | "11111111111" | "008" | "[now]" | "[now]"
+                "009" | "CustomerName009" | "CustomerAddress009" | "11111111111" | "009" | "[now]" | "[now]"
+                "010" | "CustomerName010" | "CustomerAddress010" | "11111111111" | "010" | "[now]" | "[now]"
+                "011" | "CustomerName011" | "CustomerAddress011" | "11111111111" | "011" | "[now]" | "[now]"
+                "012" | "CustomerName012" | "CustomerAddress012" | "11111111111" | "012" | "[now]" | "[now]"
+                "013" | "CustomerName013" | "CustomerAddress013" | "11111111111" | "013" | "[now]" | "[now]"
+                "014" | "CustomerName014" | "CustomerAddress014" | "11111111111" | "014" | "[now]" | "[now]"
+                "015" | "CustomerName015" | "CustomerAddress015" | "11111111111" | "015" | "[now]" | "[now]"
+                "016" | "CustomerName016" | "CustomerAddress016" | "11111111111" | "016" | "[now]" | "[now]"
+                "017" | "CustomerName017" | "CustomerAddress017" | "11111111111" | "017" | "[now]" | "[now]"
+                "018" | "CustomerName018" | "CustomerAddress018" | "11111111111" | "018" | "[now]" | "[now]"
+                "019" | "CustomerName019" | "CustomerAddress019" | "11111111111" | "019" | "[now]" | "[now]"
+                "020" | "CustomerName020" | "CustomerAddress020" | "11111111111" | "020" | "[now]" | "[now]"
+                "021" | "CustomerName021" | "CustomerAddress021" | "11111111111" | "021" | "[now]" | "[now]"
+            }
+        }
+        jobDBUnitUtil.insert(initCustomerMstDataSet)
+
+        def outputPath = outputDir + "/customer_list_"
+
+        when:
+        int exitCode = jobLauncher.syncJob(new JobRequest(
+                jobFilePath: 'META-INF/jobs/ch05/fileaccess/jobWriteMultipleCsvCommitInterval.xml',
+                jobName: 'jobWriteMultipleCsvCommitInterval',
+                jobParameter: "outputDir=" + outputPath))
+
+        then:
+        exitCode == 0
+
+        def actual1 = new File(outputPath + "01.csv").readLines()
+        def expect1 = new File("files/expect/output/ch05/fileaccess/customer_list_12.csv").readLines()
+        actual1 == expect1
+        def actual2 = new File(outputPath + "02.csv").readLines()
+        def expect2 = new File("files/expect/output/ch05/fileaccess/customer_list_13.csv").readLines()
+        actual2 == expect2
+        def actual3 = new File(outputPath + "03.csv").readLines()
+        def expect3 = new File("files/expect/output/ch05/fileaccess/customer_list_14.csv").readLines()
+        actual3 == expect3
+        def actual4 = new File(outputPath + "04.csv").readLines()
+        def expect4 = new File("files/expect/output/ch05/fileaccess/customer_list_15.csv").readLines()
+        actual4 == expect4
+    }
 
     // 6.1
     def "Reading XML file using JAXB."() {
@@ -919,7 +975,8 @@ class FileAccessSpec extends Specification {
         cursorFind.any{ it.message == "Read item: SalesPlanDetail{branchId='000003', year=2018, month=3, customerId='0000000003', amount=3000000000}" }
     }
 
-    // 6.2
+    // 6.2.1
+    @Requires({ javaVersion <= 1.8 })
     def "Writing XML file using JAXB."() {
         setup:
         jobDBUnitUtil.insert(simpleInitCustomerMstDataSet)
@@ -937,6 +994,28 @@ class FileAccessSpec extends Specification {
 
         def actual = new File(outputPath).readLines()
         def expect = new File("files/expect/output/ch05/fileaccess/customer_list_10.xml").readLines()
+        actual == expect
+    }
+
+    // 6.2.2
+    @Requires({ javaVersion > 1.8 })
+    def "Writing XML file using JAXB with java 11."() {
+        setup:
+        jobDBUnitUtil.insert(simpleInitCustomerMstDataSet)
+
+        def outputPath = outputDir + "/customer_list.xml"
+
+        when:
+        int exitCode = jobLauncher.syncJob(new JobRequest(
+                jobFilePath: 'META-INF/jobs/ch05/fileaccess/jobWriteXml.xml',
+                jobName: 'jobWriteXml',
+                jobParameter: "outputFile=" + outputPath))
+
+        then:
+        exitCode == 0
+
+        def actual = new File(outputPath).readLines()
+        def expect = new File("files/expect/output/ch05/fileaccess/customer_list_16.xml").readLines()
         actual == expect
     }
 

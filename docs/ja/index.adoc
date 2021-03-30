@@ -8,8 +8,8 @@
 . Ch04 ジョブの起動
 ** link:Ch04_SyncJob.adoc[同期実行]
 ** link:Ch04_JobParameter.adoc[ジョブの起動パラメータ]
-** link:Ch04_AsyncJobWithWebContainer.adoc[非同期実行（DBポーリング）]
-** link:Ch04_AsyncJobWithDB.adoc[非同期実行（Webコンテナ）]
+** link:Ch04_AsyncJobWithDB.adoc[非同期実行（DBポーリング）]
+** link:Ch04_AsyncJobWithWebContainer.adoc[非同期実行（Webコンテナ）]
 ** link:Ch04_Listener.adoc[リスナー]
 . Ch05 データの入出力
 ** link:Ch05_Transaction.adoc[トランザクション制御]

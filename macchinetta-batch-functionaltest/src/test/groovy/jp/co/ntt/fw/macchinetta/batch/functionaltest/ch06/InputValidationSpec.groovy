@@ -18,6 +18,7 @@ package jp.co.ntt.fw.macchinetta.batch.functionaltest.ch06
 import groovy.util.logging.Slf4j
 import org.junit.Rule
 import org.junit.rules.TestName
+import jp.co.ntt.fw.macchinetta.batch.functionaltest.ch06.inputvalidation.module.ValidateAndAbortByTryCatchItemProcessor
 import jp.co.ntt.fw.macchinetta.batch.functionaltest.ch06.inputvalidation.module.ValidateAndAbortItemProcessor
 import jp.co.ntt.fw.macchinetta.batch.functionaltest.ch06.inputvalidation.module.ValidateAndBulkMessageItemProcessor
 import jp.co.ntt.fw.macchinetta.batch.functionaltest.ch06.inputvalidation.module.ValidateAndBulkMessageTasklet
@@ -80,7 +81,7 @@ class InputValidationSpec extends Specification {
     }
 
 
-    // 1.1
+    // 1.1.1
     def "Perform input check. If an error occurs, throw an input check exception and abort the process."() {
         when:
         int exitCode = jobLauncher.syncJob(new JobRequest(
@@ -105,6 +106,48 @@ class InputValidationSpec extends Specification {
         mongoUtil.find(
                 new LogCondition(
                         logger: ValidateAndAbortItemProcessor.class.name,
+                        level: 'ERROR',
+                        message: ~/Exception occurred in input validation at the 5 th item/
+                )).size() == 1
+
+        def expectSalesPlanDetailDataSet = DBUnitUtil.createDataSet {
+            sales_plan_detail {
+                branch_id | year | month | customer_id | amount
+                "000001" | 3016 | 1 | "0000000001" | 100000000
+                "000002" | 3017 | 2 | "0000000002" | 200000000
+                "000003" | 3018 | 3 | "0000000003" | 300000000
+            }
+        }
+        def actualTable2 = jobDBUnitUtil.getIncludedColumnsTable("sales_plan_detail",
+                expectSalesPlanDetailDataSet.getTableMetaData("sales_plan_detail").getColumns())
+        def expectITable2 = expectSalesPlanDetailDataSet.getTable("sales_plan_detail")
+        DBUnitUtil.assertEquals(expectITable2, actualTable2)
+    }
+    // 1.1.2
+    def "Perform input check using try catch. If an error occurs, throw an input check exception and abort the process."() {
+        when:
+        int exitCode = jobLauncher.syncJob(new JobRequest(
+                jobFilePath: 'META-INF/jobs/ch06/inputvalidation/jobInputValidationAbortByTryCatch.xml',
+                jobName: 'jobInputValidationAbortByTryCatch',
+                jobParameter: "inputFile=files/test/input/ch06/inputvalidation/sales_plan_detail_01.csv"))
+
+        then:
+        exitCode == 255
+
+        def expectJobExecutionDataSet = DBUnitUtil.createDataSet {
+            batch_job_execution {
+                job_execution_id | exit_code
+                1 | "FAILED"
+            }
+        }
+        def actualTable1 = adminDBUnitUtil.getIncludedColumnsTable("batch_job_execution",
+                expectJobExecutionDataSet.getTableMetaData("batch_job_execution").getColumns())
+        def expectITable1 = expectJobExecutionDataSet.getTable("batch_job_execution")
+        DBUnitUtil.assertEquals(expectITable1, actualTable1)
+
+        mongoUtil.find(
+                new LogCondition(
+                        logger: ValidateAndAbortByTryCatchItemProcessor.class.name,
                         level: 'ERROR',
                         message: ~/Exception occurred in input validation at the 5 th item/
                 )).size() == 1

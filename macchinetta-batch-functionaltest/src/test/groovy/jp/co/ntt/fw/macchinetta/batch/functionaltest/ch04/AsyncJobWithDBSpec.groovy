@@ -908,35 +908,6 @@ class AsyncJobWithDBSpec extends Specification {
     }
 
     // Testcase 8, test no.1
-    def "The bean is overwritten in order not to modularize it"() {
-        setup:
-        def jobRequest1 = new JobRequest(
-                jobName: 'asyncJobModularizeConfirmJob01'
-        )
-        def jobSeqId1 = launcher.registerAsyncJob(adminDB, jobRequest1)
-        def jobRequest2 = new JobRequest(
-                jobName: 'asyncJobModularizeConfirmJob02'
-        )
-        def jobSeqId2 = launcher.registerAsyncJob(adminDB, jobRequest2)
-        def command = "java -cp target/dependency/* ${AsyncBatchDaemon.class.name} META-INF/ch04/asyncjobwithdb/async-batch-daemon-nomodule.xml"
-
-        when:
-        def p = JobLauncher.executeProcess(command)
-        launcher.waitAsyncJob(adminDB, jobSeqId1)
-        launcher.waitAsyncJob(adminDB, jobSeqId2)
-        launcher.stopAsyncBatchDaemon(p)
-
-        mongoUtil.waitForOutputLog(new LogCondition(message: 'Async Batch Daemon stopped after all jobs completed.'))
-
-        def itemProceesorLog1 = mongoUtil.find(new LogCondition(message: 'Processing on ModularizationConfirmationItemProcessor01.'))
-        def itemProceesorLog2 = mongoUtil.find(new LogCondition(message: 'Processing on ModularizationConfirmationItemProcessor02.'))
-
-        then:
-        itemProceesorLog1.size() != itemProceesorLog2.size()
-        itemProceesorLog1.size() == 0 ? itemProceesorLog2.size() != 0 : itemProceesorLog2.size() == 0
-    }
-
-    // Testcase 8, test no.2
     def "Bean is not overwritten because it is modularized"() {
         setup:
         def jobRequest1 = new JobRequest(

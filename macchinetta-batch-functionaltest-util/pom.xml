@@ -10,7 +10,7 @@
     <parent>
         <groupId>jp.co.ntt.fw.macchinetta.batch</groupId>
         <artifactId>macchinetta-batch-functionaltest-build</artifactId>
-        <version>2.2.0.RELEASE</version>
+        <version>2.3.0.RELEASE</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -149,6 +149,7 @@
                 <groupId>org.codehaus.groovy</groupId>
                 <artifactId>groovy-all</artifactId>
                 <version>${org.codehaus.groovy.version}</version>
+                <type>pom</type>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -166,7 +167,22 @@
 
         <dependency>
             <groupId>org.codehaus.groovy</groupId>
-            <artifactId>groovy-all</artifactId>
+            <artifactId>groovy</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.codehaus.groovy</groupId>
+            <artifactId>groovy-sql</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.codehaus.groovy</groupId>
+            <artifactId>groovy-datetime</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.codehaus.groovy</groupId>
+            <artifactId>groovy-dateutil</artifactId>
         </dependency>
 
         <dependency>
@@ -201,10 +217,10 @@
 
         <!-- == Dependency Versions == -->
         <!-- == Spring Boot Dependencies == -->
-        <org.springframework.boot.version>2.2.4.RELEASE</org.springframework.boot.version>
+        <org.springframework.boot.version>2.4.1</org.springframework.boot.version>
 
         <!-- == TERASOLUNA Batch == -->
-        <terasoluna-batch.version>5.3.0.RELEASE</terasoluna-batch.version>
+        <terasoluna-batch.version>5.4.0.RELEASE</terasoluna-batch.version>
 
         <!-- == DBUnit == -->
         <org.dbunit.dbunit.version>2.5.4</org.dbunit.dbunit.version>
@@ -214,7 +230,7 @@
 
         <!-- == Groovy == -->
         <org.codehaus.groovy.modules.http-builder.version>0.7.1</org.codehaus.groovy.modules.http-builder.version>
-        <org.codehaus.groovy.version>2.4.17</org.codehaus.groovy.version>
+        <org.codehaus.groovy.version>2.5.9</org.codehaus.groovy.version>
 
         <!-- == Mongo == -->
         <com.gmongo.verson>1.5</com.gmongo.verson>

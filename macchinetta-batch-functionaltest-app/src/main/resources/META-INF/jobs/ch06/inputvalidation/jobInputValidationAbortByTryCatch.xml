@@ -13,23 +13,24 @@
     <import resource="classpath:META-INF/spring/job-base-context.xml"/>
 
     <context:component-scan base-package="jp.co.ntt.fw.macchinetta.batch.functionaltest.app.common"/>
-    <context:component-scan base-package="jp.co.ntt.fw.macchinetta.batch.functionaltest.app.plan"/>
+
+    <context:component-scan base-package="jp.co.ntt.fw.macchinetta.batch.functionaltest.ch06.inputvalidation.module"/>
+
     <mybatis:scan
             base-package="jp.co.ntt.fw.macchinetta.batch.functionaltest.app.repository.plan"
             factory-ref="jobSqlSessionFactory"/>
 
-    <bean id="reader" class="org.springframework.batch.item.xml.StaxEventItemReader" scope="step"
-          p:resource="file:#{jobParameters['inputFile']}"
-          p:encoding="UTF-8"
-          p:fragmentRootElementName="SalesPlanDetail"
-          p:strict="true">
-        <property name="unmarshaller">
-            <bean class="org.springframework.oxm.jaxb.Jaxb2Marshaller">
-                <property name="classesToBeBound">
-                    <list>
-                        <value>jp.co.ntt.fw.macchinetta.batch.functionaltest.ch05.fileaccess.model.plan.SalesPlanDetailToJaxb
-                        </value>
-                    </list>
+    <bean id="reader" class="org.springframework.batch.item.file.FlatFileItemReader" scope="step"
+          p:resource="file:#{jobParameters['inputFile']}">
+        <property name="lineMapper">
+            <bean class="org.springframework.batch.item.file.mapping.DefaultLineMapper">
+                <property name="lineTokenizer">
+                    <bean class="org.springframework.batch.item.file.transform.DelimitedLineTokenizer"
+                          p:names="branchId,year,month,customerId,amount"/>
+                </property>
+                <property name="fieldSetMapper">
+                    <bean class="org.springframework.batch.item.file.mapping.BeanWrapperFieldSetMapper"
+                          p:targetType="jp.co.ntt.fw.macchinetta.batch.functionaltest.ch06.inputvalidation.model.plan.VerificationSalesPlanDetail"/>
                 </property>
             </bean>
         </property>
@@ -39,11 +40,11 @@
           p:statementId="jp.co.ntt.fw.macchinetta.batch.functionaltest.app.repository.plan.SalesPlanDetailRepository.create"
           p:sqlSessionTemplate-ref="batchModeSqlSessionTemplate"/>
 
-    <batch:job id="jobReadXml" job-repository="jobRepository">
-        <batch:step id="jobReadXml.step01">
+    <batch:job id="jobInputValidationAbortByTryCatch" job-repository="jobRepository">
+        <batch:step id="jobInputValidationAbortByTryCatch.step01">
             <batch:tasklet transaction-manager="jobTransactionManager">
-                <batch:chunk reader="reader"
-                             writer="writer" commit-interval="10"/>
+                <batch:chunk reader="reader" processor="validateAndAbortByTryCatchItemProcessor"
+                             writer="writer" commit-interval="3"/>
                 <batch:listeners>
                     <batch:listener ref="loggingItemReaderListener"/>
                 </batch:listeners>

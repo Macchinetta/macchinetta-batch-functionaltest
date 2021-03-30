@@ -29,7 +29,8 @@
           p:rootTagName="records"
           p:overwriteOutput="true"
           p:shouldDeleteIfEmpty="false"
-          p:transactional="true">
+          p:transactional="true"
+          p:standalone="false">
         <property name="marshaller">
             <bean class="org.springframework.oxm.jaxb.Jaxb2Marshaller">
                 <property name="classesToBeBound">

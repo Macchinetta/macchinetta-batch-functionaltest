@@ -18,6 +18,7 @@
 
     <bean id="reader" class="org.springframework.batch.item.xml.StaxEventItemReader" scope="step"
           p:resource="file:#{jobParameters['inputFile']}"
+          p:encoding="UTF-8"
           p:fragmentRootElementName="customer"
           p:strict="true">
         <property name="unmarshaller">
