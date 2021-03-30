@@ -30,6 +30,7 @@ import spock.lang.Shared
 import spock.lang.Specification
 
 import java.nio.file.Files
+import java.util.regex.Pattern
 
 /**
  * Function test of transaction control.
@@ -273,14 +274,14 @@ class TransactionSpec extends Specification {
                 jobName: 'outputAllCustomerList01',
                 jobParameter: "outputFile=${outputFileName}"
         )
-        def sql = '==>  Preparing: SELECT branch_id AS branchId, branch_name AS branchName, ' +
-                'branch_address AS branchAddress, branch_tel AS branchTel, create_date AS createDate, ' +
-                'update_date AS updateDate FROM branch_mst ORDER BY branch_id '
+
+        def logger = 'jp.co.ntt.fw.macchinetta.batch.functionaltest.ch05.transaction.repository.admin.BranchRepository.findAll'
+        def sql = Pattern.compile('Preparing: SELECT branch_id AS branchId, branch_name AS branchName,.*FROM branch_mst ORDER BY branch_id')
 
         when:
         def exitValue = launcher.syncJob(jobRequest)
 
-        def sqlLogs = mongoUtil.find(new LogCondition(message: sql))
+        def sqlLogs = mongoUtil.find(new LogCondition(logger: logger, message: sql))
 
         then:
         exitValue == 0
@@ -315,14 +316,14 @@ class TransactionSpec extends Specification {
                 jobName: 'outputAllCustomerList02',
                 jobParameter: "outputFile=${outputFileName}"
         )
-        def sql = '==>  Preparing: SELECT branch_id AS branchId, branch_name AS branchName, ' +
-                'branch_address AS branchAddress, branch_tel AS branchTel, create_date AS createDate, ' +
-                'update_date AS updateDate FROM branch_mst WHERE branch_id = ? '
+
+        def logger = 'jp.co.ntt.fw.macchinetta.batch.functionaltest.ch05.transaction.repository.admin.BranchRepository.findOne'
+        def sql = Pattern.compile('SELECT branch_id AS branchId, branch_name AS branchName,.*FROM branch_mst WHERE branch_id = ?')
 
         when:
         def exitValue = launcher.syncJob(jobRequest)
 
-        def sqlLogs = mongoUtil.find(new LogCondition(message: sql))
+        def sqlLogs = mongoUtil.find(new LogCondition(logger: logger, message: sql))
 
         then:
         exitValue == 0

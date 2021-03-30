@@ -665,6 +665,22 @@ icon:tags[] git clone/pull時に自動変換に注意
 ** 1,2,3,4番目 = 5件のレコード
 ** 5番目 = 1件のレコード
 
+|3
+|正常系 +
+同期型起動
+|一定件数ごとの複数ファイルへの出力(commit-interval < itemCountLimitPerResourceの場合)
+|
+* commit-interval = 3のチャンクモデルのジョブ
+* DBより21件レコードを取得する
+* MultiResourceItemWriterにより複数ファイルへ書き込む
+** itemCountLimitPerResource = 4
+|
+* 出力ファイルにより、
+* itemCountLimitPerResourceの件数を超えていない場合、チャンクサイズ以内の件数のレコードが書き込まれていること
+* itemCountLimitPerResourceの件数を超えた場合、次のファイルにレコードが書き込まれること
+** 1,2,3番目 = 6件のレコード
+** 4番目 = 3件のレコード
+
 |===
 
 [[xmlFile]]

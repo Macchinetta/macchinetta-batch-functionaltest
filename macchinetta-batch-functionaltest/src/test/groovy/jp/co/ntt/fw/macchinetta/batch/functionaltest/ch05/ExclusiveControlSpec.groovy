@@ -34,6 +34,7 @@ import spock.lang.Specification
 import spock.lang.Unroll
 
 import java.nio.file.Files
+import java.util.regex.Pattern
 
 /**
  * Function test of exclusive control.
@@ -279,9 +280,8 @@ class ExclusiveControlSpec extends Specification {
 
         mongoUtil.waitForOutputLog(new LogCondition(message: 'job finished.[JobName:chunkPessimisticLockCheckJob][ExitStatus:FAILED]'))
         mongoUtil.find(new LogCondition(
-                message: '==>  Preparing: SELECT branch_id AS branchId, branch_name AS branchName, branch_address AS ' +
-                        'branchAddress, branch_tel AS branchTel, create_date AS createDate, update_date AS updateDate ' +
-                        'FROM branch_mst WHERE branch_id = ? AND branch_name = ? FOR UPDATE NOWAIT ')).size() == 1
+                logger: 'jp.co.ntt.fw.macchinetta.batch.functionaltest.ch05.exclusivecontrol.repository.ExclusiveControlRepository.branchFindOneByNameWithNowWaitLock',
+                message: Pattern.compile('FOR UPDATE NOWAIT'))).size() == 1
         def errorLog = mongoUtil.find(new LogCondition(
                 message: 'Encountered an error executing step chunkPessimisticLockCheckJob.step01 in job chunkPessimisticLockCheckJob'))
         errorLog.size() == 1
@@ -364,9 +364,8 @@ class ExclusiveControlSpec extends Specification {
         exitValue == 255
         mongoUtil.waitForOutputLog(new LogCondition(message: 'job finished.[JobName:taskletPessimisticLockCheckJob][ExitStatus:FAILED]'))
         mongoUtil.find(new LogCondition(
-                message: '==>  Preparing: SELECT branch_id AS branchId, branch_name AS branchName, branch_address AS ' +
-                        'branchAddress, branch_tel AS branchTel, create_date AS createDate, update_date AS updateDate ' +
-                        'FROM branch_mst WHERE branch_id = ? FOR UPDATE NOWAIT ')).size() == 1
+                logger: 'jp.co.ntt.fw.macchinetta.batch.functionaltest.ch05.exclusivecontrol.repository.ExclusiveControlRepository.branchFindOneWithNowWaitLock',
+                message: Pattern.compile('FOR UPDATE NOWAIT'))).size() == 1
         def errorLog = mongoUtil.find(new LogCondition(
                 message: 'Encountered an error executing step taskletPessimisticLockCheckJob.step01 in job taskletPessimisticLockCheckJob'))
         errorLog.size() == 1
