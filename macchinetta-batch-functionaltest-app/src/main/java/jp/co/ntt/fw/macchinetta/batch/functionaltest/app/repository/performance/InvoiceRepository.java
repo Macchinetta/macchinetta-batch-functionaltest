@@ -18,6 +18,7 @@ package jp.co.ntt.fw.macchinetta.batch.functionaltest.app.repository.performance
 import jp.co.ntt.fw.macchinetta.batch.functionaltest.app.model.performance.Invoice;
 import jp.co.ntt.fw.macchinetta.batch.functionaltest.app.model.performance.SalesPerformanceDetail;
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.cursor.Cursor;
 
 import java.util.List;
 
@@ -50,10 +51,10 @@ public interface InvoiceRepository {
     int deleteAll();
 
     /**
-     * Summarize invoice by branch.
+     * Get cursor for summarize invoice by branch.
      *
      * @param branchId Branch id.
-     * @return Summarized invoice by branch.
+     * @return Cursor for summarized invoice by branch.
      */
-    List<SalesPerformanceDetail> summarizeInvoice(@Param("branchId") String branchId);
+    Cursor<SalesPerformanceDetail> summarizeInvoice(@Param("branchId") String branchId);
 }

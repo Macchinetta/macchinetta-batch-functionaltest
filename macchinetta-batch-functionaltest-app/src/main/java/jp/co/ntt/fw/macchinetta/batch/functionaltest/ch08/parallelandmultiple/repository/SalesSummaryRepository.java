@@ -18,8 +18,7 @@ package jp.co.ntt.fw.macchinetta.batch.functionaltest.ch08.parallelandmultiple.r
 import org.apache.ibatis.annotations.Param;
 import jp.co.ntt.fw.macchinetta.batch.functionaltest.app.model.performance.SalesPerformanceSummary;
 import jp.co.ntt.fw.macchinetta.batch.functionaltest.app.model.plan.SalesPlanSummary;
-
-import java.util.List;
+import org.apache.ibatis.cursor.Cursor;
 
 /**
  * Repository of sales summary.
@@ -37,7 +36,7 @@ public interface SalesSummaryRepository {
      * @param offset Offset.
      * @return Summary of sales performance matching the conditions.
      */
-    List<SalesPerformanceSummary> findByYearAndMonth(@Param("year") int year, @Param("month") int month,
+    Cursor<SalesPerformanceSummary> findByYearAndMonth(@Param("year") int year, @Param("month") int month,
             @Param("dataSize") int dataSize, @Param("offset") int offset);
 
     /**

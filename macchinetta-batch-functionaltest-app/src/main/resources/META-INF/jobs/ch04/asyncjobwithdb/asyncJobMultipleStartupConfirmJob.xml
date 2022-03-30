@@ -13,7 +13,6 @@
     <import resource="classpath:META-INF/spring/job-base-context.xml"/>
 
     <context:component-scan base-package="jp.co.ntt.fw.macchinetta.batch.functionaltest.app.common"/>
-    <context:component-scan base-package="jp.co.ntt.fw.macchinetta.batch.functionaltest.app.performance"/>
     <context:component-scan base-package="jp.co.ntt.fw.macchinetta.batch.functionaltest.ch04.asyncjobwithdb.listener"/>
     <mybatis:scan
             base-package="jp.co.ntt.fw.macchinetta.batch.functionaltest.app.repository.performance"

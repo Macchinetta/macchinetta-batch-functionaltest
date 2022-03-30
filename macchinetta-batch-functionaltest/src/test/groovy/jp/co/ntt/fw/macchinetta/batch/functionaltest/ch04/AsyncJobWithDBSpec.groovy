@@ -17,8 +17,6 @@ package jp.co.ntt.fw.macchinetta.batch.functionaltest.ch04
 
 import groovy.util.logging.Slf4j
 import org.dbunit.dataset.ITable
-import org.junit.Rule
-import org.junit.rules.TestName
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler
 import org.terasoluna.batch.async.db.AsyncBatchDaemon
 import jp.co.ntt.fw.macchinetta.batch.functionaltest.ch04.asyncjobwithdb.EmulateLongProcessingItemProcessor
@@ -64,9 +62,6 @@ A list of test cases is shown below.
 """)
 class AsyncJobWithDBSpec extends Specification {
 
-    @Rule
-    TestName testName = new TestName()
-
     @Shared
             launcher = new JobLauncher()
     @Shared
@@ -81,7 +76,7 @@ class AsyncJobWithDBSpec extends Specification {
     }
 
     def setup() {
-        log.debug("### Spec case of [{}]", testName.methodName)
+        log.debug("### Spec case of [{}]", this.specificationContext.currentIteration.displayName)
         adminDB.dropAndCreateTable()
         mongoUtil.deleteAll()
         def stopFile = launcher.stopFile()
@@ -129,7 +124,7 @@ class AsyncJobWithDBSpec extends Specification {
 
         // daemon log
         def daemonLaunchLog = mongoUtil.findOne(message: 'Async Batch Daemon start.')
-        def schedulerStartLog = mongoUtil.findOne(new LogCondition(message: "Initializing ExecutorService 'daemonTaskScheduler'", logger: ThreadPoolTaskScheduler.class.name))
+        def schedulerStartLog = mongoUtil.findOne(new LogCondition(message: 'Initializing ExecutorService \'daemonTaskScheduler\'', logger: ThreadPoolTaskScheduler.class.name))
         def pollingLog = mongoUtil.find(new LogCondition(message: 'Polling processing.')).sort {l,r -> l.timestamp <=> r.timestamp}
         def findStopFileLog = mongoUtil.findOne(message: 'Async Batch Daemon has detected the polling stop file, and then shutdown now!')
         def daemonStopLog = mongoUtil.findOne(message: 'Async Batch Daemon stopped after all jobs completed.')
@@ -387,7 +382,7 @@ class AsyncJobWithDBSpec extends Specification {
         def signalProcess = launcher.executeProcess(command)
         signalProcess.waitForOrKill(TimeUnit.SECONDS.toMillis(10L))
 
-        mongoUtil.waitForOutputLog(new LogCondition(message: 'Shutting down ExecutorService'))
+        mongoUtil.waitForOutputLog(new LogCondition(message: 'Shutting down ExecutorService \'daemonTaskScheduler\''))
 
         then:
         signalProcess.exitValue() == 0

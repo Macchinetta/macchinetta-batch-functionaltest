@@ -16,8 +16,7 @@
 package jp.co.ntt.fw.macchinetta.batch.functionaltest.ch05.fileaccess.repository.mst;
 
 import jp.co.ntt.fw.macchinetta.batch.functionaltest.app.model.mst.Customer;
-
-import java.util.List;
+import org.apache.ibatis.cursor.Cursor;
 
 /**
  * Repository of customer master.
@@ -26,9 +25,9 @@ import java.util.List;
  */
 public interface CustomerRepository {
     /**
-     * Find All customer master data.
+     * Fetch customer master data by cursor.
      *
-     * @return All Customer master data.
+     * @return Cursor for customer master data.
      */
-    List<Customer> findAll();
+    Cursor<Customer> findAll();
 }

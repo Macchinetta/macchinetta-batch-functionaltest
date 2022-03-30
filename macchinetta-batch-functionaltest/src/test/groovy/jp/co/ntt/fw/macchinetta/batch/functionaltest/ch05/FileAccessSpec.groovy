@@ -15,8 +15,7 @@
  */
 package jp.co.ntt.fw.macchinetta.batch.functionaltest.ch05
 
-import org.junit.Rule
-import org.junit.rules.TestName
+import jp.co.ntt.fw.macchinetta.batch.functionaltest.util.FileUtil
 import org.slf4j.LoggerFactory
 import org.springframework.batch.item.file.FlatFileParseException
 import org.springframework.batch.item.file.transform.IncorrectLineLengthException
@@ -35,6 +34,7 @@ import spock.lang.Shared
 import spock.lang.Requires
 import spock.lang.Specification
 
+import java.nio.charset.Charset
 import java.nio.file.Files
 import java.util.concurrent.TimeUnit
 /**
@@ -93,9 +93,6 @@ A list of test cases is shown below.
 """)
 class FileAccessSpec extends Specification {
 
-    @Rule
-    TestName testName = new TestName()
-
     @Shared
             log = LoggerFactory.getLogger(FileAccessSpec)
 
@@ -112,7 +109,7 @@ class FileAccessSpec extends Specification {
             mongoUtil = new MongoUtil()
 
     def setup() {
-        log.debug("### Spec case of [{}]", testName.methodName)
+        log.debug("### Spec case of [{}]", this.specificationContext.currentIteration.displayName)
         adminDBUnitUtil.dropAndCreateTable()
         jobDBUnitUtil.dropAndCreateTable()
         mongoUtil.deleteAll()
@@ -417,11 +414,15 @@ class FileAccessSpec extends Specification {
 
     // 2.1.1
     def "Reading fixed byte length file. Line endings is linebreak."() {
+        setup:
+        def target = new File("files/test/input/ch05/fileaccess/sales_plan_detail_08.txt")
+        def copyFile = FileUtil.copyWithCharset(target, Charset.forName("MS932"))
+
         when:
         int exitCode = jobLauncher.syncJob(new JobRequest(
                 jobFilePath: 'META-INF/jobs/ch05/fileaccess/jobReadFixedLengthSeparateLineBreaks.xml',
                 jobName: 'jobReadFixedLengthSeparateLineBreaks',
-                jobParameter: "inputFile=files/test/input/ch05/fileaccess/sales_plan_detail_08.txt"))
+                jobParameter: "inputFile=" + copyFile.path))
 
         then:
         exitCode == 0
@@ -436,17 +437,23 @@ class FileAccessSpec extends Specification {
         cursorFind.any{ it.message == "Read item: SalesPlanDetail{branchId='売上01', year=2016, month=1, customerId='0000001', amount=1000000000}" }
         cursorFind.any{ it.message == "Read item: SalesPlanDetail{branchId='売上02', year=2017, month=2, customerId='0000002', amount=2000000000}" }
         cursorFind.any{ it.message == "Read item: SalesPlanDetail{branchId='売上03', year=2018, month=3, customerId='0000003', amount=3000000000}" }
+
+        cleanup:
+        copyFile.delete()
     }
 
     // 2.1.2
     def "Reading fixed byte length file. Line endings specified in fixed bytes."() {
-        when:
+        setup:
         def charsetName = "MS932"
+        def target = new File("files/test/input/ch05/fileaccess/sales_plan_detail_09.txt")
+        def copyFile = FileUtil.copyWithCharset(target, Charset.forName(charsetName))
+
+        when:
         int exitCode = jobLauncher.syncJob(new JobRequest(
                 jobFilePath: 'META-INF/jobs/ch05/fileaccess/jobReadFixedLengthSeparateFixedLength.xml',
                 jobName: 'jobReadFixedLengthSeparateFixedLength',
-                jobParameter: "inputFile=files/test/input/ch05/fileaccess/sales_plan_detail_09.txt " +
-                        "readCharsetName=" + charsetName + " tokenizeCharsetName=" + charsetName))
+                jobParameter: "inputFile=" + copyFile.path + " readCharsetName=" + charsetName + " tokenizeCharsetName=" + charsetName))
 
         then:
         exitCode == 0
@@ -461,16 +468,23 @@ class FileAccessSpec extends Specification {
         cursorFind.any{ it.message == "Read item: SalesPlanDetail{branchId='売上01', year=2016, month=1, customerId='0000001', amount=1000000000}" }
         cursorFind.any{ it.message == "Read item: SalesPlanDetail{branchId='売上02', year=2017, month=2, customerId='0000002', amount=2000000000}" }
         cursorFind.any{ it.message == "Read item: SalesPlanDetail{branchId='売上03', year=2018, month=3, customerId='0000003', amount=3000000000}" }
+
+        cleanup:
+        copyFile.delete()
     }
 
     // 2.1.3
     def "Reading fixed byte length file. Incorrect encoding specification."() {
+        setup:
+        def charsetName = "MS932"
+        def target = new File("files/test/input/ch05/fileaccess/sales_plan_detail_18.txt")
+        def copyFile = FileUtil.copyWithCharset(target, Charset.forName(charsetName))
+
         when:
         int exitCode = jobLauncher.syncJob(new JobRequest(
                 jobFilePath: 'META-INF/jobs/ch05/fileaccess/jobReadFixedLengthSeparateFixedLengthWithLinebreaks.xml',
                 jobName: 'jobReadFixedLengthSeparateFixedLengthWithLinebreaks',
-                jobParameter: "inputFile=files/test/input/ch05/fileaccess/sales_plan_detail_18.txt " +
-                        "readCharsetName=UTF-8 tokenizeCharsetName=MS932"))
+                jobParameter: "inputFile=" + copyFile.path + " readCharsetName=UTF-8" + " tokenizeCharsetName=" + charsetName))
 
         then:
         exitCode == 0
@@ -485,6 +499,9 @@ class FileAccessSpec extends Specification {
         cursorFind.any{ it.message == "Read item: SalesPlanDetail{branchId='SALE01', year=2016, month=1, customerId='0000001', amount=1000000000}" }
         cursorFind.every{ it.message != "Read item: SalesPlanDetail{branchId='売上02', year=2017, month=2, customerId='0000002', amount=2000000000}" }
         cursorFind.any{ it.message == "Read item: SalesPlanDetail{branchId='S\nLE03', year=2018, month=3, customerId='0000003', amount=3000000000}" }
+
+        cleanup:
+        copyFile.delete()
     }
 
     // 2.1.4
@@ -516,6 +533,8 @@ class FileAccessSpec extends Specification {
     def "Writing fixed byte length file. Line endings is linebreak."() {
         setup:
         def outputPath = outputDir + "/customer_list.txt"
+        def target = new File("files/expect/output/ch05/fileaccess/customer_list_02.txt")
+        def copyFile = FileUtil.copyWithCharset(target, Charset.forName("MS932"))
 
         when:
         int exitCode = jobLauncher.syncJob(new JobRequest(
@@ -528,14 +547,19 @@ class FileAccessSpec extends Specification {
         exitCode == 0
 
         def actual = new File(outputPath).readLines()
-        def expect = new File("files/expect/output/ch05/fileaccess/customer_list_02.txt").readLines()
+        def expect = copyFile.readLines()
         actual == expect
+
+        cleanup:
+        copyFile.delete()
     }
 
     // 2.2.2
     def "Writing fixed byte length file. Line endings specified in fixed bytes."() {
         setup:
         def outputPath = outputDir + "/customer_list.txt"
+        def target = new File("files/expect/output/ch05/fileaccess/customer_list_03.txt")
+        def copyFile = FileUtil.copyWithCharset(target, Charset.forName("MS932"))
 
         when:
         int exitCode = jobLauncher.syncJob(new JobRequest(
@@ -548,8 +572,11 @@ class FileAccessSpec extends Specification {
         exitCode == 0
 
         def actual = new File(outputPath).readLines()
-        def expect = new File("files/expect/output/ch05/fileaccess/customer_list_03.txt").readLines()
+        def expect = copyFile.readLines()
         actual == expect
+
+        cleanup:
+        copyFile.delete()
     }
 
     // 2.2.3
@@ -1179,5 +1206,117 @@ class FileAccessSpec extends Specification {
         cleanup:
         Files.deleteIfExists(outputFile.toPath())
 
+    }
+
+    // 9.1
+    def "Check the default value of FlatFileItemReader encoding."() {
+        setup:
+        def defaultCharset = Charset.defaultCharset()
+        def target = new File("files/test/input/ch05/fileaccess/sales_plan_detail_20.csv")
+        def copyFile = FileUtil.copyWithCharset(target, defaultCharset)
+
+        when:
+        int exitCode = jobLauncher.syncJob({
+            JobLauncher.SyncJobArg arg ->
+                arg.jobRequest = new JobRequest(
+                        jobFilePath: "META-INF/jobs/ch05/fileaccess/jobReadCsvByDefaultEncoding.xml",
+                        jobName: "jobReadCsvByDefaultEncoding",
+                        jobParameter: "inputFile=" + copyFile.path)
+                arg.sysprop = ["file.encoding=" + defaultCharset.name()]
+        })
+
+        then:
+        exitCode == 0
+
+        def cursorFind = mongoUtil.find(
+                new LogCondition(
+                        logger: LoggingItemReaderListener.class.name,
+                        level: "INFO"
+                ))
+        cursorFind.size() == 3
+
+        cursorFind.any{ it.message == "Read item: SalesPlanDetail{branchId='支店01', year=2016, month=1, customerId='0000000001', amount=1000000000}" }
+        cursorFind.any{ it.message == "Read item: SalesPlanDetail{branchId='支店02', year=2017, month=2, customerId='0000000002', amount=2000000000}" }
+        cursorFind.any{ it.message == "Read item: SalesPlanDetail{branchId='支店03', year=2018, month=3, customerId='0000000003', amount=3000000000}" }
+
+        cleanup:
+        copyFile.delete()
+    }
+
+    // 9.2
+    def "Check the default value of FlatFileItemWriter encoding."() {
+        setup:
+        def inputFile = new File("files/test/input/ch05/fileaccess/sales_plan_detail_20.csv")
+        def outputFile = new File("files/test/output/ch05/fileaccess/sales_plan_detail_20.csv")
+
+        when:
+        int exitCode = jobLauncher.syncJob(new JobRequest(
+                jobFilePath: "META-INF/jobs/ch05/fileaccess/jobWriteCsvByDefaultEncoding.xml",
+                jobName: "jobWriteCsvByDefaultEncoding",
+                jobParameter: "inputFile=" + inputFile.path + " outputFile=" + outputFile.path))
+
+        then:
+        exitCode == 0
+
+        def actual = outputFile.readLines("UTF-8")
+        def expect = new File("files/expect/output/ch05/fileaccess/sales_plan_detail_20.csv").readLines("UTF-8")
+
+        actual == expect
+    }
+
+    // 9.3
+    def "Check the default value of StaxEventItemReader encoding."() {
+        setup:
+        def defaultCharset = Charset.defaultCharset()
+        def target = new File("files/test/input/ch05/fileaccess/sales_plan_detail_21.xml")
+        def copyFile = FileUtil.copyWithCharset(target, defaultCharset)
+
+        when:
+        int exitCode = jobLauncher.syncJob({
+            JobLauncher.SyncJobArg arg ->
+                arg.jobRequest = new JobRequest(
+                        jobFilePath: "META-INF/jobs/ch05/fileaccess/jobReadXmlByDefaultEncoding.xml",
+                        jobName: "jobReadXmlByDefaultEncoding",
+                        jobParameter: "inputFile=" + copyFile.path)
+                arg.sysprop = ["file.encoding=" + defaultCharset.name()]
+        })
+
+        then:
+        exitCode == 0
+
+        def cursorFind = mongoUtil.find(
+                new LogCondition(
+                        logger: LoggingItemReaderListener.class.name,
+                        level: "INFO"
+                ))
+        cursorFind.size() == 3
+
+        cursorFind.any{ it.message == "Read item: SalesPlanDetail{branchId='支店01', year=2016, month=1, customerId='0000000001', amount=1000000000}" }
+        cursorFind.any{ it.message == "Read item: SalesPlanDetail{branchId='支店02', year=2017, month=2, customerId='0000000002', amount=2000000000}" }
+        cursorFind.any{ it.message == "Read item: SalesPlanDetail{branchId='支店03', year=2018, month=3, customerId='0000000003', amount=3000000000}" }
+
+        cleanup:
+        copyFile.delete()
+    }
+
+    // 9.4
+    def "Check the default value of StaxEventItemWriter encoding."() {
+        setup:
+        def inputFile = new File("files/test/input/ch05/fileaccess/sales_plan_detail_21.xml")
+        def outputFile = new File("files/test/output/ch05/fileaccess/sales_plan_detail_21.xml")
+
+        when:
+        int exitCode = jobLauncher.syncJob(new JobRequest(
+                jobFilePath: "META-INF/jobs/ch05/fileaccess/jobWriteXmlByDefaultEncoding.xml",
+                jobName: "jobWriteXmlByDefaultEncoding",
+                jobParameter: "inputFile=" + inputFile.path + " outputFile=" + outputFile.path))
+
+        then:
+        exitCode == 0
+
+        def actual = outputFile.readLines("UTF-8")
+        def expect = new File("files/expect/output/ch05/fileaccess/sales_plan_detail_21.xml").readLines("UTF-8")
+
+        actual == expect
     }
 }

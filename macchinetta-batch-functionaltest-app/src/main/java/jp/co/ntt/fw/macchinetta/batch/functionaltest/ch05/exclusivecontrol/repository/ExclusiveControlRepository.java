@@ -19,8 +19,7 @@ import jp.co.ntt.fw.macchinetta.batch.functionaltest.app.model.mst.Branch;
 import org.apache.ibatis.annotations.Param;
 import jp.co.ntt.fw.macchinetta.batch.functionaltest.app.model.plan.SalesPlanDetail;
 import jp.co.ntt.fw.macchinetta.batch.functionaltest.ch05.exclusivecontrol.model.ExclusiveBranch;
-
-import java.util.List;
+import org.apache.ibatis.cursor.Cursor;
 
 /**
  * Repository of exclusive control.
@@ -30,12 +29,12 @@ import java.util.List;
 public interface ExclusiveControlRepository {
 
     /**
-     * Find sales plan detail by branch_id.
+     * Get cursor for sales plan detail by branch_id.
      *
      * @param branchId Branch id.
-     * @return Sales plan detail by branch_id.
+     * @return Cursor for sales plan detail by branch_id.
      */
-    List<SalesPlanDetail> planFindByBranch(@Param("branchId") String branchId);
+    Cursor<SalesPlanDetail> planFindByBranch(@Param("branchId") String branchId);
 
     /**
      * Find one branch master data.
@@ -70,11 +69,11 @@ public interface ExclusiveControlRepository {
     Branch branchFindOneWithNowWaitLock(@Param("branchId") String branchId);
 
     /**
-     * Find all branch id by branch name.
+     * Get cursor for branch id by branch name.
      *
-     * @return List of branch master data.
+     * @return Get cursor for branch id by branch name.
      */
-    List<String> branchIdFindByName(@Param("branchName") String branchName);
+    Cursor<String> branchIdFindByName(@Param("branchName") String branchName);
 
     /**
      * Find one branch master data with NOWAIT lock.

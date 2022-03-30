@@ -16,8 +16,6 @@
 package jp.co.ntt.fw.macchinetta.batch.functionaltest.ch08
 
 import groovy.util.logging.Slf4j
-import org.junit.Rule
-import org.junit.rules.TestName
 import org.springframework.batch.core.job.AbstractJob
 import jp.co.ntt.fw.macchinetta.batch.functionaltest.ch08.flowcontrol.ConfirmPromotionalTasklet
 import jp.co.ntt.fw.macchinetta.batch.functionaltest.ch08.flowcontrol.PromotionTargetItemProcessor
@@ -46,9 +44,6 @@ A list of test cases is shown below.
 """)
 class FlowControlSpec extends Specification {
 
-    @Rule
-    TestName testName = new TestName()
-
     @Shared
             jobLauncher = new JobLauncher()
 
@@ -59,7 +54,7 @@ class FlowControlSpec extends Specification {
             mongoUtil = new MongoUtil()
 
     def setup() {
-        log.debug("### Spec case of [{}]", testName.methodName)
+        log.debug("### Spec case of [{}]", this.specificationContext.currentIteration.displayName)
         mongoUtil.deleteAll()
     }
 

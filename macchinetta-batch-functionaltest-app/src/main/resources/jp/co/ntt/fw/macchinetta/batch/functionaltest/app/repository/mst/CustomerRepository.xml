@@ -38,7 +38,7 @@
         ]]>
     </select>
 
-    <select id="cursor" resultType="jp.co.ntt.fw.macchinetta.batch.functionaltest.app.model.mst.Customer">
+    <select id="findAllAtOnce" resultType="jp.co.ntt.fw.macchinetta.batch.functionaltest.app.model.mst.Customer">
         <![CDATA[
         SELECT
             customer_id AS customerId,

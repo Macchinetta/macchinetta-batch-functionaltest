@@ -56,7 +56,7 @@ public class CacheSetListener extends StepExecutionListenerSupport {
     @Override
     public void beforeStep(StepExecution stepExecution) {
         logger.info("CacheSetListener is called at before step.");
-        for(Customer customer : customerRepository.findAll()) {
+        for(Customer customer : customerRepository.findAllAtOnce()) {
             cache.addCustomer(customer.getCustomerId(), customer);
         }
     }

@@ -16,8 +16,7 @@
 package jp.co.ntt.fw.macchinetta.batch.functionaltest.ch06.reprocessing.repository;
 
 import jp.co.ntt.fw.macchinetta.batch.functionaltest.app.model.plan.SalesPlanDetail;
-
-import java.util.List;
+import org.apache.ibatis.cursor.Cursor;
 
 /**
  * Repository of detail of sales plan with restartable on condition basis.
@@ -31,7 +30,7 @@ public interface RestartOnConditionRepository {
      *
      * @return details of sales plan that match the criteria.
      */
-    List<SalesPlanDetail> findByZeroOrLessAmount();
+    Cursor<SalesPlanDetail> findByZeroOrLessAmount();
 
     /**
      * Update detail of sales plan.

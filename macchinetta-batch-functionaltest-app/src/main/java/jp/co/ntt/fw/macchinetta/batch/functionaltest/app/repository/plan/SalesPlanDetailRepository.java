@@ -17,8 +17,7 @@ package jp.co.ntt.fw.macchinetta.batch.functionaltest.app.repository.plan;
 
 import jp.co.ntt.fw.macchinetta.batch.functionaltest.app.model.plan.SalesPlanDetail;
 import jp.co.ntt.fw.macchinetta.batch.functionaltest.app.model.plan.SalesPlanSummary;
-
-import java.util.List;
+import org.apache.ibatis.cursor.Cursor;
 
 /**
  * Repository of detail of sales plan.
@@ -27,11 +26,11 @@ import java.util.List;
  */
 public interface SalesPlanDetailRepository {
     /**
-     * Find all detail of sales plan.
+     * Get cursor for detail of sales plan.
      *
-     * @return all detail of sales plan.
+     * @return Cursor detail of sales plan.
      */
-    List<SalesPlanDetail> findAll();
+    Cursor<SalesPlanDetail> findAll();
 
     /**
      * Create detail of sales plan.
@@ -48,9 +47,9 @@ public interface SalesPlanDetailRepository {
     int deleteAll();
 
     /**
-     * Summarize details of sales plan.
+     * Get cursor for summarize details of sales plan.
      *
-     * @return Summary data summarizing details of sales plan.
+     * @return Cursor for summary data summarizing details of sales plan.
      */
-    List<SalesPlanSummary> summarizeDetails();
+    Cursor<SalesPlanSummary> summarizeDetails();
 }

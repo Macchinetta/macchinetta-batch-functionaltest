@@ -19,7 +19,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.core.StepExecutionListener;
+import org.springframework.batch.core.annotation.AfterStep;
+import org.springframework.batch.core.annotation.BeforeStep;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -38,8 +39,7 @@ import java.util.List;
  */
 @Component
 @Scope("step")
-public class CheckAmountItemProcessor implements ItemProcessor<SalesPlanSummary, SalesPlanSummary>,
-                                     StepExecutionListener {
+public class CheckAmountItemProcessor implements ItemProcessor<SalesPlanSummary, SalesPlanSummary> {
 
     /**
      * Logger.
@@ -47,9 +47,14 @@ public class CheckAmountItemProcessor implements ItemProcessor<SalesPlanSummary,
     private static final Logger logger = LoggerFactory.getLogger(CheckAmountItemProcessor.class);
 
     /**
-     * Error items.
+     * Key string of errorItems.
      */
-    private List<SalesPlanSummary> errorItems = new ArrayList<>();
+    private static final String ERROR_ITEMS_KEY = "errorItems";
+
+    /**
+     * StepExecution.
+     */
+    private StepExecution stepExecution;
 
     /**
      * Check the amount, skip the data processing in case of an error.
@@ -60,27 +65,29 @@ public class CheckAmountItemProcessor implements ItemProcessor<SalesPlanSummary,
      */
     @Override
     public SalesPlanSummary process(SalesPlanSummary item) throws Exception {
-
         if (item.getAmount().signum() == -1) {
             logger.warn("amount is negative. skip item [item: {}]", item);
+
+            if (!stepExecution.getExecutionContext().containsKey(ERROR_ITEMS_KEY)) {
+                stepExecution.getExecutionContext().put(ERROR_ITEMS_KEY, new ArrayList<SalesPlanSummary>());
+            }
+            @SuppressWarnings("unchecked")
+            List<SalesPlanSummary> errorItems = (List<SalesPlanSummary>) stepExecution.getExecutionContext().get(ERROR_ITEMS_KEY);
             errorItems.add(item);
+
             return null;
         }
-
         return item;
     }
 
     /**
      * Before step.
-     * <p>
-     * Clear error item list.
-     * </p>
      *
      * @param stepExecution Step execution.
      */
-    @Override
+    @BeforeStep
     public void beforeStep(StepExecution stepExecution) {
-        errorItems.clear();
+        this.stepExecution = stepExecution;
     }
 
     /**
@@ -90,14 +97,14 @@ public class CheckAmountItemProcessor implements ItemProcessor<SalesPlanSummary,
      * </p>
      *
      * @param stepExecution Step execution.
-     * @return
+     * @return Exit status.
      */
-    @Override
+    @AfterStep
     public ExitStatus afterStep(StepExecution stepExecution) {
-        if (errorItems.size() > 0) {
+        if (stepExecution.getExecutionContext().containsKey(ERROR_ITEMS_KEY)) {
             logger.info("Change status 'STEP COMPLETED WITH SKIPS'");
             return new ExitStatus("STEP COMPLETED WITH SKIPS");
         }
-        return null;
+        return stepExecution.getExitStatus();
     }
 }

@@ -16,6 +16,7 @@
 package jp.co.ntt.fw.macchinetta.batch.functionaltest.ch05.fileaccess.model.plan;
 
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlType;
 import java.math.BigDecimal;
 
 /**
@@ -24,6 +25,7 @@ import java.math.BigDecimal;
  * @since 2.0.1
  */
 @XmlRootElement(name = "SalesPlanDetail")
+@XmlType(propOrder = { "branchId", "year", "month", "customerId", "amount" })
 public class SalesPlanDetailToJaxb {
 
     /**

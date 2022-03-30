@@ -16,8 +16,6 @@
 package jp.co.ntt.fw.macchinetta.batch.functionaltest.ch06
 
 import groovy.util.logging.Slf4j
-import org.junit.Rule
-import org.junit.rules.TestName
 import jp.co.ntt.fw.macchinetta.batch.functionaltest.ch06.inputvalidation.module.ValidateAndAbortByTryCatchItemProcessor
 import jp.co.ntt.fw.macchinetta.batch.functionaltest.ch06.inputvalidation.module.ValidateAndAbortItemProcessor
 import jp.co.ntt.fw.macchinetta.batch.functionaltest.ch06.inputvalidation.module.ValidateAndBulkMessageItemProcessor
@@ -28,7 +26,6 @@ import jp.co.ntt.fw.macchinetta.batch.functionaltest.util.DBUnitUtil
 import jp.co.ntt.fw.macchinetta.batch.functionaltest.util.JobLauncher
 import jp.co.ntt.fw.macchinetta.batch.functionaltest.util.JobRequest
 import jp.co.ntt.fw.macchinetta.batch.functionaltest.util.LogCondition
-import jp.co.ntt.fw.macchinetta.batch.functionaltest.util.LogCursor
 import jp.co.ntt.fw.macchinetta.batch.functionaltest.util.MongoUtil
 import spock.lang.Narrative
 import spock.lang.Shared
@@ -52,9 +49,6 @@ A list of test cases is shown below.
 """)
 class InputValidationSpec extends Specification {
 
-    @Rule
-    TestName testName = new TestName()
-
     @Shared
             jobLauncher = new JobLauncher()
 
@@ -68,7 +62,7 @@ class InputValidationSpec extends Specification {
             mongoUtil = new MongoUtil()
 
     def setup() {
-        log.debug("### Spec case of [{}]", testName.methodName)
+        log.debug("### Spec case of [{}]", this.specificationContext.currentIteration.displayName)
         adminDBUnitUtil.dropAndCreateTable()
         jobDBUnitUtil.dropAndCreateTable()
         mongoUtil.deleteAll()

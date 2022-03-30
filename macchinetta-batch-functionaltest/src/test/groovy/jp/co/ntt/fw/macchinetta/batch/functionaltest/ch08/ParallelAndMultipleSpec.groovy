@@ -17,8 +17,6 @@ package jp.co.ntt.fw.macchinetta.batch.functionaltest.ch08
 
 import groovy.util.logging.Slf4j
 import org.apache.commons.collections.ListUtils
-import org.junit.Rule
-import org.junit.rules.TestName
 import jp.co.ntt.fw.macchinetta.batch.functionaltest.util.DBUnitUtil
 import jp.co.ntt.fw.macchinetta.batch.functionaltest.util.JobLauncher
 import jp.co.ntt.fw.macchinetta.batch.functionaltest.util.JobRequest
@@ -45,9 +43,6 @@ import java.util.concurrent.TimeUnit
 """)
 class ParallelAndMultipleSpec extends Specification {
 
-    @Rule
-    TestName testName = new TestName()
-
     @Shared
             launcher = new JobLauncher()
 
@@ -66,7 +61,7 @@ class ParallelAndMultipleSpec extends Specification {
     }
 
     def setup() {
-        log.debug("### Spec case of [{}]", testName.methodName)
+        log.debug("### Spec case of [{}]", this.specificationContext.currentIteration.displayName)
         adminDB.dropAndCreateTable() // To make verification easier to rebuild every time.
         mongoUtil.deleteAll()
     }

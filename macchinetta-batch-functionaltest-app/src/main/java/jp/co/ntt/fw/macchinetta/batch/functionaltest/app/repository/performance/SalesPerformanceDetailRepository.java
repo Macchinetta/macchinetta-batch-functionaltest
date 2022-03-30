@@ -17,8 +17,7 @@ package jp.co.ntt.fw.macchinetta.batch.functionaltest.app.repository.performance
 
 import jp.co.ntt.fw.macchinetta.batch.functionaltest.app.model.performance.SalesPerformanceDetail;
 import jp.co.ntt.fw.macchinetta.batch.functionaltest.app.model.performance.SalesPerformanceSummary;
-
-import java.util.List;
+import org.apache.ibatis.cursor.Cursor;
 
 /**
  * Repository of detail of sales performance.
@@ -28,11 +27,11 @@ import java.util.List;
 public interface SalesPerformanceDetailRepository {
 
     /**
-     * Find all detail of sales performance.
+     * Get cursor for detail of sales performance.
      *
-     * @return all detail of sales performance.
+     * @return Cursor for detail of sales performance.
      */
-    List<SalesPerformanceDetail> findAll();
+    Cursor<SalesPerformanceDetail> findAll();
 
     /**
      * Create detail of sales performance.
@@ -49,10 +48,10 @@ public interface SalesPerformanceDetailRepository {
     int deleteAll();
 
     /**
-     * Summarize details of sales performance.
+     * Get cursor for summarize details of sales performance.
      *
-     * @return Summary data summarizing details of sales performance.
+     * @return Cursor for summary data summarizing details of sales performance.
      */
-    List<SalesPerformanceSummary> summarizeDetails();
+    Cursor<SalesPerformanceSummary> summarizeDetails();
 
 }

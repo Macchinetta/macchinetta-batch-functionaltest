@@ -19,8 +19,6 @@ import org.apache.ibatis.cursor.Cursor;
 import jp.co.ntt.fw.macchinetta.batch.functionaltest.app.model.plan.SalesPlanDetail;
 import jp.co.ntt.fw.macchinetta.batch.functionaltest.ch05.dbaccess.SalesDTO;
 
-import java.util.List;
-
 /**
  * Repository of sales in database access.
  *
@@ -29,18 +27,11 @@ import java.util.List;
 public interface SalesRepository {
 
     /**
-     * Find all detail of sales plan.
+     * Get cursor for sales plan.
      *
-     * @return all detail of sales plan.
-     **/
-    List<SalesPlanDetail> findAll();
-
-    /**
-     * Fetch sales plan by cursor.
-     *
-     * @return cursor for sales plan.
+     * @return Cursor for sales plan.
      */
-    Cursor<SalesPlanDetail> cursor();
+    Cursor<SalesPlanDetail> findAll();
 
     /**
      * Update detail of sales plan.

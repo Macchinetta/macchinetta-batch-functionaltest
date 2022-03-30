@@ -23,7 +23,7 @@
             factory-ref="jobSqlSessionFactory"/>
 
     <bean id="reader" class="org.mybatis.spring.batch.MyBatisCursorItemReader" scope="step"
-          p:queryId="jp.co.ntt.fw.macchinetta.batch.functionaltest.app.repository.mst.CustomerRepository.cursor"
+          p:queryId="jp.co.ntt.fw.macchinetta.batch.functionaltest.app.repository.mst.CustomerRepository.findAll"
           p:sqlSessionFactory-ref="jobSqlSessionFactory"/>
 
     <bean id="writer" class="org.springframework.batch.item.file.FlatFileItemWriter" scope="step"

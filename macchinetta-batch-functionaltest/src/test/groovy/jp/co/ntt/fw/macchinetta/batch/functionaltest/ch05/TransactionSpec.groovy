@@ -16,8 +16,6 @@
 package jp.co.ntt.fw.macchinetta.batch.functionaltest.ch05
 
 import groovy.util.logging.Slf4j
-import org.junit.Rule
-import org.junit.rules.TestName
 import org.springframework.dao.DuplicateKeyException
 import jp.co.ntt.fw.macchinetta.batch.functionaltest.ch05.transaction.component.ItemWriteException
 import jp.co.ntt.fw.macchinetta.batch.functionaltest.util.DBUnitUtil
@@ -50,9 +48,6 @@ A list of test cases is shown below.
 """)
 class TransactionSpec extends Specification {
 
-    @Rule
-    TestName testName = new TestName()
-
     @Shared
             launcher = new JobLauncher()
 
@@ -70,7 +65,7 @@ class TransactionSpec extends Specification {
     }
 
     def setup() {
-        log.debug("### Spec case of [{}]", testName.methodName)
+        log.debug("### Spec case of [{}]", this.specificationContext.currentIteration.displayName)
         adminDB.dropAndCreateTable()
         mongoUtil.deleteAll()
     }

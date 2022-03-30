@@ -16,8 +16,6 @@
 package jp.co.ntt.fw.macchinetta.batch.functionaltest.ch04
 
 import groovy.util.logging.Slf4j
-import org.junit.Rule
-import org.junit.rules.TestName
 import org.springframework.batch.core.launch.support.SimpleJobLauncher
 import org.springframework.batch.core.launch.support.SimpleJobOperator
 import org.springframework.core.task.TaskRejectedException
@@ -58,9 +56,6 @@ A list of test cases on web container is shown below.
 @Stepwise
 class AsyncJobWithWebContainerSpec extends Specification {
 
-    @Rule
-    TestName testName = new TestName()
-
     @Shared
             restUtil = new RestUtil()
 
@@ -84,7 +79,7 @@ class AsyncJobWithWebContainerSpec extends Specification {
     }
 
     def setup() {
-        log.debug("### Spec case of [{}]", testName.methodName)
+        log.debug("### Spec case of [{}]", this.specificationContext.currentIteration.displayName)
     }
 
     def cleanupSpec() {

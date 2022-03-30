@@ -16,8 +16,6 @@
 package jp.co.ntt.fw.macchinetta.batch.functionaltest.ch07
 
 import groovy.util.logging.Slf4j
-import org.junit.Rule
-import org.junit.rules.TestName
 import org.springframework.batch.core.BatchStatus
 import org.springframework.batch.core.ExitStatus
 import org.springframework.batch.core.explore.JobExplorer
@@ -55,9 +53,6 @@ A list of test cases is shown below.
 """)
 class JobManagementSpec extends Specification {
 
-    @Rule
-    TestName testName = new TestName()
-
     @Shared
             launcher = new JobLauncher()
 
@@ -76,7 +71,7 @@ class JobManagementSpec extends Specification {
     }
 
     def setup() {
-        log.debug("### Spec case of [{}]", testName.methodName)
+        log.debug("### Spec case of [{}]", this.specificationContext.currentIteration.displayName)
         mongoUtil.deleteAll()
     }
 
@@ -181,7 +176,7 @@ class JobManagementSpec extends Specification {
         then:
         p.exitValue() == 0
         mongoUtil.find(new LogCondition(
-               logger: JobMonitor.class.name,
+                logger: JobMonitor.class.name,
                 level: 'INFO',
                 message: 'Job Name : jobSalesPlan02'
         )).size() == 1
@@ -436,8 +431,7 @@ class JobManagementSpec extends Specification {
         when:
         def exitValue = launcher.syncJob(new JobRequest(
                 jobFilePath: 'META-INF/jobs/ch07/jobmanagement/customizedJobExitCodeChunkJob.xml',
-                jobName: 'customizedJobExitCodeChunkJob',
-                jobParameter: 'interval=0'
+                jobName: 'customizedJobExitCodeChunkJob'
         ))
 
         then:
@@ -482,8 +476,7 @@ class JobManagementSpec extends Specification {
         when:
         def exitValue = launcher.syncJob(new JobRequest(
                 jobFilePath: 'META-INF/jobs/ch07/jobmanagement/customizedJobExitCodeTaskletJob.xml',
-                jobName: 'customizedJobExitCodeTaskletJob',
-                jobParameter: 'interval=0'
+                jobName: 'customizedJobExitCodeTaskletJob'
         ))
 
         then:
@@ -498,14 +491,10 @@ class JobManagementSpec extends Specification {
 
     // Testcase 2, test no.3
     def "Confirmation of exit code mapping (normal termination)"() {
-        setup:
-        setupInitialData()
-
         when:
         def exitValue = launcher.syncJob(new JobRequest(
-                jobFilePath: 'META-INF/jobs/ch07/jobmanagement/customizedJobExitCodeChunkJob.xml',
-                jobName: 'customizedJobExitCodeChunkJob',
-                jobParameter: 'interval=0'
+                jobFilePath: 'META-INF/jobs/ch07/jobmanagement/emulateLongTaskJob.xml',
+                jobName: 'emulateLongTaskJob'
         ))
 
         then:
@@ -514,40 +503,31 @@ class JobManagementSpec extends Specification {
 
     // Testcase 2, test no.4
     def "Confirmation of exit code mapping (abnormal termination)"() {
-        setup:
-        setupInitialData()
-        jobDB.insert(DBUnitUtil.createDataSet({
-            sales_plan_summary {
-                branch_id | year | month | amount
-                "0010"    | 2016 | 12    | 9999
-            }
-        }))
-
         when:
         def exitValue = launcher.syncJob(new JobRequest(
-                jobFilePath: 'META-INF/jobs/ch07/jobmanagement/customizedJobExitCodeChunkJob.xml',
-                jobName: 'customizedJobExitCodeChunkJob',
-                jobParameter: 'interval=0'
+                jobFilePath: 'META-INF/jobs/ch07/jobmanagement/emulateLongTaskJob.xml',
+                jobName: 'emulateLongTaskJob',
+                jobParameter: 'shouldFail=true'
         ))
 
         then:
+        mongoUtil.findOne(new LogCondition(message: 'job started. [JobName:emulateLongTaskJob]')) != null
         exitValue == 250
     }
 
     // Testcase 2, test no.5
     def "Confirmation of exit code mapping (stop)"() {
         setup:
-        setupInitialData()
         def command = "java -cp target/dependency/* ${CommandLineJobRunner.class.name} " +
-                "META-INF/jobs/ch07/jobmanagement/customizedJobExitCodeChunkJob.xml customizedJobExitCodeChunkJob interval=10000"
+                "META-INF/jobs/ch07/jobmanagement/emulateLongTaskJob.xml emulateLongTaskJob interval=10000"
 
         when:
         def p = JobLauncher.executeProcess(command)
-        mongoUtil.waitForOutputLog(new LogCondition(message: 'job started. [JobName:customizedJobExitCodeChunkJob]'))
+        mongoUtil.waitForOutputLog(new LogCondition(message: 'job started. [JobName:emulateLongTaskJob]'))
         sleep(1000L)    // wait 1 seconds.
         def exitValue = launcher.syncJob(new JobRequest(
-                jobFilePath: 'META-INF/jobs/ch07/jobmanagement/customizedJobExitCodeChunkJob.xml',
-                jobName: 'customizedJobExitCodeChunkJob',
+                jobFilePath: 'META-INF/jobs/ch07/jobmanagement/emulateLongTaskJob.xml',
+                jobName: 'emulateLongTaskJob',
                 jobParameter: '-stop'
         ))
         p.waitFor()

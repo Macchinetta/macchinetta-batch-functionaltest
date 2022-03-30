@@ -17,8 +17,6 @@ package jp.co.ntt.fw.macchinetta.batch.functionaltest.ch04
 
 import groovy.util.logging.Slf4j
 import org.dbunit.dataset.SortedTable
-import org.junit.Rule
-import org.junit.rules.TestName
 import org.springframework.batch.core.JobParametersInvalidException
 import org.springframework.batch.core.launch.support.CommandLineJobRunner
 import org.springframework.batch.core.step.AbstractStep
@@ -58,9 +56,6 @@ A list of test cases is shown below.
 """)
 class JobParameterSpec extends Specification {
 
-    @Rule
-    TestName testName = new TestName()
-
     @Shared
             jobLauncher = new JobLauncher()
 
@@ -74,7 +69,7 @@ class JobParameterSpec extends Specification {
             mongoUtil = new MongoUtil()
 
     def setup() {
-        log.debug("### Spec case of [{}]", testName.methodName)
+        log.debug("### Spec case of [{}]", this.specificationContext.currentIteration.displayName)
         adminDBUnitUtil.dropAndCreateTable()
         jobDBUnitUtil.dropAndCreateTable()
         mongoUtil.deleteAll()

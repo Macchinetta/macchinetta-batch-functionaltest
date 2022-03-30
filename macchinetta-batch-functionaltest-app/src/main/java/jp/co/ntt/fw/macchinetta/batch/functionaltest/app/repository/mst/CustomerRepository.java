@@ -36,24 +36,24 @@ public interface CustomerRepository {
     Customer findOne(@Param("customerId") String customerId);
 
     /**
-     * Find All customer master data.
+     * Get cursor for customer master data.
+     *
+     * @return Cursor for customer master data.
+     */
+    Cursor<Customer> findAll();
+
+    /**
+     * Find all customer master data.
      *
      * @return All Customer master data.
      */
-    List<Customer> findAll();
+    List<Customer> findAllAtOnce();
 
     /**
-     * Get customer master data cursor.
-     *
-     * @return Customer master data cursor.
-     */
-    Cursor<Customer> cursor();
-
-    /**
-     * Find customer master data by branch.
+     * Get cursor for customer master data by branch.
      *
      * @param branchId Branch id.
-     * @return Customer master data by branch.
+     * @return Cursor for customer master data by branch.
      */
-    List<Customer> findByBranch(@Param("branchId") String branchId);
+    Cursor<Customer> findByBranch(@Param("branchId") String branchId);
 }

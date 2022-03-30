@@ -17,6 +17,7 @@ package jp.co.ntt.fw.macchinetta.batch.functionaltest.ch05.dbaccess.repository;
 
 import jp.co.ntt.fw.macchinetta.batch.functionaltest.app.model.mst.Customer;
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.cursor.Cursor;
 
 import java.util.List;
 
@@ -35,11 +36,11 @@ public interface DBAccessCustomerRepository {
     Customer findOne(@Param("customerId") String customerId);
 
     /**
-     * Find All customer master data.
+     * Get cursor for customer master data.
      *
-     * @return All Customer master data.
+     * @return Cursor for customer master data.
      */
-    List<Customer> findAll();
+    Cursor<Customer> findAll();
 
     /**
      * Find customer master data by branch.

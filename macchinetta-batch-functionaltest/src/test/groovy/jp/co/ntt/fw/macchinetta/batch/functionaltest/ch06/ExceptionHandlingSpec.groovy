@@ -16,8 +16,6 @@
 package jp.co.ntt.fw.macchinetta.batch.functionaltest.ch06
 
 import groovy.util.logging.Slf4j
-import org.junit.Rule
-import org.junit.rules.TestName
 import org.springframework.batch.core.step.AbstractStep
 import jp.co.ntt.fw.macchinetta.batch.functionaltest.ch06.exceptionhandling.AmountCheckProcessor
 import jp.co.ntt.fw.macchinetta.batch.functionaltest.ch06.exceptionhandling.AmountCheckWithSkipProcessor
@@ -54,9 +52,6 @@ A list of test cases is shown below.
 """)
 class ExceptionHandlingSpec extends Specification {
 
-    @Rule
-    TestName testName = new TestName()
-
     @Shared
             launcher = new JobLauncher()
 
@@ -75,7 +70,7 @@ class ExceptionHandlingSpec extends Specification {
     }
 
     def setup() {
-        log.debug("### Spec case of [{}]", testName.methodName)
+        log.debug("### Spec case of [{}]", this.specificationContext.currentIteration.displayName)
         mongoUtil.deleteAll()
     }
 

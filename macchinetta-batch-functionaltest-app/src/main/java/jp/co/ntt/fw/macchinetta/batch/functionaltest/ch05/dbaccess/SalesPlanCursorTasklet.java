@@ -46,8 +46,7 @@ public class SalesPlanCursorTasklet implements Tasklet {
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
         logger.info("Start read customer by Mapper IF using cursor.");
 
-        try (Cursor<SalesPlanDetail> cursor = repository.cursor()) {
-
+        try (Cursor<SalesPlanDetail> cursor = repository.findAll()) {
             for (SalesPlanDetail salesPlan : cursor) {
                 logger.info("Read item: " + salesPlan.toString());
             }

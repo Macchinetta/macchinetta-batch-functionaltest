@@ -16,8 +16,6 @@
 package jp.co.ntt.fw.macchinetta.batch.functionaltest.ch04
 
 import groovy.util.logging.Slf4j
-import org.junit.Rule
-import org.junit.rules.TestName
 import jp.co.ntt.fw.macchinetta.batch.functionaltest.ch04.listener.AllProcessListener
 import jp.co.ntt.fw.macchinetta.batch.functionaltest.ch04.listener.BeforeStepException
 import jp.co.ntt.fw.macchinetta.batch.functionaltest.ch04.listener.LoggingReader
@@ -56,9 +54,6 @@ Notice that the number of reads of the normal ItemReader contains the number of 
 
 class ListenerSpec extends Specification {
 
-    @Rule
-    TestName testName = new TestName()
-
     @Shared
             launcher = new JobLauncher()
 
@@ -78,7 +73,7 @@ class ListenerSpec extends Specification {
     }
 
     def setup() {
-        log.debug("### Spec case of [{}]", testName.methodName)
+        log.debug("### Spec case of [{}]", this.specificationContext.currentIteration.displayName)
         mongoUtil.deleteAll()
     }
 

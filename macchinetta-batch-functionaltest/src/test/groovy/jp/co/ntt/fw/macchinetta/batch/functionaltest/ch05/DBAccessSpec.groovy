@@ -16,8 +16,6 @@
 package jp.co.ntt.fw.macchinetta.batch.functionaltest.ch05
 
 import groovy.util.logging.Slf4j
-import org.junit.Rule
-import org.junit.rules.TestName
 import org.springframework.batch.core.launch.support.CommandLineJobRunner
 import org.springframework.batch.core.step.AbstractStep
 import org.springframework.dao.InvalidDataAccessResourceUsageException
@@ -57,9 +55,6 @@ Case5 : To confirm DB access by Mapper IF.
 """)
 class DBAccessSpec extends Specification {
 
-    @Rule
-    TestName testName = new TestName()
-
     @Shared
             launcher = new JobLauncher()
     @Shared
@@ -75,7 +70,7 @@ class DBAccessSpec extends Specification {
     }
 
     def setup() {
-        log.debug("### Spec case of [{}]", testName.methodName)
+        log.debug("### Spec case of [{}]", this.specificationContext.currentIteration.displayName)
         jobDB.dropAndCreateTable()
         mongoUtil.deleteAll()
     }

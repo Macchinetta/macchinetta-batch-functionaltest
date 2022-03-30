@@ -16,8 +16,6 @@
 package jp.co.ntt.fw.macchinetta.batch.functionaltest.ch04
 
 import groovy.util.logging.Slf4j
-import org.junit.Rule
-import org.junit.rules.TestName
 import org.springframework.batch.core.launch.support.CommandLineJobRunner
 import jp.co.ntt.fw.macchinetta.batch.functionaltest.app.common.SimpleJobTasklet
 import jp.co.ntt.fw.macchinetta.batch.functionaltest.util.JobLauncher
@@ -42,9 +40,6 @@ The test viewpoint is CommandLineJobRunner's arguments.
 """)
 class SyncJobSpec extends Specification {
 
-    @Rule
-    TestName testName = new TestName()
-
     @Shared
             jobLauncher = new JobLauncher()
 
@@ -59,7 +54,7 @@ class SyncJobSpec extends Specification {
     }
 
     def setup() {
-        log.debug("### Spec case of [{}]", testName.methodName)
+        log.debug("### Spec case of [{}]", this.specificationContext.currentIteration.displayName)
         mongoUtil.deleteAll()
     }
 

@@ -16,8 +16,6 @@
 package jp.co.ntt.fw.macchinetta.batch.functionaltest.ch07
 
 import groovy.util.logging.Slf4j
-import org.junit.Rule
-import org.junit.rules.TestName
 import org.springframework.batch.core.job.AbstractJob
 import org.springframework.dao.DuplicateKeyException
 import jp.co.ntt.fw.macchinetta.batch.functionaltest.ch04.jobparameter.RefInXmlTasklet
@@ -61,9 +59,6 @@ Delete results verification using JobRepository.
 """)
 class SyncJobUsingEmbeddedDBSpec extends Specification {
 
-    @Rule
-    TestName testName = new TestName()
-
     @Shared
             jobLauncher = new UseH2JobLauncher(new JobLauncher())
 
@@ -74,7 +69,7 @@ class SyncJobUsingEmbeddedDBSpec extends Specification {
             mongoUtil = new MongoUtil()
 
     def setup() {
-        log.debug("### Spec case of [{}]", testName.methodName)
+        log.debug("### Spec case of [{}]", this.specificationContext.currentIteration.displayName)
         jobDBUnitUtil.dropAndCreateTable()
         mongoUtil.deleteAll()
     }
