@@ -24,7 +24,7 @@ Tested environments are managed at https://github.com/Macchinetta/macchinetta-ba
 
 **Preconditions are as follow:**
 
-* http://openjdk.java.net/[OpenJDK 8 or 11] installed. (`JAVA_HOME` defined as environment variable.)
+* https://developers.redhat.com/products/openjdk[OpenJDK 8 or 11 or 17] installed. (`JAVA_HOME` defined as environment variable.)
 * https://maven.apache.org/download.cgi[Maven] installed. (Can run `mvn` command.)
 * https://www.mongodb.com/download-center[MongoDB] installed. (Default install.)
 * https://www.postgresql.org/download/[PostgreSQL] installed. (Default install.)

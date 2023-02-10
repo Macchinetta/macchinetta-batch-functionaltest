@@ -10,7 +10,7 @@
     <parent>
         <groupId>jp.co.ntt.fw.macchinetta.batch</groupId>
         <artifactId>macchinetta-batch-functionaltest-build</artifactId>
-        <version>2.3.1.RELEASE</version>
+        <version>2.3.2.RELEASE</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -28,29 +28,6 @@
     <build>
         <pluginManagement>
             <plugins>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-compiler-plugin</artifactId>
-                    <version>${maven-compiler-plugin.version}</version>
-                    <configuration>
-                        <compilerId>groovy-eclipse-compiler</compilerId>
-                        <source>${java-version}</source>
-                        <target>${java-version}</target>
-                    </configuration>
-                    <dependencies>
-                        <dependency>
-                            <groupId>org.codehaus.groovy</groupId>
-                            <artifactId>groovy-eclipse-compiler</artifactId>
-                            <version>${groovy-eclipse-compiler.version}</version>
-                        </dependency>
-                        <dependency>
-                            <groupId>org.codehaus.groovy</groupId>
-                            <artifactId>groovy-eclipse-batch</artifactId>
-                            <version>${groovy-eclipse-batch.version}</version>
-                        </dependency>
-                    </dependencies>
-                </plugin>
-
                 <!-- licence and formatter -->
                 <plugin>
                     <groupId>com.mycila</groupId>
@@ -213,20 +190,18 @@
     <properties>
         <!-- == Maven Plugin Versions == -->
         <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
-        <groovy-eclipse-compiler.version>3.7.0</groovy-eclipse-compiler.version>
-        <groovy-eclipse-batch.version>3.0.8-01</groovy-eclipse-batch.version>
         <license-maven-plugin.version>4.1</license-maven-plugin.version>
         <formatter-maven-plugin.version>2.15.0</formatter-maven-plugin.version>
 
         <!-- == Dependency Versions == -->
         <!-- == Spring Boot Dependencies == -->
-        <org.springframework.boot.version>2.6.1</org.springframework.boot.version>
+        <org.springframework.boot.version>2.7.7</org.springframework.boot.version>
 
         <!-- == TERASOLUNA Batch == -->
-        <terasoluna-batch.version>5.4.1.RELEASE</terasoluna-batch.version>
+        <terasoluna-batch.version>5.4.2.RELEASE</terasoluna-batch.version>
 
         <!-- == DBUnit == -->
-        <org.dbunit.dbunit.version>2.7.2</org.dbunit.dbunit.version>
+        <org.dbunit.dbunit.version>2.7.3</org.dbunit.dbunit.version>
 
         <!-- == Logback Contrib == -->
         <ch.qos.logback.contrib.version>0.1.5</ch.qos.logback.contrib.version>
@@ -244,4 +219,126 @@
         <!-- == Project Properties == -->
         <project.root.basedir>${project.basedir}</project.root.basedir>
     </properties>
+    
+    <profiles>
+        <profile>
+            <id>jdk8</id>
+            <activation>
+                <jdk>1.8</jdk>
+            </activation>
+            <build>
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <groupId>org.apache.maven.plugins</groupId>
+                            <artifactId>maven-compiler-plugin</artifactId>
+                            <version>${maven-compiler-plugin.version}</version>
+                            <configuration>
+                                <compilerId>groovy-eclipse-compiler</compilerId>
+                                <source>${java-version}</source>
+                                <target>${java-version}</target>
+                            </configuration>
+                            <dependencies>
+                                <dependency>
+                                    <groupId>org.codehaus.groovy</groupId>
+                                    <artifactId>groovy-eclipse-compiler</artifactId>
+                                    <version>${groovy-eclipse-compiler.version}</version>
+                                </dependency>
+                                <dependency>
+                                    <groupId>org.codehaus.groovy</groupId>
+                                    <artifactId>groovy-eclipse-batch</artifactId>
+                                    <version>${groovy-eclipse-batch.version}</version>
+                                </dependency>
+                            </dependencies>
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
+            </build>
+            <properties>
+                <groovy-eclipse-compiler.version>3.7.0</groovy-eclipse-compiler.version>
+                <groovy-eclipse-batch.version>3.0.8-01</groovy-eclipse-batch.version>
+            </properties>
+        </profile>
+        <profile>
+            <id>jdk11</id>
+            <activation>
+                <jdk>11</jdk>
+            </activation>
+            <build>
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <groupId>org.apache.maven.plugins</groupId>
+                            <artifactId>maven-compiler-plugin</artifactId>
+                            <version>${maven-compiler-plugin.version}</version>
+                            <configuration>
+                                <compilerId>groovy-eclipse-compiler</compilerId>
+                                <source>${java-version}</source>
+                                <target>${java-version}</target>
+                            </configuration>
+                            <dependencies>
+                                <dependency>
+                                    <groupId>org.codehaus.groovy</groupId>
+                                    <artifactId>groovy-eclipse-compiler</artifactId>
+                                    <version>${groovy-eclipse-compiler.version}</version>
+                                </dependency>
+                                <dependency>
+                                    <groupId>org.codehaus.groovy</groupId>
+                                    <artifactId>groovy-eclipse-batch</artifactId>
+                                    <version>${groovy-eclipse-batch.version}</version>
+                                </dependency>
+                            </dependencies>
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
+            </build>
+            <properties>
+                <groovy-eclipse-compiler.version>3.7.0</groovy-eclipse-compiler.version>
+                <groovy-eclipse-batch.version>3.0.8-01</groovy-eclipse-batch.version>
+            </properties>
+        </profile>
+        <profile>
+            <id>jdk17</id>
+            <activation>
+                <jdk>17</jdk>
+            </activation>
+            <build>
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <groupId>org.codehaus.gmavenplus</groupId>
+                            <artifactId>gmavenplus-plugin</artifactId>
+                            <version>${gmavenplus-plugin.version}</version>
+                            <executions>
+                                <execution>
+                                    <goals>
+                                        <goal>addSources</goal>
+                                        <goal>compile</goal>
+                                    </goals>
+                                </execution>
+                            </executions>
+                        </plugin>
+                        <plugin>
+                            <groupId>org.apache.maven.plugins</groupId>
+                            <artifactId>maven-compiler-plugin</artifactId>
+                            <version>${maven-compiler-plugin.version}</version>
+                            <configuration>
+                                <source>${java-version}</source>
+                                <target>${java-version}</target>
+                            </configuration>
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.gmavenplus</groupId>
+                        <artifactId>gmavenplus-plugin</artifactId>
+                    </plugin>
+                </plugins>
+            </build>
+            <properties>
+                <gmavenplus-plugin.version>1.13.1</gmavenplus-plugin.version>
+            </properties>
+        </profile>
+    </profiles>
 </project>

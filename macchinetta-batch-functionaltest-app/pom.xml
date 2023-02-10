@@ -10,7 +10,7 @@
     <parent>
         <groupId>jp.co.ntt.fw.macchinetta.batch</groupId>
         <artifactId>macchinetta-batch-functionaltest-build</artifactId>
-        <version>2.3.1.RELEASE</version>
+        <version>2.3.2.RELEASE</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -35,10 +35,10 @@
 
         <!-- == Dependency Versions == -->
         <!-- == Spring Boot Dependencies == -->
-        <org.springframework.boot.version>2.6.1</org.springframework.boot.version>
+        <org.springframework.boot.version>2.7.7</org.springframework.boot.version>
 
         <!-- == TERASOLUNA Batch == -->
-        <terasoluna-batch.version>5.4.1.RELEASE</terasoluna-batch.version>
+        <terasoluna-batch.version>5.4.2.RELEASE</terasoluna-batch.version>
 
         <!-- == Mongo Java Driver == -->
         <mongo-java-driver.version>2.14.3</mongo-java-driver.version>
@@ -48,7 +48,7 @@
 
         <!-- == JAXB == -->
         <jaxb-core.version>2.3.0.1</jaxb-core.version>
-        <jaxb-impl.version>2.3.5</jaxb-impl.version>
+        <jaxb-impl.version>2.3.7</jaxb-impl.version>
 
         <!-- == Project Properties == -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -57,7 +57,7 @@
         <!-- == Environment Properties == -->
         <jdbc.driver.groupId>org.postgresql</jdbc.driver.groupId>
         <jdbc.driver.artifactId>postgresql</jdbc.driver.artifactId>
-        <project.config.resource.directory.rdbms>config/rdbms/postgresql13/local</project.config.resource.directory.rdbms>
+        <project.config.resource.directory.rdbms>config/rdbms/postgresql14/local</project.config.resource.directory.rdbms>
         <project.config.resource.directory.mongo>config/mongo/local</project.config.resource.directory.mongo>
     </properties>
 
@@ -105,6 +105,12 @@
                 <groupId>com.oracle.database.jdbc</groupId>
                 <artifactId>${oracle.jdbc.artifactId}</artifactId>
                 <version>${oracle.jdbc.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.postgresql</groupId>
+                <artifactId>postgresql</artifactId>
+                <version>${postgresql.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -314,22 +320,40 @@
                 </dependency>
             </dependencies>
         </profile>
+        <profile>
+            <id>jdk17</id>
+            <activation>
+                <jdk>17</jdk>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>com.sun.xml.bind</groupId>
+                    <artifactId>jaxb-core</artifactId>
+                    <scope>runtime</scope>
+                </dependency>
+                <dependency>
+                    <groupId>com.sun.xml.bind</groupId>
+                    <artifactId>jaxb-impl</artifactId>
+                    <scope>runtime</scope>
+                </dependency>
+            </dependencies>
+        </profile>
 
         <profile>
-            <id>postgresql13-local</id>
+            <id>postgresql14-local</id>
             <properties>
                 <jdbc.driver.groupId>org.postgresql</jdbc.driver.groupId>
                 <jdbc.driver.artifactId>postgresql</jdbc.driver.artifactId>
-                <project.config.resource.directory.rdbms>config/rdbms/postgresql13/local</project.config.resource.directory.rdbms>
+                <project.config.resource.directory.rdbms>config/rdbms/postgresql14/local</project.config.resource.directory.rdbms>
                 <project.config.resource.directory.mongo>config/mongo/local</project.config.resource.directory.mongo>
             </properties>
         </profile>
         <profile>
-            <id>postgresql13-it</id>
+            <id>postgresql14-it</id>
             <properties>
                 <jdbc.driver.groupId>org.postgresql</jdbc.driver.groupId>
                 <jdbc.driver.artifactId>postgresql</jdbc.driver.artifactId>
-                <project.config.resource.directory.rdbms>config/rdbms/postgresql13/it</project.config.resource.directory.rdbms>
+                <project.config.resource.directory.rdbms>config/rdbms/postgresql14/it</project.config.resource.directory.rdbms>
                 <project.config.resource.directory.mongo>config/mongo/it</project.config.resource.directory.mongo>
             </properties>
         </profile>

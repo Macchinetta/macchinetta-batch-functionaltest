@@ -474,34 +474,42 @@ class FileAccessSpec extends Specification {
     }
 
     // 2.1.3
-    def "Reading fixed byte length file. Incorrect encoding specification."() {
+    def "Reading fixed byte length file. Incorrect record length."() {
         setup:
-        def charsetName = "MS932"
+        def charsetName = "UTF-8"
         def target = new File("files/test/input/ch05/fileaccess/sales_plan_detail_18.txt")
-        def copyFile = FileUtil.copyWithCharset(target, Charset.forName(charsetName))
 
         when:
         int exitCode = jobLauncher.syncJob(new JobRequest(
                 jobFilePath: 'META-INF/jobs/ch05/fileaccess/jobReadFixedLengthSeparateFixedLengthWithLinebreaks.xml',
                 jobName: 'jobReadFixedLengthSeparateFixedLengthWithLinebreaks',
-                jobParameter: "inputFile=" + copyFile.path + " readCharsetName=UTF-8" + " tokenizeCharsetName=" + charsetName))
+                jobParameter: "inputFile=" + target.path + " readCharsetName=" + charsetName + " tokenizeCharsetName=" + charsetName))
 
         then:
-        exitCode == 0
+        exitCode == 255
 
         def cursorFind = mongoUtil.find(
                 new LogCondition(
                         logger: LoggingItemReaderListener.class.name,
                         level: 'INFO'
                 ))
-        cursorFind.size() == 3
+        cursorFind.size() == 2
 
         cursorFind.any{ it.message == "Read item: SalesPlanDetail{branchId='SALE01', year=2016, month=1, customerId='0000001', amount=1000000000}" }
-        cursorFind.every{ it.message != "Read item: SalesPlanDetail{branchId='売上02', year=2017, month=2, customerId='0000002', amount=2000000000}" }
-        cursorFind.any{ it.message == "Read item: SalesPlanDetail{branchId='S\nLE03', year=2018, month=3, customerId='0000003', amount=3000000000}" }
+        cursorFind.any{ it.message == "Read item: SalesPlanDetail{branchId='SALE02', year=2017, month=2, customerId='0000002', amount=2000000000}" }
 
-        cleanup:
-        copyFile.delete()
+        def exceptionFind = mongoUtil.find(
+                new LogCondition(
+                        logger: LoggingItemReaderListener.class.name,
+                        level: 'ERROR'
+                ))
+
+        exceptionFind.size() == 1
+
+        exceptionFind.any{
+            it.throwable.message == "readByteLength is less than byteLength. [readByteLength:31][byteLength:32]"
+            it.throwable._class == IncorrectLineLengthException.class
+        }
     }
 
     // 2.1.4
