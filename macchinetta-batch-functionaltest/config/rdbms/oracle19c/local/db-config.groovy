@@ -9,9 +9,9 @@ dbunit {
                   'CREATE TABLE BATCH_JOB_EXECUTION_PARAMS', 'CREATE TABLE BATCH_STEP_EXECUTION',
                   'CREATE TABLE BATCH_STEP_EXECUTION_CONTEXT', 'CREATE TABLE BATCH_JOB_EXECUTION_CONTEXT']
 
-        dropSqlFilePaths = ['org/springframework/batch/core/schema-drop-oracle10g.sql',
+        dropSqlFilePaths = ['org/springframework/batch/core/schema-drop-oracle.sql',
                             'org/terasoluna/batch/async/db/schema-drop-oracle12c.sql']
-        createSqlFilePaths = ['schema-oracle10g.sql',
+        createSqlFilePaths = ['org/springframework/batch/core/schema-oracle.sql',
                               'org/terasoluna/batch/async/db/schema-oracle12c.sql']
         ch04 {
             // for Ch04-AsyncJobWithDB, define customized job-request table ddl script.

@@ -37,7 +37,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import jp.co.ntt.fw.macchinetta.batch.functionaltest.app.common.BooleanLatch;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 /**
  * Controller for launching jobs and referring job information.
@@ -86,10 +86,18 @@ public class JobController {
     public ResponseEntity<JobOperationResource> launch(@PathVariable("jobName") String jobName,
             @RequestBody JobOperationResource requestResource) {
 
+        String jobParams = requestResource.getJobParams();
         JobOperationResource responseResource = new JobOperationResource();
         responseResource.setJobName(jobName);
-        responseResource.setJobParams(requestResource.getJobParams());
-
+        responseResource.setJobParams(jobParams);
+        if(jobParams == null){
+            requestResource.setJobParams("");
+        }else {
+            // Change the jobParameter's delimiter because of https://github.com/spring-projects/spring-batch/issues/2122
+            if (jobParams.contains(",")) {
+                requestResource.setJobParams(jobParams.replace(",", " "));
+            }
+        }
         try {
             Long jobExecutionId = jobOperator.start(jobName, requestResource.getJobParams());
             responseResource.setJobExecutionId(jobExecutionId);
@@ -208,7 +216,6 @@ public class JobController {
         dest.setLastUpdated(src.getLastUpdated());
         dest.setExitStatus(src.getExitStatus().toString());
         dest.setExecutionContext(src.getExecutionContext().toString());
-        dest.setJobConfigurationName(src.getJobConfigurationName());
         for (Throwable th : src.getFailureExceptions()) {
             dest.getFailureExceptions().add(th.toString());
         }

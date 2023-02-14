@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:batch="http://www.springframework.org/schema/batch"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:mybatis="http://mybatis.org/schema/mybatis-spring"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd
+             http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd
+             http://www.springframework.org/schema/batch https://www.springframework.org/schema/batch/spring-batch.xsd
+             http://mybatis.org/schema/mybatis-spring http://mybatis.org/schema/mybatis-spring.xsd">
+
+    <import resource="classpath:META-INF/spring/job-base-context.xml"/>
+
+    <context:component-scan base-package="jp.co.ntt.fw.macchinetta.batch.functionaltest.app.common"/>
+    <context:component-scan base-package="jp.co.ntt.fw.macchinetta.batch.functionaltest.ch05.fileaccess.module"/>
+    <context:component-scan base-package="jp.co.ntt.fw.macchinetta.batch.functionaltest.ch05.fileaccess.jaxb"/>
+
+    <bean id="reader" class="org.springframework.batch.item.xml.StaxEventItemReader" scope="step"
+          p:resource="file:#{jobParameters['inputFile']}"
+          p:encoding="UTF-8"
+          p:fragmentRootElementName="customer"
+          p:strict="true">
+        <property name="unmarshaller">
+            <bean class="org.springframework.oxm.jaxb.Jaxb2Marshaller"
+                  p:schema="file:files/test/input/ch05/fileaccess/customer.xsd"
+                  p:validationEventHandler-ref="customerValidationEventHandler">
+                <property name="classesToBeBound">
+                    <list>
+                        <value>jp.co.ntt.fw.macchinetta.batch.functionaltest.ch05.fileaccess.model.jaxb.Customer</value>
+                    </list>
+                </property>
+            </bean>
+        </property>
+    </bean>
+
+    <batch:job id="jobReadXmlWithSchemaValidation" job-repository="jobRepository">
+        <batch:step id="jobReadXmlWithSchemaValidation.step01">
+            <batch:tasklet transaction-manager="jobTransactionManager">
+                <batch:chunk reader="reader"
+                             writer="loggingItemWriter" commit-interval="10"/>
+                <batch:listeners>
+                    <batch:listener ref="loggingItemReaderListener"/>
+                </batch:listeners>
+            </batch:tasklet>
+        </batch:step>
+        <batch:listeners>
+            <batch:listener ref="jobExecutionLoggingListener"/>
+        </batch:listeners>
+    </batch:job>
+
+</beans>

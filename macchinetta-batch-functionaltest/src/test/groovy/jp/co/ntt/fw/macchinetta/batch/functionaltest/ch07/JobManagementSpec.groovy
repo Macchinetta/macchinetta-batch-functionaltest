@@ -112,7 +112,7 @@ class JobManagementSpec extends Specification {
         def jobExplorer = (JobExplorer) context.getBean("jobExplorer")
 
         when:
-        def jobExecutionId = jobOperator.start('jobSalesPlan02', 'param1=dummy1,param2=dummy2')
+        def jobExecutionId = jobOperator.start('jobSalesPlan02', 'param1=dummy1 param2=dummy2')
         def jobExecution = jobExplorer.getJobExecution(jobExecutionId)
 
         then:
@@ -167,7 +167,7 @@ class JobManagementSpec extends Specification {
         def jobOperator = (JobOperator) context.getBean("jobOperator")
 
         when:
-        def jobExecutionId = jobOperator.start('jobSalesPlan02', 'param1=dummy1,param2=dummy2')
+        def jobExecutionId = jobOperator.start('jobSalesPlan02', 'param1=dummy1 param2=dummy2')
         def command = "java -cp target/dependency/* jp.co.ntt.fw.macchinetta.batch.functionaltest.ch07.jobmanagement.JobMonitor ${jobExecutionId}"
 
         def p = JobLauncher.executeProcess(command)
@@ -243,7 +243,7 @@ class JobManagementSpec extends Specification {
                 "SELECT * FROM batch_job_execution_params WHERE job_execution_id = ${jobExecutionId}")
         def params = [:]
         for (int i in 0..<jobParameters.rowCount) {
-            params.put(jobParameters.getValue(i, 'key_name'), jobParameters.getValue(i, 'string_val'))
+            params.put(jobParameters.getValue(i, 'parameter_name'), jobParameters.getValue(i, 'parameter_value'))
         }
         params.get('param3') == 'dummy3'
         params.get('param4') == 'dummy4'
@@ -338,7 +338,7 @@ class JobManagementSpec extends Specification {
         jobLauncher.setTaskExecutor(taskExecutor)
 
         when:
-        def jobExecutionId = jobOperator.start("jobSalesPlan02WithLongTermTask", null)
+        def jobExecutionId = jobOperator.start("jobSalesPlan02WithLongTermTask", "")
         mongoUtil.waitForOutputLog(new LogCondition(message: 'job started. [JobName:jobSalesPlan02WithLongTermTask]'))
         sleep(1000)
         jobOperator.stop(jobExecutionId)

@@ -18,8 +18,8 @@ package jp.co.ntt.fw.macchinetta.batch.functionaltest;
 import ch.qos.logback.classic.LoggerContext;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
+import jakarta.servlet.ServletContextEvent;
+import jakarta.servlet.ServletContextListener;
 
 /**
  * Stop LoggerContext in order to prevent executor-thread leak after destroying the ServletContext.

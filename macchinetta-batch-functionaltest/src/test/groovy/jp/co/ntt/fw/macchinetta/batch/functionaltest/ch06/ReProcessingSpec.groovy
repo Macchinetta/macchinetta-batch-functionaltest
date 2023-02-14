@@ -20,6 +20,7 @@ import org.springframework.batch.core.BatchStatus
 import org.springframework.batch.core.ExitStatus
 import org.springframework.batch.core.explore.JobExplorer
 import org.springframework.batch.core.launch.JobOperator
+import org.springframework.batch.core.repository.dao.DefaultExecutionContextSerializer
 import org.springframework.context.ApplicationContext
 import org.springframework.context.support.ClassPathXmlApplicationContext
 import jp.co.ntt.fw.macchinetta.batch.functionaltest.util.DBUnitUtil
@@ -227,8 +228,10 @@ class ReProcessingSpec extends Specification {
         failedStepExecution.getValue(0, 'write_count') == 10
         failedStepExecution.getValue(0, 'rollback_count') == 1
         def failedShortContext = failedStepExecutionContext.getValue(0, 'short_context')
-        failedShortContext ==~ /.*read\.count":10.*/
-        failedShortContext ==~ /.*Writer\.written":\["java.lang.Long",10].*/
+        def serializer = new DefaultExecutionContextSerializer()
+        def failedShortContextMap = serializer.deserialize(new ByteArrayInputStream(failedShortContext.getBytes()))
+        failedShortContextMap.get("MyBatisCursorItemReader.read.count") == 10
+        failedShortContextMap.get("FlatFileItemWriter.written") == 10
 
         completedJobExecution.rowCount == 2
         failedJobExecution.getValue(0, 'job_instance_id') != completedJobExecution.getValue(1, 'job_instance_id') // Confirm that restarted as another job
@@ -247,11 +250,13 @@ class ReProcessingSpec extends Specification {
         completedtepExecution.getValue(1, 'write_count') == 14
         completedtepExecution.getValue(1, 'rollback_count') == 0
         def completedShortContext0 = completedtepExecutionContext.getValue(0, 'short_context')
-        completedShortContext0 ==~ /.*read\.count":10.*/
-        completedShortContext0 ==~ /.*Writer\.written":\["java.lang.Long",10].*/
+        def completedShortContext0Map = serializer.deserialize(new ByteArrayInputStream(completedShortContext0.getBytes()))
+        completedShortContext0Map.get("MyBatisCursorItemReader.read.count") == 10
+        completedShortContext0Map.get("FlatFileItemWriter.written") == 10
         def completedShortContext1 = completedtepExecutionContext.getValue(1, 'short_context')
-        completedShortContext1 ==~ /.*read\.count":15.*/
-        completedShortContext1 ==~ /.*Writer\.written":\["java.lang.Long",14].*/
+        def completedShortContext1Map = serializer.deserialize(new ByteArrayInputStream(completedShortContext1.getBytes()))
+        completedShortContext1Map.get("MyBatisCursorItemReader.read.count") == 15
+        completedShortContext1Map.get("FlatFileItemWriter.written") == 14
 
         cleanup:
         Files.deleteIfExists(outputFile.toPath())

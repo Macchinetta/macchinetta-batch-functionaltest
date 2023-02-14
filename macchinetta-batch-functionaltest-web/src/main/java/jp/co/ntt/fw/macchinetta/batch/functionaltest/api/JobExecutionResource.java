@@ -15,8 +15,8 @@
  */
 package jp.co.ntt.fw.macchinetta.batch.functionaltest.api;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -54,22 +54,22 @@ public class JobExecutionResource {
     /**
      * Job start time.
      */
-    private Date startTime = null;
+    private LocalDateTime startTime = null;
 
     /**
      * Job repository create time.
      */
-    private Date createTime = null;
+    private LocalDateTime createTime = null;
 
     /**
      * Job end time.
      */
-    private Date endTime = null;
+    private LocalDateTime endTime = null;
 
     /**
      * Job repository last updated time.
      */
-    private Date lastUpdated = null;
+    private LocalDateTime lastUpdated = null;
 
     /**
      * Exit status.
@@ -85,11 +85,6 @@ public class JobExecutionResource {
      * Job failure exceptions.
      */
     private List<String> failureExceptions = new ArrayList<>();
-
-    /**
-     * Job configuration name.
-     */
-    private String jobConfigurationName = null;
 
     /**
      * Job explorer error message.
@@ -191,7 +186,7 @@ public class JobExecutionResource {
      *
      * @return The current of job start time.
      */
-    public Date getStartTime() {
+    public LocalDateTime getStartTime() {
         return startTime;
     }
 
@@ -200,7 +195,7 @@ public class JobExecutionResource {
      *
      * @param startTime New job start time.
      */
-    public void setStartTime(Date startTime) {
+    public void setStartTime(LocalDateTime startTime) {
         this.startTime = startTime;
     }
 
@@ -209,7 +204,7 @@ public class JobExecutionResource {
      *
      * @return The current of job repository create time.
      */
-    public Date getCreateTime() {
+    public LocalDateTime getCreateTime() {
         return createTime;
     }
 
@@ -218,7 +213,7 @@ public class JobExecutionResource {
      *
      * @param createTime New job repository create time.
      */
-    public void setCreateTime(Date createTime) {
+    public void setCreateTime(LocalDateTime createTime) {
         this.createTime = createTime;
     }
 
@@ -227,7 +222,7 @@ public class JobExecutionResource {
      *
      * @return The current of job end time.
      */
-    public Date getEndTime() {
+    public LocalDateTime getEndTime() {
         return endTime;
     }
 
@@ -236,7 +231,7 @@ public class JobExecutionResource {
      *
      * @param endTime New job end time.
      */
-    public void setEndTime(Date endTime) {
+    public void setEndTime(LocalDateTime endTime) {
         this.endTime = endTime;
     }
 
@@ -245,7 +240,7 @@ public class JobExecutionResource {
      *
      * @return The current of job repository last updated time.
      */
-    public Date getLastUpdated() {
+    public LocalDateTime getLastUpdated() {
         return lastUpdated;
     }
 
@@ -254,7 +249,7 @@ public class JobExecutionResource {
      *
      * @param lastUpdated New job repository last updated time.
      */
-    public void setLastUpdated(Date lastUpdated) {
+    public void setLastUpdated(LocalDateTime lastUpdated) {
         this.lastUpdated = lastUpdated;
     }
 
@@ -310,24 +305,6 @@ public class JobExecutionResource {
      */
     public void setFailureExceptions(List<String> failureExceptions) {
         this.failureExceptions = failureExceptions;
-    }
-
-    /**
-     * Job configuration name.
-     *
-     * @return The current of job configuration name.
-     */
-    public String getJobConfigurationName() {
-        return jobConfigurationName;
-    }
-
-    /**
-     * Job configuration name.
-     *
-     * @param jobConfigurationName New job configuration name.
-     */
-    public void setJobConfigurationName(String jobConfigurationName) {
-        this.jobConfigurationName = jobConfigurationName;
     }
 
     /**

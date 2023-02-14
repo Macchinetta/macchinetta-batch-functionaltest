@@ -21,6 +21,7 @@ import org.springframework.batch.core.JobParametersInvalidException
 import org.springframework.batch.core.launch.support.CommandLineJobRunner
 import org.springframework.batch.core.step.AbstractStep
 import org.springframework.beans.factory.UnsatisfiedDependencyException
+import org.terasoluna.batch.async.db.AsyncBatchDaemon
 import jp.co.ntt.fw.macchinetta.batch.functionaltest.ch04.jobparameter.AndEnvValRefInJavaTasklet
 import jp.co.ntt.fw.macchinetta.batch.functionaltest.ch04.jobparameter.InvalidDefaultValSettingTasklet
 import jp.co.ntt.fw.macchinetta.batch.functionaltest.ch04.jobparameter.RefInJavaTasklet
@@ -110,16 +111,16 @@ class JobParameterSpec extends Specification {
 
         def expectDataSet = DBUnitUtil.createDataSet {
             batch_job_execution_params {
-                job_execution_id | type_cd | key_name | long_val
-                1 | "LONG" | "jsr_batch_run_id" | 1
-                1 | "STRING" | "outputFile" | 0
-                2 | "LONG" | "jsr_batch_run_id" | 3
-                2 | "STRING" | "outputFile" | 0
+                job_execution_id | parameter_type | parameter_name | parameter_value
+                1 | "java.lang.Long" | "jsr_batch_run_id" | 1
+                1 | "java.lang.String" | "outputFile" | "files/test/output/ch04/jobparameter/tmp/CustomerList1.csv"
+                2 | "java.lang.Long" | "jsr_batch_run_id" | 3
+                2 | "java.lang.String" | "outputFile" | "files/test/output/ch04/jobparameter/tmp/CustomerList1.csv"
             }
         }
         def actualTable = adminDBUnitUtil.getIncludedColumnsTable("batch_job_execution_params",
                 expectDataSet.getTableMetaData("batch_job_execution_params").getColumns())
-        actualTable = new SortedTable(actualTable, ['job_execution_id', 'type_cd'] as String[])
+        actualTable = new SortedTable(actualTable, ['job_execution_id', 'parameter_type'] as String[])
 
         then:
         exitCode1 == 0
@@ -152,16 +153,16 @@ class JobParameterSpec extends Specification {
         when:
         def expectDataSet = DBUnitUtil.createDataSet {
             batch_job_execution_params {
-                job_execution_id | type_cd | key_name | long_val
-                1 | "LONG" | "jsr_batch_run_id" | 1
-                1 | "STRING" | "outputFile" | 0
-                2 | "LONG" | "jsr_batch_run_id" | 3
-                2 | "STRING" | "outputFile" | 0
+                job_execution_id | parameter_type | parameter_name | parameter_value
+                1 | "java.lang.Long" | "jsr_batch_run_id" | 1
+                1 | "java.lang.String" | "outputFile" | "files/test/output/ch04/jobparameter/tmp/CustomerList2.csv"
+                2 | "java.lang.Long" | "jsr_batch_run_id" | 3
+                2 | "java.lang.String" | "outputFile" | "files/test/output/ch04/jobparameter/tmp/CustomerList2.csv"
             }
         }
         def actualTable = adminDBUnitUtil.getIncludedColumnsTable("batch_job_execution_params",
                 expectDataSet.getTableMetaData("batch_job_execution_params").getColumns())
-        actualTable = new SortedTable(actualTable, ['job_execution_id', 'type_cd'] as String[])
+        actualTable = new SortedTable(actualTable, ['job_execution_id', 'parameter_type'] as String[])
 
         then:
         def expectITable = expectDataSet.getTable("batch_job_execution_params")

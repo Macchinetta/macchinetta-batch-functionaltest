@@ -140,7 +140,7 @@ class AsyncJobWithDBSpec extends Specification {
         jobExecutionId = jobExecutionId == null ? -1 : jobExecutionId
 
         // job repository
-        def jobParamSql = "SELECT * FROM batch_job_execution_params WHERE job_execution_id = " + jobExecutionId + " AND key_name = 'param1'"
+        def jobParamSql = "SELECT * FROM batch_job_execution_params WHERE job_execution_id = " + jobExecutionId + " AND parameter_name = 'param1'"
         def jobParamTable = adminDB.createQueryTable("jobParam", jobParamSql)
         def jobExecutionSql = "SELECT * FROM batch_job_execution WHERE job_execution_id = " + jobExecutionId
         def jobExecutionTable = adminDB.createQueryTable("jobExecution", jobExecutionSql)
@@ -174,7 +174,7 @@ class AsyncJobWithDBSpec extends Specification {
 
         // Assertion to the data from database.
         jobExecutionId != -1
-        jobParamTable.getValue(0, "string_val") == "non_parameter"
+        jobParamTable.getValue(0, "parameter_value") == "non_parameter"
         jobExecutionTable.getValue(0, "exit_code") == "COMPLETED"
         p.exitValue() == 0
 
@@ -339,7 +339,7 @@ class AsyncJobWithDBSpec extends Specification {
             launcher.registerAsyncJob(adminDB, jobRequest)
         }
         def env = ["async-batch-daemon.polling-interval=5000", "async-batch-daemon.polling-initial-delay=5000"] as String[]
-        def command = "java -cp target/dependency/* ${AsyncBatchDaemon.class.name}"
+        def command = "java -cp target/dependency/* ${AsyncBatchDaemon.class.name} ${launcher.getBeanDefinitionPath('async-batch-daemon.default')}"
 
         def stopFile = launcher.stopFile()
         if (!stopFile.exists()) {
@@ -347,8 +347,7 @@ class AsyncJobWithDBSpec extends Specification {
         }
 
         when:
-        def p = JobLauncher.executeProcess(command, env, null)
-
+        def p = launcher.executeProcess(command, env, null)
         def daemonStopLog = mongoUtil.waitForOutputLog(new LogCondition(message: 'Polling stop file already exists. Daemon stop. Please delete the file. [Path:' + stopFile.toPath() + ']'))
         def jobRequestTable = adminDB.getTable('batch_job_request')
 
@@ -715,18 +714,18 @@ class AsyncJobWithDBSpec extends Specification {
         adminDB2.insert(DBUnitUtil.createDataSet({
             batch_job_request {
                 job_name | job_parameter | polling_status | create_date | priority
-                "asyncJobCustomizedBatchJobRequest" | "registrationOrder=1,executionOrder=3" | "INIT" | "[now]" | 3
-                "asyncJobCustomizedBatchJobRequest" | "registrationOrder=2,executionOrder=1" | "INIT" | "[now]" | 1
-                "asyncJobCustomizedBatchJobRequest" | "registrationOrder=3,executionOrder=2" | "INIT" | "[now]" | 2
+                "asyncJobCustomizedBatchJobRequest" | "registrationOrder=1 executionOrder=3" | "INIT" | "[now]" | 3
+                "asyncJobCustomizedBatchJobRequest" | "registrationOrder=2 executionOrder=1" | "INIT" | "[now]" | 1
+                "asyncJobCustomizedBatchJobRequest" | "registrationOrder=3 executionOrder=2" | "INIT" | "[now]" | 2
             }
         }))
         def initJobRequestTable = adminDB2.createQueryTable("init",
                 "SELECT * FROM batch_job_request ORDER BY priority ASC")
         def env = ["async-batch-daemon.job-concurrency-num=1"] as String[]
-        def command = "java -cp target/dependency/* ${AsyncBatchDaemon.class.name} META-INF/ch04/asyncjobwithdb/async-batch-daemon-customized-repository.xml"
+        def command = "java -cp target/dependency/* ${AsyncBatchDaemon.class.name} ${launcher.getBeanDefinitionPath('async-batch-daemon.customized-repository')}"
 
         when:
-        def p = JobLauncher.executeProcess(command, env, null)
+        def p = launcher.executeProcess(command, env, null)
         launcher.waitAsyncJob(adminDB2, (long) initJobRequestTable.getValue(2, "job_seq_id"), 180 * 1000L)
         launcher.stopAsyncBatchDaemon(p)
 
@@ -781,10 +780,10 @@ class AsyncJobWithDBSpec extends Specification {
         def initJobRequestTable = adminDB2.createQueryTable("init",
                 "SELECT * FROM batch_job_request WHERE group_id = 'G1' ORDER BY job_seq_id ASC")
         def env = ["async-batch-daemon.job-concurrency-num=1", "GROUP_ID=G1"] as String[]
-        def command = "java -cp target/dependency/* ${AsyncBatchDaemon.class.name} META-INF/ch04/asyncjobwithdb/async-batch-daemon-query-params.xml"
+        def command = "java -cp target/dependency/* ${AsyncBatchDaemon.class.name} ${launcher.getBeanDefinitionPath('async-batch-daemon.query-params')}"
 
         when:
-        def p = JobLauncher.executeProcess(command, env, null)
+        def p = launcher.executeProcess(command, env, null)
         launcher.waitAsyncJob(adminDB2, (long) initJobRequestTable.getValue(1, "job_seq_id"), 180 * 1000L)
         launcher.stopAsyncBatchDaemon(p)
 
@@ -822,11 +821,11 @@ class AsyncJobWithDBSpec extends Specification {
         def jobRequest = new JobRequest(
                 jobName: 'asyncJobCustomizedClockTask'
         )
-        def command = "java -Duser.timezone=${timezone} -cp target/dependency/* ${AsyncBatchDaemon.class.name} META-INF/ch04/asyncjobwithdb/async-batch-daemon-clock.xml"
+        def command = "java -Duser.timezone=${timezone} -cp target/dependency/* ${AsyncBatchDaemon.class.name} ${launcher.getBeanDefinitionPath('async-batch-daemon.clock')}"
         def jobSeqId = launcher.registerAsyncJob(adminDB, jobRequest)
 
         when:
-        def p = JobLauncher.executeProcess(command)
+        def p = launcher.executeProcess(command)
 
         launcher.waitAsyncJob(adminDB, jobSeqId)
         launcher.stopAsyncBatchDaemon(p)

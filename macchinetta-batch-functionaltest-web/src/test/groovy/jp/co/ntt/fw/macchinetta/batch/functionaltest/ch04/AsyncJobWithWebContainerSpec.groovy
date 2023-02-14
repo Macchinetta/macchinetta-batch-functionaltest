@@ -71,7 +71,6 @@ class AsyncJobWithWebContainerSpec extends Specification {
     def setupSpec() {
         mongoUtil.deleteAll()
         dbUnitUtil.dropAndCreateTable()
-
         def result = restUtil.get('signal')
 
         assert result.status == 200
@@ -104,8 +103,8 @@ class AsyncJobWithWebContainerSpec extends Specification {
 
         when:
         // Submit new asynchronous job with REST API.
-        String jobParameter = "xxx=${System.currentTimeMillis()}"
-        RestSubmitResult restSubmitResult = restUtil.submitJob('jobEmulatedLongBatchTask', "${jobParameter}")
+        String currentTimeMilllis = System.currentTimeMillis()
+        RestSubmitResult restSubmitResult = restUtil.submitJob('jobEmulatedLongBatchTask', "xxx=${currentTimeMilllis}")
         Long jobExecutionId = restSubmitResult?.data?.jobExecutionId
 
         then:
@@ -142,7 +141,7 @@ class AsyncJobWithWebContainerSpec extends Specification {
         mongoUtil.waitForOutputLog(new LogCondition(
                 level: 'INFO',
                 logger: "${SimpleJobLauncher.class.name}",
-                message: ~/completed with the following parameters:.*${jobParameter}/))
+                message: ~/completed with the following parameters:.*value=${currentTimeMilllis}/))
         restJobExecution = restUtil.getJobExecution(jobExecutionId)
 
         then:

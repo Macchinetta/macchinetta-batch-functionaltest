@@ -317,10 +317,11 @@ class InputValidationSpec extends Specification {
 
         def cursorFind = mongoUtil.find(
                 new LogCondition(
-                        logger: ValidateAndBulkMessageItemProcessor.class.name
+                        logger: ValidateAndBulkMessageItemProcessor.class.name,
+                        level: 'WARN'
                 ))
 
-        mongoUtil.find(new LogCondition(level: 'WARN')).size() == 4
+        cursorFind.size() == 4
 
         def list = cursorFind.message.asList()
 
@@ -388,10 +389,11 @@ class InputValidationSpec extends Specification {
 
         def cursorFind = mongoUtil.find(
                 new LogCondition(
-                        logger: ValidateAndBulkMessageTasklet.class.name
+                        logger: ValidateAndBulkMessageTasklet.class.name,
+                        level: 'WARN'
                 ))
 
-        mongoUtil.find(new LogCondition(level: 'WARN')).size() == 4
+        cursorFind.size() == 4
 
         def list = cursorFind.message.asList()
 

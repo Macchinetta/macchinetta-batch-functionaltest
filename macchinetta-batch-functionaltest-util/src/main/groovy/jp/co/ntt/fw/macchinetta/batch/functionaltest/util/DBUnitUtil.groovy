@@ -52,8 +52,10 @@ class DBUnitUtil {
     final String[] dropSqlFilePaths
     final String[] createSqlFilePaths
     static final clock = Clock.systemDefaultZone()
+    final String database
 
     DBUnitUtil(String database = 'job') {
+        this.database = database
         conf = new ConfigSlurper().parse(
                 new ClassPathResource('db-config.groovy').URL).dbunit."${database}"
         ds = new BasicDataSource(
@@ -136,6 +138,14 @@ class DBUnitUtil {
     def dropAndCreateTable() {
         executeSqlScriptIgnoreFailedDrops(dropSqlFilePaths)
         executeSqlScript(createSqlFilePaths)
+        // When creating a JobRepository,
+        // Set the starting value of the sequence from 0 to 1 when using oracle
+        // (same condition as postgres)
+        if (this.database.equals("admin") && conf.driver.contains('oracle')) {
+            createQueryTable("result", "SELECT BATCH_STEP_EXECUTION_SEQ.NEXTVAL FROM DUAL")
+            createQueryTable("result", "SELECT BATCH_JOB_EXECUTION_SEQ.NEXTVAL FROM DUAL")
+            createQueryTable("result", "SELECT BATCH_JOB_SEQ.NEXTVAL FROM DUAL")
+        }
     }
 
     def executeSqlScript(String[] scriptFiles) {

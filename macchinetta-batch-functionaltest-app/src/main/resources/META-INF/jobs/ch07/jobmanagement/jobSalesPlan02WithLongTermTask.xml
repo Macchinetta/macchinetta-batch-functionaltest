@@ -10,7 +10,7 @@
              http://www.springframework.org/schema/batch https://www.springframework.org/schema/batch/spring-batch.xsd
              http://mybatis.org/schema/mybatis-spring http://mybatis.org/schema/mybatis-spring.xsd">
 
-    <import resource="classpath:META-INF/spring/job-base-context.xml"/>
+    <bean class="jp.co.ntt.fw.macchinetta.batch.functionaltest.config.JobBaseContextConfig"/>
 
     <context:component-scan base-package="jp.co.ntt.fw.macchinetta.batch.functionaltest.app.common"/>
     <context:component-scan base-package="jp.co.ntt.fw.macchinetta.batch.functionaltest.ch07.jobmanagement"/>

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:batch="http://www.springframework.org/schema/batch"
+       xmlns:mybatis="http://mybatis.org/schema/mybatis-spring"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd
+             http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd
+             http://www.springframework.org/schema/batch https://www.springframework.org/schema/batch/spring-batch.xsd
+             http://mybatis.org/schema/mybatis-spring http://mybatis.org/schema/mybatis-spring.xsd">
+
+    <import resource="classpath:META-INF/spring/job-base-context.xml"/>
+
+    <context:annotation-config/>
+    <context:component-scan base-package="jp.co.ntt.fw.macchinetta.batch.functionaltest.app.common"/>
+    <context:component-scan base-package="jp.co.ntt.fw.macchinetta.batch.functionaltest.ch04.asyncjobwithdb"/>
+    <mybatis:scan
+            base-package="jp.co.ntt.fw.macchinetta.batch.functionaltest.app.repository.performance"
+            factory-ref="jobSqlSessionFactory"/>
+
+    <batch:job id="asyncJobCustomizedClockTask" job-repository="jobRepository">
+        <batch:step id="asyncJobCustomizedClockTask.step01">
+            <batch:tasklet transaction-manager="jobTransactionManager" ref="customizedClockTask">
+            </batch:tasklet>
+        </batch:step>
+        <batch:listeners>
+            <batch:listener ref="jobExecutionLoggingListener"/>
+        </batch:listeners>
+    </batch:job>
+
+</beans>

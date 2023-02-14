@@ -10,7 +10,7 @@
     <parent>
         <groupId>jp.co.ntt.fw.macchinetta.batch</groupId>
         <artifactId>macchinetta-batch-functionaltest-build</artifactId>
-        <version>2.3.1.RELEASE</version>
+        <version>2.4.0.RELEASE</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -33,22 +33,21 @@
                     <artifactId>maven-compiler-plugin</artifactId>
                     <version>${maven-compiler-plugin.version}</version>
                     <configuration>
-                        <compilerId>groovy-eclipse-compiler</compilerId>
                         <source>${java-version}</source>
                         <target>${java-version}</target>
                     </configuration>
-                    <dependencies>
-                        <dependency>
-                            <groupId>org.codehaus.groovy</groupId>
-                            <artifactId>groovy-eclipse-compiler</artifactId>
-                            <version>${groovy-eclipse-compiler.version}</version>
-                        </dependency>
-                        <dependency>
-                            <groupId>org.codehaus.groovy</groupId>
-                            <artifactId>groovy-eclipse-batch</artifactId>
-                            <version>${groovy-eclipse-batch.version}</version>
-                        </dependency>
-                    </dependencies>
+                </plugin>
+                <plugin>
+                    <groupId>org.codehaus.gmavenplus</groupId>
+                    <artifactId>gmavenplus-plugin</artifactId>
+                    <version>${gmavenplus-plugin.version}</version>
+                    <executions>
+                        <execution>
+                            <goals>
+                                <goal>compile</goal>
+                            </goals>
+                        </execution>
+                    </executions>
                 </plugin>
 
                 <!-- licence and formatter -->
@@ -88,6 +87,10 @@
                 <artifactId>maven-compiler-plugin</artifactId>
             </plugin>
             <plugin>
+                <groupId>org.codehaus.gmavenplus</groupId>
+                <artifactId>gmavenplus-plugin</artifactId>
+            </plugin>
+            <plugin>
                 <groupId>net.revelc.code.formatter</groupId>
                 <artifactId>formatter-maven-plugin</artifactId>
             </plugin>
@@ -112,6 +115,12 @@
                 <groupId>org.dbunit</groupId>
                 <artifactId>dbunit</artifactId>
                 <version>${org.dbunit.dbunit.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>com.oracle.database.jdbc</groupId>
+                        <artifactId>ojdbc8</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
 
             <dependency>
@@ -148,6 +157,30 @@
                 <groupId>commons-io</groupId>
                 <artifactId>commons-io</artifactId>
                 <version>${commons-io.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.codehaus.groovy</groupId>
+                <artifactId>groovy</artifactId>
+                <version>${groovy.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.codehaus.groovy</groupId>
+                <artifactId>groovy-sql</artifactId>
+                <version>${groovy.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.codehaus.groovy</groupId>
+                <artifactId>groovy-datetime</artifactId>
+                <version>${groovy.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.codehaus.groovy</groupId>
+                <artifactId>groovy-dateutil</artifactId>
+                <version>${groovy.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -186,6 +219,12 @@
         <dependency>
             <groupId>org.dbunit</groupId>
             <artifactId>dbunit</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.oracle.database.jdbc</groupId>
+                    <artifactId>ojdbc8</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
@@ -212,27 +251,27 @@
 
     <properties>
         <!-- == Maven Plugin Versions == -->
-        <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
-        <groovy-eclipse-compiler.version>3.7.0</groovy-eclipse-compiler.version>
-        <groovy-eclipse-batch.version>3.0.8-01</groovy-eclipse-batch.version>
-        <license-maven-plugin.version>4.1</license-maven-plugin.version>
-        <formatter-maven-plugin.version>2.15.0</formatter-maven-plugin.version>
+        <maven-compiler-plugin.version>3.10.1</maven-compiler-plugin.version>
+        <gmavenplus-plugin.version>1.13.1</gmavenplus-plugin.version>
+        <license-maven-plugin.version>4.2.rc3</license-maven-plugin.version>
+        <formatter-maven-plugin.version>2.20.0</formatter-maven-plugin.version>
 
         <!-- == Dependency Versions == -->
         <!-- == Spring Boot Dependencies == -->
-        <org.springframework.boot.version>2.6.1</org.springframework.boot.version>
+        <org.springframework.boot.version>3.0.1</org.springframework.boot.version>
 
         <!-- == TERASOLUNA Batch == -->
-        <terasoluna-batch.version>5.4.1.RELEASE</terasoluna-batch.version>
+        <terasoluna-batch.version>5.5.0.RELEASE</terasoluna-batch.version>
 
         <!-- == DBUnit == -->
-        <org.dbunit.dbunit.version>2.7.2</org.dbunit.dbunit.version>
+        <org.dbunit.dbunit.version>2.7.3</org.dbunit.dbunit.version>
 
         <!-- == Logback Contrib == -->
         <ch.qos.logback.contrib.version>0.1.5</ch.qos.logback.contrib.version>
 
         <!-- == Groovy == -->
         <org.codehaus.groovy.modules.http-builder.version>0.7.1</org.codehaus.groovy.modules.http-builder.version>
+        <groovy.version>3.0.11</groovy.version>
 
         <!-- == Mongo == -->
         <com.gmongo.verson>1.5</com.gmongo.verson>

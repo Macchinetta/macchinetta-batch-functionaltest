@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:batch="http://www.springframework.org/schema/batch"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd
+                http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd
+                http://www.springframework.org/schema/batch https://www.springframework.org/schema/batch/spring-batch.xsd">
+
+    <import resource="classpath:META-INF/spring/job-base-context.xml"/>
+
+    <bean id="promotionalFlowTasklet"
+          class="jp.co.ntt.fw.macchinetta.batch.functionaltest.ch08.flowcontrol.SequentialFlowTasklet"/>
+
+    <batch:job id="jobPromotionalFlow" job-repository="jobRepository">
+        <batch:step id="jobPromotionalFlow.step1" next="jobPromotionalFlow.step2">
+            <batch:tasklet transaction-manager="jobTransactionManager">
+                <bean class="jp.co.ntt.fw.macchinetta.batch.functionaltest.ch08.flowcontrol.SavePromotionalTasklet"/>
+            </batch:tasklet>
+            <batch:listeners>
+                <batch:listener>
+                    <bean class="org.springframework.batch.core.listener.ExecutionContextPromotionListener"
+                          p:keys="promotion"
+                          p:strict="true"/>
+                </batch:listener>
+            </batch:listeners>
+        </batch:step>
+        <batch:step id="jobPromotionalFlow.step2">
+            <batch:tasklet transaction-manager="jobTransactionManager">
+                <bean class="jp.co.ntt.fw.macchinetta.batch.functionaltest.ch08.flowcontrol.ConfirmPromotionalTasklet"/>
+            </batch:tasklet>
+        </batch:step>
+    </batch:job>
+
+</beans>

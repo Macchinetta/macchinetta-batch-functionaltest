@@ -22,6 +22,7 @@ import org.springframework.batch.item.file.transform.IncorrectLineLengthExceptio
 import org.springframework.oxm.UnmarshallingFailureException
 import org.springframework.validation.BindException
 import jp.co.ntt.fw.macchinetta.batch.functionaltest.app.common.LoggingItemReaderListener
+import jp.co.ntt.fw.macchinetta.batch.functionaltest.ch05.fileaccess.jaxb.customer.CustomerValidationEventHandler
 import jp.co.ntt.fw.macchinetta.batch.functionaltest.ch05.fileaccess.module.LoggingHeaderRecordItemProcessor
 import jp.co.ntt.fw.macchinetta.batch.functionaltest.ch05.fileaccess.plan.UseDateSalesPlanDetailFieldSetMapper
 import jp.co.ntt.fw.macchinetta.batch.functionaltest.util.DBUnitUtil
@@ -474,34 +475,42 @@ class FileAccessSpec extends Specification {
     }
 
     // 2.1.3
-    def "Reading fixed byte length file. Incorrect encoding specification."() {
+    def "Reading fixed byte length file. Incorrect record length."() {
         setup:
-        def charsetName = "MS932"
+        def charsetName = "UTF-8"
         def target = new File("files/test/input/ch05/fileaccess/sales_plan_detail_18.txt")
-        def copyFile = FileUtil.copyWithCharset(target, Charset.forName(charsetName))
 
         when:
         int exitCode = jobLauncher.syncJob(new JobRequest(
                 jobFilePath: 'META-INF/jobs/ch05/fileaccess/jobReadFixedLengthSeparateFixedLengthWithLinebreaks.xml',
                 jobName: 'jobReadFixedLengthSeparateFixedLengthWithLinebreaks',
-                jobParameter: "inputFile=" + copyFile.path + " readCharsetName=UTF-8" + " tokenizeCharsetName=" + charsetName))
+                jobParameter: "inputFile=" + target.path + " readCharsetName=" + charsetName + " tokenizeCharsetName=" + charsetName))
 
         then:
-        exitCode == 0
+        exitCode == 255
 
         def cursorFind = mongoUtil.find(
                 new LogCondition(
                         logger: LoggingItemReaderListener.class.name,
                         level: 'INFO'
                 ))
-        cursorFind.size() == 3
+        cursorFind.size() == 2
 
         cursorFind.any{ it.message == "Read item: SalesPlanDetail{branchId='SALE01', year=2016, month=1, customerId='0000001', amount=1000000000}" }
-        cursorFind.every{ it.message != "Read item: SalesPlanDetail{branchId='売上02', year=2017, month=2, customerId='0000002', amount=2000000000}" }
-        cursorFind.any{ it.message == "Read item: SalesPlanDetail{branchId='S\nLE03', year=2018, month=3, customerId='0000003', amount=3000000000}" }
+        cursorFind.any{ it.message == "Read item: SalesPlanDetail{branchId='SALE02', year=2017, month=2, customerId='0000002', amount=2000000000}" }
 
-        cleanup:
-        copyFile.delete()
+        def exceptionFind = mongoUtil.find(
+                new LogCondition(
+                        logger: LoggingItemReaderListener.class.name,
+                        level: 'ERROR'
+                ))
+
+        exceptionFind.size() == 1
+
+        exceptionFind.any{
+            it.throwable.message == "readByteLength is less than byteLength. [readByteLength:31][byteLength:32]"
+            it.throwable._class == IncorrectLineLengthException.class
+        }
     }
 
     // 2.1.4
@@ -1109,16 +1118,15 @@ class FileAccessSpec extends Specification {
         exitCode == 255
 
         def throwableCursor = mongoUtil.findOne(
-                new LogCondition(
-                        logger: LoggingItemReaderListener.class.name,
-                        level: 'ERROR'
-                ))
+            new LogCondition(
+                logger: CustomerValidationEventHandler.class.name,
+                level: 'ERROR'
+            ))
 
-        throwableCursor.message == "Exception occurred while reading."
-
-        throwableCursor.throwable._class == UnmarshallingFailureException
-        throwableCursor.throwable.message.contains("Value 'Data Hanako' with length = '11' is not facet-valid with respect to maxLength '10' for type 'stringMaxSize'.")
-        throwableCursor.throwable.stackTrace.size() > 0
+        throwableCursor.message.contains("MESSAGE:cvc-maxLength-valid: Value 'Data Hanako' with length = '11' is not facet-valid with respect to maxLength '10' for type 'stringMaxSize'.")
+        throwableCursor.message.contains("LINKED EXCEPTION:org.xml.sax.SAXParseException")
+        throwableCursor.message.contains("LINE NUMBER:17")
+        throwableCursor.message.contains("COLUMN NUMBER:33")
     }
 
     // 7.1
@@ -1211,9 +1219,7 @@ class FileAccessSpec extends Specification {
     // 9.1
     def "Check the default value of FlatFileItemReader encoding."() {
         setup:
-        def defaultCharset = Charset.defaultCharset()
         def target = new File("files/test/input/ch05/fileaccess/sales_plan_detail_20.csv")
-        def copyFile = FileUtil.copyWithCharset(target, defaultCharset)
 
         when:
         int exitCode = jobLauncher.syncJob({
@@ -1221,8 +1227,7 @@ class FileAccessSpec extends Specification {
                 arg.jobRequest = new JobRequest(
                         jobFilePath: "META-INF/jobs/ch05/fileaccess/jobReadCsvByDefaultEncoding.xml",
                         jobName: "jobReadCsvByDefaultEncoding",
-                        jobParameter: "inputFile=" + copyFile.path)
-                arg.sysprop = ["file.encoding=" + defaultCharset.name()]
+                        jobParameter: "inputFile=" + target.path)
         })
 
         then:
@@ -1238,9 +1243,6 @@ class FileAccessSpec extends Specification {
         cursorFind.any{ it.message == "Read item: SalesPlanDetail{branchId='支店01', year=2016, month=1, customerId='0000000001', amount=1000000000}" }
         cursorFind.any{ it.message == "Read item: SalesPlanDetail{branchId='支店02', year=2017, month=2, customerId='0000000002', amount=2000000000}" }
         cursorFind.any{ it.message == "Read item: SalesPlanDetail{branchId='支店03', year=2018, month=3, customerId='0000000003', amount=3000000000}" }
-
-        cleanup:
-        copyFile.delete()
     }
 
     // 9.2
@@ -1267,9 +1269,7 @@ class FileAccessSpec extends Specification {
     // 9.3
     def "Check the default value of StaxEventItemReader encoding."() {
         setup:
-        def defaultCharset = Charset.defaultCharset()
         def target = new File("files/test/input/ch05/fileaccess/sales_plan_detail_21.xml")
-        def copyFile = FileUtil.copyWithCharset(target, defaultCharset)
 
         when:
         int exitCode = jobLauncher.syncJob({
@@ -1277,8 +1277,7 @@ class FileAccessSpec extends Specification {
                 arg.jobRequest = new JobRequest(
                         jobFilePath: "META-INF/jobs/ch05/fileaccess/jobReadXmlByDefaultEncoding.xml",
                         jobName: "jobReadXmlByDefaultEncoding",
-                        jobParameter: "inputFile=" + copyFile.path)
-                arg.sysprop = ["file.encoding=" + defaultCharset.name()]
+                        jobParameter: "inputFile=" + target.path)
         })
 
         then:
@@ -1294,9 +1293,6 @@ class FileAccessSpec extends Specification {
         cursorFind.any{ it.message == "Read item: SalesPlanDetail{branchId='支店01', year=2016, month=1, customerId='0000000001', amount=1000000000}" }
         cursorFind.any{ it.message == "Read item: SalesPlanDetail{branchId='支店02', year=2017, month=2, customerId='0000000002', amount=2000000000}" }
         cursorFind.any{ it.message == "Read item: SalesPlanDetail{branchId='支店03', year=2018, month=3, customerId='0000000003', amount=3000000000}" }
-
-        cleanup:
-        copyFile.delete()
     }
 
     // 9.4

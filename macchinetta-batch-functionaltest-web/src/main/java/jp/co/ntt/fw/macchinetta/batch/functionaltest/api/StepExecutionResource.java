@@ -15,8 +15,8 @@
  */
 package jp.co.ntt.fw.macchinetta.batch.functionaltest.api;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -44,52 +44,52 @@ public class StepExecutionResource {
     /**
      * Read count.
      */
-    private int readCount = 0;
+    private long readCount = 0L;
 
     /**
      * Write count.
      */
-    private int writeCount = 0;
+    private long writeCount = 0L;
 
     /**
      * Commit count.
      */
-    private int commitCount = 0;
+    private long commitCount = 0L;
 
     /**
      * Rollback count.
      */
-    private int rollbackCount = 0;
+    private long rollbackCount = 0L;
 
     /**
      * Read skip count.
      */
-    private int readSkipCount = 0;
+    private long readSkipCount = 0L;
 
     /**
      * Process skip count.
      */
-    private int processSkipCount = 0;
+    private long processSkipCount = 0L;
 
     /**
      * Write skip count.
      */
-    private int writeSkipCount = 0;
+    private long writeSkipCount = 0L;
 
     /**
      * Step start time.
      */
-    private Date startTime = null;
+    private LocalDateTime startTime = null;
 
     /**
      * Step end time.
      */
-    private Date endTime = null;
+    private LocalDateTime endTime = null;
 
     /**
      * Job repository last updated time.
      */
-    private Date lastUpdated = null;
+    private LocalDateTime lastUpdated = null;
 
     /**
      * Step execution context.
@@ -109,7 +109,7 @@ public class StepExecutionResource {
     /**
      * Filter count.
      */
-    private int filterCount;
+    private long filterCount;
 
     /**
      * Step failure exceptions.
@@ -175,7 +175,7 @@ public class StepExecutionResource {
      *
      * @return The current of read count.
      */
-    public int getReadCount() {
+    public long getReadCount() {
         return readCount;
     }
 
@@ -184,7 +184,7 @@ public class StepExecutionResource {
      *
      * @param readCount New read count.
      */
-    public void setReadCount(int readCount) {
+    public void setReadCount(long readCount) {
         this.readCount = readCount;
     }
 
@@ -193,7 +193,7 @@ public class StepExecutionResource {
      *
      * @return The current of write count.
      */
-    public int getWriteCount() {
+    public long getWriteCount() {
         return writeCount;
     }
 
@@ -202,7 +202,7 @@ public class StepExecutionResource {
      *
      * @param writeCount New write count.
      */
-    public void setWriteCount(int writeCount) {
+    public void setWriteCount(long writeCount) {
         this.writeCount = writeCount;
     }
 
@@ -211,7 +211,7 @@ public class StepExecutionResource {
      *
      * @return The current of commit count.
      */
-    public int getCommitCount() {
+    public long getCommitCount() {
         return commitCount;
     }
 
@@ -220,7 +220,7 @@ public class StepExecutionResource {
      *
      * @param commitCount New commit count.
      */
-    public void setCommitCount(int commitCount) {
+    public void setCommitCount(long commitCount) {
         this.commitCount = commitCount;
     }
 
@@ -229,7 +229,7 @@ public class StepExecutionResource {
      *
      * @return The current of rollback count.
      */
-    public int getRollbackCount() {
+    public long getRollbackCount() {
         return rollbackCount;
     }
 
@@ -238,7 +238,7 @@ public class StepExecutionResource {
      *
      * @param rollbackCount New rollback count.
      */
-    public void setRollbackCount(int rollbackCount) {
+    public void setRollbackCount(long rollbackCount) {
         this.rollbackCount = rollbackCount;
     }
 
@@ -247,7 +247,7 @@ public class StepExecutionResource {
      *
      * @return The current of read skip count.
      */
-    public int getReadSkipCount() {
+    public long getReadSkipCount() {
         return readSkipCount;
     }
 
@@ -256,7 +256,7 @@ public class StepExecutionResource {
      *
      * @param readSkipCount New read skip count.
      */
-    public void setReadSkipCount(int readSkipCount) {
+    public void setReadSkipCount(long readSkipCount) {
         this.readSkipCount = readSkipCount;
     }
 
@@ -265,7 +265,7 @@ public class StepExecutionResource {
      *
      * @return The current of process skip count.
      */
-    public int getProcessSkipCount() {
+    public long getProcessSkipCount() {
         return processSkipCount;
     }
 
@@ -274,7 +274,7 @@ public class StepExecutionResource {
      *
      * @param processSkipCount New process skip count.
      */
-    public void setProcessSkipCount(int processSkipCount) {
+    public void setProcessSkipCount(long processSkipCount) {
         this.processSkipCount = processSkipCount;
     }
 
@@ -283,7 +283,7 @@ public class StepExecutionResource {
      *
      * @return The current of write skip count.
      */
-    public int getWriteSkipCount() {
+    public long getWriteSkipCount() {
         return writeSkipCount;
     }
 
@@ -292,7 +292,7 @@ public class StepExecutionResource {
      *
      * @param writeSkipCount New write skip count.
      */
-    public void setWriteSkipCount(int writeSkipCount) {
+    public void setWriteSkipCount(long writeSkipCount) {
         this.writeSkipCount = writeSkipCount;
     }
 
@@ -301,7 +301,7 @@ public class StepExecutionResource {
      *
      * @return The current of step start time.
      */
-    public Date getStartTime() {
+    public LocalDateTime getStartTime() {
         return startTime;
     }
 
@@ -310,7 +310,7 @@ public class StepExecutionResource {
      *
      * @param startTime New step start time.
      */
-    public void setStartTime(Date startTime) {
+    public void setStartTime(LocalDateTime startTime) {
         this.startTime = startTime;
     }
 
@@ -319,7 +319,7 @@ public class StepExecutionResource {
      *
      * @return The current of step end time.
      */
-    public Date getEndTime() {
+    public LocalDateTime getEndTime() {
         return endTime;
     }
 
@@ -328,7 +328,7 @@ public class StepExecutionResource {
      *
      * @param endTime New step end time.
      */
-    public void setEndTime(Date endTime) {
+    public void setEndTime(LocalDateTime endTime) {
         this.endTime = endTime;
     }
 
@@ -337,7 +337,7 @@ public class StepExecutionResource {
      *
      * @return The current of job repository last updated time.
      */
-    public Date getLastUpdated() {
+    public LocalDateTime getLastUpdated() {
         return lastUpdated;
     }
 
@@ -346,7 +346,7 @@ public class StepExecutionResource {
      *
      * @param lastUpdated New job repository last updated time.
      */
-    public void setLastUpdated(Date lastUpdated) {
+    public void setLastUpdated(LocalDateTime lastUpdated) {
         this.lastUpdated = lastUpdated;
     }
 
@@ -409,7 +409,7 @@ public class StepExecutionResource {
      *
      * @return The current of filter count.
      */
-    public int getFilterCount() {
+    public long getFilterCount() {
         return filterCount;
     }
 
@@ -418,7 +418,7 @@ public class StepExecutionResource {
      *
      * @param filterCount New filter count.
      */
-    public void setFilterCount(int filterCount) {
+    public void setFilterCount(long filterCount) {
         this.filterCount = filterCount;
     }
 

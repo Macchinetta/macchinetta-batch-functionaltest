@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:batch="http://www.springframework.org/schema/batch"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:mybatis="http://mybatis.org/schema/mybatis-spring"
+       xmlns:task="http://www.springframework.org/schema/task"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd
+             http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd
+             http://www.springframework.org/schema/batch https://www.springframework.org/schema/batch/spring-batch.xsd
+             http://mybatis.org/schema/mybatis-spring http://mybatis.org/schema/mybatis-spring.xsd
+             http://www.springframework.org/schema/task https://www.springframework.org/schema/task/spring-task.xsd">
+
+    <import resource="classpath:META-INF/spring/job-base-context.xml"/>
+
+    <context:component-scan base-package="jp.co.ntt.fw.macchinetta.batch.functionaltest.app.common"/>
+    <context:component-scan base-package="jp.co.ntt.fw.macchinetta.batch.functionaltest.app.evaluation"/>
+    <mybatis:scan
+            base-package="jp.co.ntt.fw.macchinetta.batch.functionaltest.app.repository.evaluation"
+            factory-ref="jobSqlSessionFactory"/>
+
+    <bean id="reader" class="org.mybatis.spring.batch.MyBatisCursorItemReader" scope="step"
+          p:queryId="jp.co.ntt.fw.macchinetta.batch.functionaltest.app.repository.evaluation.EvaluationRepository.findEvaluationData"
+          p:sqlSessionFactory-ref="jobSqlSessionFactory">
+        <property name="parameterValues">
+            <map>
+                <entry key="branchId" value="#{stepExecutionContext['branch'].branchId}"/>
+                <entry key="year" value="#{jobParameters['year']}" value-type="java.lang.Integer"/>
+                <entry key="month" value="#{jobParameters['month']}" value-type="java.lang.Integer"/>
+            </map>
+        </property>
+    </bean>
+
+    <bean id="writer" class="org.springframework.batch.item.file.FlatFileItemWriter" scope="step"
+          p:resource="file:#{jobParameters['outputPath']}/Evaluation_#{stepExecutionContext['branch'].branchId}.csv">
+        <property name="lineAggregator">
+            <bean class="org.springframework.batch.item.file.transform.DelimitedLineAggregator">
+                <property name="fieldExtractor">
+                    <bean class="org.springframework.batch.item.file.transform.BeanWrapperFieldExtractor"
+                          p:names="branchId,branchName,year,month,evaluation,ratio"/>
+                </property>
+            </bean>
+        </property>
+    </bean>
+
+    <batch:step id="jobEvaluationReport01.step.worker">
+        <batch:tasklet transaction-manager="jobTransactionManager">
+            <batch:chunk reader="reader" processor="evaluationItemProcessor" writer="writer" commit-interval="10"/>
+        </batch:tasklet>
+    </batch:step>
+
+    <batch:job id="jobEvaluationReport01" job-repository="jobRepository">
+        <batch:step id="jobEvaluationReport01.step.manager">
+            <batch:partition partitioner="evaluationReportPartitioner" step="jobEvaluationReport01.step.worker">
+                <batch:handler grid-size="5" task-executor="parallelTaskExecutor"/>
+            </batch:partition>
+        </batch:step>
+        <batch:listeners>
+            <batch:listener ref="jobExecutionLoggingListener"/>
+        </batch:listeners>
+    </batch:job>
+
+    <!-- Task Executor -->
+    <task:executor id="parallelTaskExecutor" pool-size="10" queue-capacity="200"/>
+
+</beans>

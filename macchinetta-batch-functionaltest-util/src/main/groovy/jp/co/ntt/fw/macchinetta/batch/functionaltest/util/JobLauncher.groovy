@@ -158,7 +158,7 @@ class JobLauncher {
             systemProperties += " -D${sp}"
         }
 
-        def command = "java -cp target/dependency/* ${systemProperties} ${remoteDebug} ${AsyncBatchDaemon.class.name}"
+        def command = "java -cp target/dependency/* ${systemProperties} ${remoteDebug} ${AsyncBatchDaemon.class.name} ${getBeanDefinitionPath('async-batch-daemon.default')}"
         executeProcess(command, env, null)
     }
 
@@ -237,5 +237,13 @@ class JobLauncher {
         void exit(int status) {
             this.status = status
         }
+    }
+
+    String getBeanDefinitionPath(String key) {
+        def appProp = new Properties()
+        new ClassPathResource('bean-definition.properties').URL.withInputStream { inputStream ->
+            appProp.load(inputStream)
+        }
+        appProp.get(key)
     }
 }

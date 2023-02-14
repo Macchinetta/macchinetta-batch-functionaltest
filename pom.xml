@@ -6,7 +6,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>jp.co.ntt.fw.macchinetta.batch</groupId>
     <artifactId>macchinetta-batch-functionaltest-build</artifactId>
-    <version>2.3.1.RELEASE</version>
+    <version>2.4.0.RELEASE</version>
     <packaging>pom</packaging>
 
     <name>root</name>
@@ -25,49 +25,42 @@
         <url>https://macchinetta.github.io</url>
     </organization>
 
-    <pluginRepositories>
-        <!-- === Groovy Maven Repository === -->
-        <pluginRepository>
-            <id>bintray</id>
-            <name>Groovy Bintray</name>
-            <url>https://dl.bintray.com/groovy/maven</url>
-            <releases>
-                <updatePolicy>never</updatePolicy>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </pluginRepository>
-    </pluginRepositories>
-
     <properties>
         <!-- == Project Properties == -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <archetype.test.skip>true</archetype.test.skip>
         <encoding>UTF-8</encoding>
-        <java-version>1.8</java-version>
-        <oracle.jdbc.artifactId>ojdbc8</oracle.jdbc.artifactId>
-        <oracle.jdbc.version>21.3.0.0</oracle.jdbc.version>
+        <java-version>17</java-version>
+        <oracle.jdbc.artifactId>ojdbc11</oracle.jdbc.artifactId>
+        <oracle.jdbc.version>21.8.0.0</oracle.jdbc.version>
+
+        <!-- == Configuration Properties == -->
+        <profile-name>javaconfig</profile-name>
+        <appname.suffix></appname.suffix>
     </properties>
 
-    <profiles>
-        <profile>
-            <id>jdk11</id>
-            <activation>
-                <jdk>11</jdk>
-            </activation>
-            <properties>
-                <java-version>11</java-version>
-                <oracle.jdbc.artifactId>ojdbc10</oracle.jdbc.artifactId>
-                <oracle.jdbc.version>19.12.0.0</oracle.jdbc.version>
-            </properties>
-        </profile>
-    </profiles>
-
     <modules>
-        <module>macchinetta-batch-functionaltest-app</module>
+        <module>macchinetta-batch-functionaltest-app${appname.suffix}</module>
+        <module>macchinetta-batch-functionaltest-app-common</module>
         <module>macchinetta-batch-functionaltest-util</module>
         <module>macchinetta-batch-functionaltest</module>
         <module>macchinetta-batch-functionaltest-web</module>
     </modules>
+
+    <profiles>
+        <profile>
+            <id>javaconfig</id>
+            <properties>
+                <profile-name>javaconfig</profile-name>
+                <appname.suffix></appname.suffix>
+            </properties>
+        </profile>
+        <profile>
+            <id>xmlconfig</id>
+            <properties>
+                <profile-name>xmlconfig</profile-name>
+                <appname.suffix>-${profile-name}</appname.suffix>
+            </properties>
+        </profile>
+    </profiles>
 </project>
