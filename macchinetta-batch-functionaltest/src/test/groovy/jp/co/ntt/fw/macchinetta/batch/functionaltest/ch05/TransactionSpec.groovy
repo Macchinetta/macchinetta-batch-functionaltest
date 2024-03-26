@@ -173,6 +173,72 @@ class TransactionSpec extends Specification {
         stepExecution.getValue(0, 'write_count') == 0
         stepExecution.getValue(0, 'rollback_count') == 1
     }
+    
+    // Testcase 1.2, test no.3
+    def "Transaction control test of tasklet model, Confirm implementation of intermediate commit method, correct"() {
+        setup:
+        jobDB.deleteAll(["sales_plan_detail"] as String[])
+        def jobRequest = new JobRequest(
+                jobFilePath: 'META-INF/jobs/ch05/transaction/createSalesPlanChunkTranTask.xml',
+                jobName: 'createSalesPlanChunkTranTask',
+                jobParameter: 'inputFile=./files/test/input/ch05/transaction/sales_plan_branch_0002_correct.csv'
+        )
+        def expectDataSet = DBUnitUtil.createDataSetFormCSV("./files/expect/database/ch05/transaction/")
+
+        when:
+        def exitValue = launcher.syncJob(jobRequest)
+
+        def planDetailTable = jobDB.getTable("sales_plan_detail")
+
+        then:
+        exitValue == 0
+        DBUnitUtil.assertEquals(expectDataSet.getTable("sales_plan_branch_0002_correct_expect_chunked"), planDetailTable)
+
+        def log = mongoUtil.findOne(new LogCondition(
+                message: 'Finish Create sales plan by chunk transaction of tasklet model.',
+                level: 'INFO'
+        ))
+        log != null
+        log.throwable == null
+        def stepExecution = adminDB.getTable("batch_step_execution")
+        stepExecution.getValue(0, 'commit_count') == 1
+        stepExecution.getValue(0, 'read_count') == 0
+        stepExecution.getValue(0, 'write_count') == 0
+        stepExecution.getValue(0, 'rollback_count') == 0
+    }
+    
+    // Testcase 1.2, test no.4
+    def "Transaction control test of tasklet model, Confirm implementation of intermediate commit method, correct 99"() {
+        setup:
+        jobDB.deleteAll(["sales_plan_detail"] as String[])
+        def jobRequest = new JobRequest(
+                jobFilePath: 'META-INF/jobs/ch05/transaction/createSalesPlanChunkTranTask.xml',
+                jobName: 'createSalesPlanChunkTranTask',
+                jobParameter: 'inputFile=./files/test/input/ch05/transaction/sales_plan_branch_0002_correct_99.csv'
+        )
+        def expectDataSet = DBUnitUtil.createDataSetFormCSV("./files/expect/database/ch05/transaction/")
+
+        when:
+        def exitValue = launcher.syncJob(jobRequest)
+
+        def planDetailTable = jobDB.getTable("sales_plan_detail")
+
+        then:
+        exitValue == 0
+        DBUnitUtil.assertEquals(expectDataSet.getTable("sales_plan_branch_0002_99_expect_chunked"), planDetailTable)
+
+        def log = mongoUtil.findOne(new LogCondition(
+                message: 'Finish Create sales plan by chunk transaction of tasklet model.',
+                level: 'INFO'
+        ))
+        log != null
+        log.throwable == null
+        def stepExecution = adminDB.getTable("batch_step_execution")
+        stepExecution.getValue(0, 'commit_count') == 1
+        stepExecution.getValue(0, 'read_count') == 0
+        stepExecution.getValue(0, 'write_count') == 0
+        stepExecution.getValue(0, 'rollback_count') == 0
+    }
 
     // Testcase 1.3, test no.1
     def "Transaction control at file output, transaction enabled"() {

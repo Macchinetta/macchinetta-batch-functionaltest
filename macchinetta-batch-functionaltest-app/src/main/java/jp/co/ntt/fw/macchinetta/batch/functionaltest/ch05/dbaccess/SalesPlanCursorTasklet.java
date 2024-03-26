@@ -48,7 +48,7 @@ public class SalesPlanCursorTasklet implements Tasklet {
 
         try (Cursor<SalesPlanDetail> cursor = repository.findAll()) {
             for (SalesPlanDetail salesPlan : cursor) {
-                logger.info("Read item: " + salesPlan.toString());
+                logger.info("Read item: {}", salesPlan);
             }
         }
 

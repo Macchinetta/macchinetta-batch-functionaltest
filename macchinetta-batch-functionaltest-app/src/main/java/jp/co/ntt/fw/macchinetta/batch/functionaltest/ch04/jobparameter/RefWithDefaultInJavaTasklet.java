@@ -62,7 +62,7 @@ public class RefWithDefaultInJavaTasklet implements Tasklet {
      */
     @Override
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
-        logger.info("str = " + str + ", num = " + num + ", str2 = " + str2);
+        logger.info("str = {}, num = {}, str2 = {}", str, num, str2);
         return null;
     }
 }

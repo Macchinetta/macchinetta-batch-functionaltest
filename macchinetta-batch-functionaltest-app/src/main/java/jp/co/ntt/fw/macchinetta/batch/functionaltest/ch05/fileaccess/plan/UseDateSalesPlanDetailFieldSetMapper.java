@@ -53,9 +53,11 @@ public class UseDateSalesPlanDetailFieldSetMapper implements FieldSetMapper<UseD
      */
     @Override
     public UseDateSalesPlanDetail mapFieldSet(FieldSet fieldSet) throws BindException {
-        logger.info("FieldSet : {" + "branchId='" + fieldSet.readString("branchId") + "', " + "date='"
-                + fieldSet.readString("date") + "', " + "customerId='" + fieldSet.readString("customerId") + "', "
-                + "amount='" + fieldSet.readString("amount") + "'}");
+        if (logger.isInfoEnabled()) {
+            logger.info("FieldSet : {branchId='{}', date='{}', customerId='{}', amount='{}'}",
+                    fieldSet.readString("branchId"), fieldSet.readString("date"),
+                    fieldSet.readString("customerId"), fieldSet.readString("amount"));
+        }
 
         UseDateSalesPlanDetail item = new UseDateSalesPlanDetail();
 

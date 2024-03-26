@@ -48,7 +48,7 @@ public class LoggingItemReaderListener implements ItemReadListener<Object> {
      */
     @Override
     public void afterRead(Object item) {
-        logger.info("Read item: " + item.toString());
+        logger.info("Read item: {}", item);
     }
 
     /**

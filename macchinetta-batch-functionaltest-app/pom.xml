@@ -10,7 +10,7 @@
     <parent>
         <groupId>jp.co.ntt.fw.macchinetta.batch</groupId>
         <artifactId>macchinetta-batch-functionaltest-build</artifactId>
-        <version>2.3.2.RELEASE</version>
+        <version>2.3.3.RELEASE</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -35,10 +35,10 @@
 
         <!-- == Dependency Versions == -->
         <!-- == Spring Boot Dependencies == -->
-        <org.springframework.boot.version>2.7.7</org.springframework.boot.version>
+        <org.springframework.boot.version>2.7.18</org.springframework.boot.version>
 
         <!-- == TERASOLUNA Batch == -->
-        <terasoluna-batch.version>5.4.2.RELEASE</terasoluna-batch.version>
+        <terasoluna-batch.version>5.4.3.RELEASE</terasoluna-batch.version>
 
         <!-- == Mongo Java Driver == -->
         <mongo-java-driver.version>2.14.3</mongo-java-driver.version>
@@ -46,9 +46,16 @@
         <!-- == Logback Contrib == -->
         <ch.qos.logback.contrib.version>0.1.5</ch.qos.logback.contrib.version>
 
+        <!-- == slf4j-api == -->
+        <slf4j-api.version>2.0.12</slf4j-api.version>
+
+        <!-- == logback == -->
+        <logback-core.version>1.3.14</logback-core.version>
+        <logback-classic.version>1.3.14</logback-classic.version>
+
         <!-- == JAXB == -->
         <jaxb-core.version>2.3.0.1</jaxb-core.version>
-        <jaxb-impl.version>2.3.7</jaxb-impl.version>
+        <jaxb-impl.version>2.3.9</jaxb-impl.version>
 
         <!-- == Project Properties == -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -57,7 +64,7 @@
         <!-- == Environment Properties == -->
         <jdbc.driver.groupId>org.postgresql</jdbc.driver.groupId>
         <jdbc.driver.artifactId>postgresql</jdbc.driver.artifactId>
-        <project.config.resource.directory.rdbms>config/rdbms/postgresql14/local</project.config.resource.directory.rdbms>
+        <project.config.resource.directory.rdbms>config/rdbms/postgresql15/local</project.config.resource.directory.rdbms>
         <project.config.resource.directory.mongo>config/mongo/local</project.config.resource.directory.mongo>
     </properties>
 
@@ -112,6 +119,27 @@
                 <artifactId>postgresql</artifactId>
                 <version>${postgresql.version}</version>
             </dependency>
+
+            <!-- == Begin slf4j-api == -->
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+                <version>${slf4j-api.version}</version>
+            </dependency>
+            <!-- == End slf4j-api == -->
+
+            <!-- == Begin logback == -->
+            <dependency>
+                <groupId>ch.qos.logback</groupId>
+                <artifactId>logback-core</artifactId>
+                <version>${logback-core.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>ch.qos.logback</groupId>
+                <artifactId>logback-classic</artifactId>
+                <version>${logback-classic.version}</version>
+            </dependency>
+            <!-- == End logback == -->
         </dependencies>
     </dependencyManagement>
 
@@ -130,11 +158,6 @@
             <groupId>org.glassfish</groupId>
             <artifactId>jakarta.el</artifactId>
             <scope>runtime</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-classic</artifactId>
         </dependency>
 
         <dependency>
@@ -168,6 +191,23 @@
             <artifactId>${jdbc.driver.artifactId}</artifactId>
             <scope>runtime</scope>
         </dependency>
+
+        <!-- == Begin slf4j-api == -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
+
+        <!-- == Begin logback == -->
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+        </dependency>
+        <!-- == End logback == -->
     </dependencies>
 
     <build>
@@ -338,22 +378,40 @@
                 </dependency>
             </dependencies>
         </profile>
+        <profile>
+            <id>jdk21</id>
+            <activation>
+                <jdk>21</jdk>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>com.sun.xml.bind</groupId>
+                    <artifactId>jaxb-core</artifactId>
+                    <scope>runtime</scope>
+                </dependency>
+                <dependency>
+                    <groupId>com.sun.xml.bind</groupId>
+                    <artifactId>jaxb-impl</artifactId>
+                    <scope>runtime</scope>
+                </dependency>
+            </dependencies>
+        </profile>
 
         <profile>
-            <id>postgresql14-local</id>
+            <id>postgresql15-local</id>
             <properties>
                 <jdbc.driver.groupId>org.postgresql</jdbc.driver.groupId>
                 <jdbc.driver.artifactId>postgresql</jdbc.driver.artifactId>
-                <project.config.resource.directory.rdbms>config/rdbms/postgresql14/local</project.config.resource.directory.rdbms>
+                <project.config.resource.directory.rdbms>config/rdbms/postgresql15/local</project.config.resource.directory.rdbms>
                 <project.config.resource.directory.mongo>config/mongo/local</project.config.resource.directory.mongo>
             </properties>
         </profile>
         <profile>
-            <id>postgresql14-it</id>
+            <id>postgresql15-it</id>
             <properties>
                 <jdbc.driver.groupId>org.postgresql</jdbc.driver.groupId>
                 <jdbc.driver.artifactId>postgresql</jdbc.driver.artifactId>
-                <project.config.resource.directory.rdbms>config/rdbms/postgresql14/it</project.config.resource.directory.rdbms>
+                <project.config.resource.directory.rdbms>config/rdbms/postgresql15/it</project.config.resource.directory.rdbms>
                 <project.config.resource.directory.mongo>config/mongo/it</project.config.resource.directory.mongo>
             </properties>
         </profile>

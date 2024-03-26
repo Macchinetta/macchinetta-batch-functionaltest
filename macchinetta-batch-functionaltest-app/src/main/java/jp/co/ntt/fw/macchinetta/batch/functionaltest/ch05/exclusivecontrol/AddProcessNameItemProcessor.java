@@ -17,6 +17,7 @@ package jp.co.ntt.fw.macchinetta.batch.functionaltest.ch05.exclusivecontrol;
 
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import jp.co.ntt.fw.macchinetta.batch.functionaltest.app.model.plan.SalesPlanDetail;
 import jp.co.ntt.fw.macchinetta.batch.functionaltest.ch05.exclusivecontrol.model.SalesPlanDetailWithProcessName;
@@ -27,7 +28,8 @@ import jp.co.ntt.fw.macchinetta.batch.functionaltest.ch05.exclusivecontrol.model
  * @since 2.0.1
  */
 @Component
-public class AddProcessNameItemPorcessor implements ItemProcessor<SalesPlanDetail, SalesPlanDetailWithProcessName> {
+@Scope("step")
+public class AddProcessNameItemProcessor implements ItemProcessor<SalesPlanDetail, SalesPlanDetailWithProcessName> {
 
     @Value("${processName}")
     private String processName;

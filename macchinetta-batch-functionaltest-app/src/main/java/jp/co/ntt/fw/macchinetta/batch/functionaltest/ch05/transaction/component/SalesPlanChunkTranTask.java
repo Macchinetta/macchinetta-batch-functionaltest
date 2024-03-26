@@ -15,6 +15,9 @@
  */
 package jp.co.ntt.fw.macchinetta.batch.functionaltest.ch05.transaction.component;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.StepContribution;
@@ -25,13 +28,12 @@ import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionException;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
+
 import jp.co.ntt.fw.macchinetta.batch.functionaltest.app.model.plan.SalesPlanDetail;
 import jp.co.ntt.fw.macchinetta.batch.functionaltest.app.repository.plan.SalesPlanDetailRepository;
-
-import javax.inject.Inject;
-import javax.inject.Named;
 
 /**
  * Create sales plan by chunk transaction of tasklet model.
@@ -77,16 +79,16 @@ public class SalesPlanChunkTranTask implements Tasklet {
         logger.info("Start Create sales plan by chunk transaction of tasklet model.");
 
         SalesPlanDetail item;
-        int count = 0;
         DefaultTransactionDefinition definition = new DefaultTransactionDefinition();
         TransactionStatus status = null;
+        int count = 0;
 
         try {
             itemReader.open(chunkContext.getStepContext().getStepExecution().getExecutionContext());
 
             while ((item = itemReader.read()) != null) {
 
-                logger.info("Read item: " + item.toString());
+                logger.info("Read item: {}", item);
                 if (count % 10 == 0) {
                     status = transactionManager.getTransaction(definition);
                 }
@@ -96,13 +98,22 @@ public class SalesPlanChunkTranTask implements Tasklet {
                     transactionManager.commit(status);
                 }
             }
-        } catch (Exception e) {
-            logger.error("Exception occurred while reading.", e);
-            transactionManager.rollback(status);
-            throw e;
-        } finally {
             if (status != null && !status.isCompleted()) {
                 transactionManager.commit(status);
+            }
+        } catch (Exception e) {
+            logger.error("Exception occurred while reading.", e);
+            if (status != null && !status.isCompleted()) {
+            	transactionManager.rollback(status);
+            }
+            throw e;
+        } finally {
+        	if (status != null && !status.isCompleted()) {
+                try {
+                    transactionManager.rollback(status);
+                } catch (TransactionException e2) {
+                	logger.error("TransactionException occurred while rollback.", e2);
+                }
             }
             itemReader.close();
         }

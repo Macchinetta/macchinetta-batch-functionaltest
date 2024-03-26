@@ -27,6 +27,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
 
+import java.util.Locale;
+
 import javax.inject.Inject;
 
 /**
@@ -57,9 +59,8 @@ public class ValidateAndMessageItemProcessor implements ItemProcessor<Verificati
             BindException errors = (BindException) e.getCause();
 
             for (FieldError fieldError : errors.getFieldErrors()) {
-                logger.warn(messageSource.getMessage(fieldError, null) +
-                                "Skipping item because exception occurred in input validation at the {} th item. [message:{}]",
-                                    item.getCount(), e.getMessage());
+                logger.warn("{}Skipping item because exception occurred in input validation at the {} th item. [message:{}]",
+                        messageSource.getMessage(fieldError, Locale.getDefault()), item.getCount(), e.getMessage());
             }
 
             return null; // skipping item
