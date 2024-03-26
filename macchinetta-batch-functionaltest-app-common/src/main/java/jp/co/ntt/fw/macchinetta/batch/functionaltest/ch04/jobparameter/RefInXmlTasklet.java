@@ -49,7 +49,7 @@ public class RefInXmlTasklet implements Tasklet {
      */
     @Override
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
-        logger.info("str = " + str + ", num = " + num);
+        logger.info("str = {}, num = {}", str, num);
         return null;
     }
 

@@ -22,6 +22,7 @@ import org.springframework.batch.core.explore.JobExplorer
 import org.springframework.batch.core.launch.JobOperator
 import org.springframework.batch.core.repository.dao.DefaultExecutionContextSerializer
 import org.springframework.context.ApplicationContext
+import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import org.springframework.context.support.ClassPathXmlApplicationContext
 import jp.co.ntt.fw.macchinetta.batch.functionaltest.util.DBUnitUtil
 import jp.co.ntt.fw.macchinetta.batch.functionaltest.util.JobLauncher
@@ -92,7 +93,7 @@ class ReProcessingSpec extends Specification {
 
         when:
         def exitValue1 = launcher.syncJob(new JobRequest(
-                jobFilePath: 'META-INF/jobs/ch06/reprocessing/restartOnNumberOfItemsJob.xml',
+                jobFilePath: launcher.getBeanDefinitionPath('restartOnNumberOfItemsJob'),
                 jobName: 'restartOnNumberOfItemsJob',
                 jobParameter: "outputFile=${outputFileName}"
         ))
@@ -109,7 +110,7 @@ class ReProcessingSpec extends Specification {
         mongoUtil.deleteAll()
 
         def exitValue2 = launcher.syncJob(new JobRequest(
-                jobFilePath: 'META-INF/jobs/ch06/reprocessing/restartOnNumberOfItemsJob.xml',
+                jobFilePath: launcher.getBeanDefinitionPath('restartOnNumberOfItemsJob'),
                 jobName: 'restartOnNumberOfItemsJob',
                 jobParameter: '-restart'
         ))
@@ -178,7 +179,7 @@ class ReProcessingSpec extends Specification {
         def expectAfter = new File("./files/expect/output/ch06/reprocessing/plan_data_on_condition_expect_after_restart.csv")
 
         def jobRequest = new JobRequest(
-                jobFilePath: 'META-INF/jobs/ch06/reprocessing/restartOnConditionBasisJob.xml',
+                jobFilePath: launcher.getBeanDefinitionPath('restartOnConditionBasisJob'),
                 jobName: 'restartOnConditionBasisJob',
                 jobParameter: "outputFile=${outputFileName}"
         )
@@ -278,12 +279,19 @@ class ReProcessingSpec extends Specification {
         def expectBefore = new File("./files/expect/output/ch06/reprocessing/plan_data_on_number_expect_before_restart.csv")
         def expectAfter = new File("./files/expect/output/ch06/reprocessing/plan_data_on_number_expect_after_restart.csv")
 
-        ApplicationContext context = new ClassPathXmlApplicationContext('META-INF/jobs/ch06/reprocessing/restartOnNumberOfItemsJob.xml')
+        ApplicationContext context
+        if (System.getProperty('configurationType') == 'javaconfig') {
+            context = new AnnotationConfigApplicationContext(jp.co.ntt.fw.macchinetta.batch.functionaltest.jobs.ch06.reprocessing.RestartOnNumberOfItemsJobConfig.class)
+        } else {
+            context = new ClassPathXmlApplicationContext('META-INF/jobs/ch06/reprocessing/restartOnNumberOfItemsJob.xml')
+        }
         def jobOperator = (JobOperator) context.getBean("jobOperator")
         def jobExplorer = (JobExplorer) context.getBean("jobExplorer")
 
         when:
-        def jobExecutionId = jobOperator.start('restartOnNumberOfItemsJob', "outputFile=${outputFileName}")
+        def properties = new Properties();
+        properties.setProperty("outputFile", "${outputFileName}")
+        def jobExecutionId = jobOperator.start('restartOnNumberOfItemsJob', properties)
         def jobExecution = jobExplorer.getJobExecution(jobExecutionId)
 
         Files.copy(outputFile.toPath(), backupFile.toPath())

@@ -52,6 +52,16 @@ public class JobExitCodeChangeListener implements JobExecutionListener {
                 logger.info("Change status 'JOB COMPLETED WITH SKIPS'");
                 break;
             }
+            if ("FORCE_FAIL_WITH_EXIT_CODE".equals(stepExecution.getExitStatus().getExitCode())) {
+                jobExecution.setExitStatus(new ExitStatus("FAILED_CUSTOM"));
+                logger.info("Change status 'FAILED_CUSTOM'");
+                break;
+            }
+            if ("FORCE_STOP_WITH_EXIT_CODE".equals(stepExecution.getExitStatus().getExitCode())) {
+                jobExecution.setExitStatus(new ExitStatus("STOPPED_CUSTOM"));
+                logger.info("Change status 'STOPPED_CUSTOM'");
+                break;
+            }
         }
     }
 }

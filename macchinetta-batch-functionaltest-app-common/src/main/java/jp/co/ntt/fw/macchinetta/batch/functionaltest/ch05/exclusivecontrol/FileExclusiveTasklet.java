@@ -64,7 +64,7 @@ public class FileExclusiveTasklet implements Tasklet {
      */
     private String targetPath = null;
 
-    @Value("${processName:#{null}}")
+    @Value("${processName}")
     private String processName;
 
     /**

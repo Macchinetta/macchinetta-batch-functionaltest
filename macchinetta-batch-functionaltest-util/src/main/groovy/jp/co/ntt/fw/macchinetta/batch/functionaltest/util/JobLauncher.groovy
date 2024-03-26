@@ -60,6 +60,14 @@ class JobLauncher {
 
     static final REMOTE_DEBUG_PROPERTY = 'JobLauncher.remoteDebug'
 
+    def appProp = new Properties()
+
+    JobLauncher() {
+        new ClassPathResource('bean-definition.properties').URL.withInputStream { inputStream ->
+            appProp.load(inputStream)
+        }
+    }
+
     /**
      * Execute job synchronously.
      *
@@ -240,10 +248,6 @@ class JobLauncher {
     }
 
     String getBeanDefinitionPath(String key) {
-        def appProp = new Properties()
-        new ClassPathResource('bean-definition.properties').URL.withInputStream { inputStream ->
-            appProp.load(inputStream)
-        }
         appProp.get(key)
     }
 }

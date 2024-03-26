@@ -42,18 +42,20 @@ import java.util.*;
 @Import(AsyncBatchDaemonConfig.class)
 public class AsyncBatchDaemonQueryParamsConfig {
 
-    @Value("${GROUP_ID:#{null}}")
+    @Value("${GROUP_ID}")
     private String groupId;
 
     @Bean
-    public JobRequestPollTask jobRequestPollTask(@Qualifier("adminTransactionManager") DataSourceTransactionManager adminTransactionManager,
-                                                 JobOperator jobOperator,
-                                                 MapperFactoryBean<CustomizedBatchJobRequestWithQueryParamRepository> batchJobRequestRepository,
-                                                 @Qualifier("daemonTaskExecutor") ThreadPoolTaskExecutor daemonTaskExecutor,
-                                                 AutomaticJobRegistrar automaticJobRegistrar)  throws Exception {
+    public JobRequestPollTask jobRequestPollTask(
+            @Qualifier("adminTransactionManager") DataSourceTransactionManager adminTransactionManager,
+            JobOperator jobOperator,
+            MapperFactoryBean<CustomizedBatchJobRequestWithQueryParamRepository> batchJobRequestRepository,
+            @Qualifier("daemonTaskExecutor") ThreadPoolTaskExecutor daemonTaskExecutor,
+            AutomaticJobRegistrar automaticJobRegistrar) throws Exception {
 
-        JobRequestPollTask jobRequestPollTask = new JobRequestPollTask(batchJobRequestRepository.getObject(), adminTransactionManager, daemonTaskExecutor, jobOperator,
-                automaticJobRegistrar);
+        JobRequestPollTask jobRequestPollTask = new JobRequestPollTask(
+                batchJobRequestRepository.getObject(), adminTransactionManager,
+                daemonTaskExecutor, jobOperator, automaticJobRegistrar);
         final Map<String, Object> pollingQueryParam = new LinkedHashMap<>();
         pollingQueryParam.put("groupId", groupId);
 
@@ -65,7 +67,8 @@ public class AsyncBatchDaemonQueryParamsConfig {
     public MapperFactoryBean<CustomizedBatchJobRequestWithQueryParamRepository> batchJobRequestRepository(
             @Qualifier("adminSqlSessionFactory") SqlSessionFactory adminSqlSessionFactory) {
         final MapperFactoryBean<CustomizedBatchJobRequestWithQueryParamRepository> mapperFactoryBean = new MapperFactoryBean<>();
-        mapperFactoryBean.setMapperInterface(CustomizedBatchJobRequestWithQueryParamRepository.class);
+        mapperFactoryBean.setMapperInterface(
+                CustomizedBatchJobRequestWithQueryParamRepository.class);
         mapperFactoryBean.setSqlSessionFactory(adminSqlSessionFactory);
         return mapperFactoryBean;
     }

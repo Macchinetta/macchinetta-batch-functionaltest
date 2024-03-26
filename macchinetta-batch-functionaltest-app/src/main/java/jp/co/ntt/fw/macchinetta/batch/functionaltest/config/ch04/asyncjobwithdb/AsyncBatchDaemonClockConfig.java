@@ -43,15 +43,19 @@ import java.time.ZonedDateTime;
 public class AsyncBatchDaemonClockConfig {
 
     @Bean
-    public JobRequestPollTask jobRequestPollTask(@Qualifier("adminTransactionManager") DataSourceTransactionManager adminTransactionManager,
-                                                 JobOperator jobOperator,
-                                                 MapperFactoryBean<BatchJobRequestRepository> batchJobRequestRepository,
-                                                 @Qualifier("daemonTaskExecutor") ThreadPoolTaskExecutor daemonTaskExecutor,
-                                                 AutomaticJobRegistrar automaticJobRegistrar)  throws Exception {
-
-        JobRequestPollTask jobRequestPollTask = new JobRequestPollTask(batchJobRequestRepository.getObject(), adminTransactionManager, daemonTaskExecutor, jobOperator,
-                automaticJobRegistrar);
-        jobRequestPollTask.setClock(Clock.fixed(ZonedDateTime.parse("2016-12-31T16:00-08:00[America/Los_Angeles]").toInstant(), ZoneId.of("PST", ZoneId.SHORT_IDS)));
+    public JobRequestPollTask jobRequestPollTask(
+            @Qualifier("adminTransactionManager") DataSourceTransactionManager adminTransactionManager,
+            JobOperator jobOperator,
+            MapperFactoryBean<BatchJobRequestRepository> batchJobRequestRepository,
+            @Qualifier("daemonTaskExecutor") ThreadPoolTaskExecutor daemonTaskExecutor,
+            AutomaticJobRegistrar automaticJobRegistrar) throws Exception {
+                    
+        JobRequestPollTask jobRequestPollTask = new JobRequestPollTask(
+                batchJobRequestRepository.getObject(), adminTransactionManager,
+                daemonTaskExecutor, jobOperator, automaticJobRegistrar);
+        jobRequestPollTask.setClock(Clock.fixed(ZonedDateTime.parse(
+                        "2016-12-31T16:00-08:00[America/Los_Angeles]").toInstant(),
+                ZoneId.of("PST", ZoneId.SHORT_IDS)));
         return jobRequestPollTask;
     }
 

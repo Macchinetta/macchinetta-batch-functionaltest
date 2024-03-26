@@ -16,6 +16,7 @@
 package jp.co.ntt.fw.macchinetta.batch.functionaltest.ch04
 
 import groovy.util.logging.Slf4j
+import jakarta.el.PropertyNotFoundException
 import jp.co.ntt.fw.macchinetta.batch.functionaltest.ch04.listener.AllProcessListener
 import jp.co.ntt.fw.macchinetta.batch.functionaltest.ch04.listener.BeforeStepException
 import jp.co.ntt.fw.macchinetta.batch.functionaltest.ch04.listener.LoggingReader
@@ -92,7 +93,7 @@ class ListenerSpec extends Specification {
 
         when:
         def exitValue = launcher.syncJob(new JobRequest(
-                jobFilePath: 'META-INF/jobs/ch04/listener/chunkJobWithListener.xml',
+                jobFilePath: launcher.getBeanDefinitionPath('chunkJobWithListener'),
                 jobName: "chunkJobWithListenerWithin${scope}Scope",
                 jobParameter: "inputFile=${inputFileName}"
         ))
@@ -142,13 +143,35 @@ class ListenerSpec extends Specification {
                 logger: AllProcessListener.class.name)).size() == 0
 
         where:
-        scope     || jobListener | stepListener | chunkListener | itemReadListener | itemProcessListener | ItemWriterListener
-        "Job"     || 1           | 0            | 0             | 0                | 0                   | 0
-        "Step"    || 0           | 1            | 1             | 5                | 5                   | 1
-        "Tasklet" || 0           | 1            | 1             | 5                | 5                   | 1
-        "Chunk"   || 0           | 1            | 1             | 5                | 5                   | 1
-        "All"     || 1           | 1            | 1             | 5                | 5                   | 1
+        [scope, jobListener, stepListener, chunkListener, itemReadListener, itemProcessListener, ItemWriterListener]
+                << switchParameterTableForTestCase1_1()
     }
+    
+    def switchParameterTableForTestCase1_1() {
+        def configurationType = System.getProperty('configurationType')
+        if ("javaconfig".equals(configurationType)) {
+            [
+//              scope     || jobListener | stepListener | chunkListener | itemReadListener | itemProcessListener | ItemWriterListener
+                ["Job",		 1, 0, 0, 0, 0, 0],
+                ["Step",	 0, 1, 1, 5, 5, 1],
+                ["Tasklet",	 0, 1, 1, 5, 5, 1],
+                ["Chunk",	 0, 0, 1, 5, 5, 1],
+                ["All",		 1, 1, 1, 5, 5, 1]
+            ]
+        } else if ("xmlconfig".equals(configurationType)) {
+           [
+//              scope     || jobListener | stepListener | chunkListener | itemReadListener | itemProcessListener | ItemWriterListener
+                ["Job",		 1, 0, 0, 0, 0, 0],
+                ["Step",	 0, 1, 1, 5, 5, 1],
+                ["Tasklet",	 0, 1, 1, 5, 5, 1],
+                ["Chunk",	 0, 1, 1, 5, 5, 1],
+                ["All",		 1, 1, 1, 5, 5, 1]
+            ]
+        } else {
+            throw new PropertyNotFoundException("property 'configurationType' is not found.")
+        }
+    }
+    
 
     // Testcase 1, test no.2
     @Unroll
@@ -159,7 +182,7 @@ class ListenerSpec extends Specification {
 
         when:
         def exitValue = launcher.syncJob(new JobRequest(
-                jobFilePath: 'META-INF/jobs/ch04/listener/chunkJobWithListener.xml',
+                jobFilePath: launcher.getBeanDefinitionPath('chunkJobWithListener'),
                 jobName: "chunkJobWithListenerWithin${scope}Scope",
                 jobParameter: "inputFile=${inputFileName}"
         ))
@@ -209,22 +232,53 @@ class ListenerSpec extends Specification {
                 logger: AllProcessListener.class.name)).size() == onWriteError
 
         where:
-        scope     | process     || jobListener | stepListener | beforeChunk | afterChunk | afterChunkError | beforeRead | afterRead | onReadError | beforeProcess | afterProcess | onProcessError | beforeWrite | afterWrite | onWriteError
-        "Job"     | "reader"    || 1           | 0            | 0           | 0          | 0               | 0          | 0         | 0           | 0             | 0            | 0              | 0           | 0          | 0
-        "Job"     | "processor" || 1           | 0            | 0           | 0          | 0               | 0          | 0         | 0           | 0             | 0            | 0              | 0           | 0          | 0
-        "Job"     | "writer"    || 1           | 0            | 0           | 0          | 0               | 0          | 0         | 0           | 0             | 0            | 0              | 0           | 0          | 0
-        "Step"    | "reader"    || 0           | 1            | 1           | 0          | 1               | 4          | 3         | 1           | 0             | 0            | 0              | 0           | 0          | 0
-        "Step"    | "processor" || 0           | 1            | 1           | 0          | 1               | 6          | 5         | 0           | 4             | 3            | 1              | 0           | 0          | 0
-        "Step"    | "writer"    || 0           | 1            | 1           | 0          | 1               | 6          | 5         | 0           | 5             | 5            | 0              | 1           | 0          | 1
-        "Tasklet" | "reader"    || 0           | 1            | 1           | 0          | 1               | 4          | 3         | 1           | 0             | 0            | 0              | 0           | 0          | 0
-        "Tasklet" | "processor" || 0           | 1            | 1           | 0          | 1               | 6          | 5         | 0           | 4             | 3            | 1              | 0           | 0          | 0
-        "Tasklet" | "writer"    || 0           | 1            | 1           | 0          | 1               | 6          | 5         | 0           | 5             | 5            | 0              | 1           | 0          | 1
-        "Chunk"   | "reader"    || 0           | 1            | 1           | 0          | 1               | 4          | 3         | 1           | 0             | 0            | 0              | 0           | 0          | 0
-        "Chunk"   | "processor" || 0           | 1            | 1           | 0          | 1               | 6          | 5         | 0           | 4             | 3            | 1              | 0           | 0          | 0
-        "Chunk"   | "writer"    || 0           | 1            | 1           | 0          | 1               | 6          | 5         | 0           | 5             | 5            | 0              | 1           | 0          | 1
-        "All"     | "reader"    || 1           | 1            | 1           | 0          | 1               | 4          | 3         | 1           | 0             | 0            | 0              | 0           | 0          | 0
-        "All"     | "processor" || 1           | 1            | 1           | 0          | 1               | 6          | 5         | 0           | 4             | 3            | 1              | 0           | 0          | 0
-        "All"     | "writer"    || 1           | 1            | 1           | 0          | 1               | 6          | 5         | 0           | 5             | 5            | 0              | 1           | 0          | 1
+        [scope, process, jobListener, stepListener, beforeChunk, afterChunk, afterChunkError, beforeRead, afterRead, onReadError, beforeProcess, afterProcess, onProcessError, beforeWrite, afterWrite, onWriteError]
+                << switchParameterTableForTestCase1_2()
+    }
+    
+    def switchParameterTableForTestCase1_2() {
+        def configurationType = System.getProperty('configurationType')
+        if ("javaconfig".equals(configurationType)) {
+            [
+//        scope     | process     || jobListener | stepListener | beforeChunk | afterChunk | afterChunkError | beforeRead | afterRead | onReadError | beforeProcess | afterProcess | onProcessError | beforeWrite | afterWrite | onWriteError
+                ["Job", "reader", 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                ["Job", "processor", 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                ["Job", "writer", 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                ["Step", "reader", 0, 1, 1, 0, 1, 4, 3, 1, 0, 0, 0, 0, 0, 0],
+                ["Step", "processor", 0, 1, 1, 0, 1, 6, 5, 0, 4, 3, 1, 0, 0, 0],
+                ["Step", "writer", 0, 1, 1, 0, 1, 6, 5, 0, 5, 5, 0, 1, 0, 1],
+                ["Tasklet", "reader", 0, 1, 1, 0, 1, 4, 3, 1, 0, 0, 0, 0, 0, 0],
+                ["Tasklet", "processor", 0, 1, 1, 0, 1, 6, 5, 0, 4, 3, 1, 0, 0, 0],
+                ["Tasklet", "writer", 0, 1, 1, 0, 1, 6, 5, 0, 5, 5, 0, 1, 0, 1],
+                ["Chunk", "reader", 0, 0, 1, 0, 1, 4, 3, 1, 0, 0, 0, 0, 0, 0],
+                ["Chunk", "processor", 0, 0, 1, 0, 1, 6, 5, 0, 4, 3, 1, 0, 0, 0],
+                ["Chunk", "writer", 0, 0, 1, 0, 1, 6, 5, 0, 5, 5, 0, 1, 0, 1],
+                ["All", "reader", 1, 1, 1, 0, 1, 4, 3, 1, 0, 0, 0, 0, 0, 0],
+                ["All", "processor", 1, 1, 1, 0, 1, 6, 5, 0, 4, 3, 1, 0, 0, 0],
+                ["All", "writer", 1, 1, 1, 0, 1, 6, 5, 0, 5, 5, 0, 1, 0, 1]
+            ]
+        } else if ("xmlconfig".equals(configurationType)) {
+           [
+//        scope     | process     || jobListener | stepListener | beforeChunk | afterChunk | afterChunkError | beforeRead | afterRead | onReadError | beforeProcess | afterProcess | onProcessError | beforeWrite | afterWrite | onWriteError
+                ["Job", "reader", 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                ["Job", "processor", 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                ["Job", "writer", 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                ["Step", "reader", 0, 1, 1, 0, 1, 4, 3, 1, 0, 0, 0, 0, 0, 0],
+                ["Step", "processor", 0, 1, 1, 0, 1, 6, 5, 0, 4, 3, 1, 0, 0, 0],
+                ["Step", "writer", 0, 1, 1, 0, 1, 6, 5, 0, 5, 5, 0, 1, 0, 1],
+                ["Tasklet", "reader", 0, 1, 1, 0, 1, 4, 3, 1, 0, 0, 0, 0, 0, 0],
+                ["Tasklet", "processor", 0, 1, 1, 0, 1, 6, 5, 0, 4, 3, 1, 0, 0, 0],
+                ["Tasklet", "writer", 0, 1, 1, 0, 1, 6, 5, 0, 5, 5, 0, 1, 0, 1],
+                ["Chunk", "reader", 0, 1, 1, 0, 1, 4, 3, 1, 0, 0, 0, 0, 0, 0],
+                ["Chunk", "processor", 0, 1, 1, 0, 1, 6, 5, 0, 4, 3, 1, 0, 0, 0],
+                ["Chunk", "writer", 0, 1, 1, 0, 1, 6, 5, 0, 5, 5, 0, 1, 0, 1],
+                ["All", "reader", 1, 1, 1, 0, 1, 4, 3, 1, 0, 0, 0, 0, 0, 0],
+                ["All", "processor", 1, 1, 1, 0, 1, 6, 5, 0, 4, 3, 1, 0, 0, 0],
+                ["All", "writer", 1, 1, 1, 0, 1, 6, 5, 0, 5, 5, 0, 1, 0, 1]
+            ]
+        } else {
+            throw new PropertyNotFoundException("property 'configurationType' is not found.")
+        }
     }
 
     // Testcase 2, test no.1
@@ -236,7 +290,7 @@ class ListenerSpec extends Specification {
 
         when:
         def exitValue = launcher.syncJob(new JobRequest(
-                jobFilePath: 'META-INF/jobs/ch04/listener/taskletJobWithListener.xml',
+                jobFilePath: launcher.getBeanDefinitionPath('taskletJobWithListener'),
                 jobName: "taskletJobWithListenerWithin${scope}Scope",
                 jobParameter: "inputFile=${inputFileName}"
         ))
@@ -302,7 +356,7 @@ class ListenerSpec extends Specification {
 
         when:
         def exitValue = launcher.syncJob(new JobRequest(
-                jobFilePath: 'META-INF/jobs/ch04/listener/taskletJobWithListener.xml',
+                jobFilePath: launcher.getBeanDefinitionPath('taskletJobWithListener'),
                 jobName: "taskletJobWithListenerWithin${scope}Scope",
                 jobParameter: "inputFile=${inputFileName}"
         ))
@@ -376,7 +430,7 @@ class ListenerSpec extends Specification {
 
         when:
         def exitValue = launcher.syncJob(new JobRequest(
-                jobFilePath: 'META-INF/jobs/ch04/listener/chunkJobWithListenerAnnotation.xml',
+                jobFilePath: launcher.getBeanDefinitionPath('chunkJobWithListenerAnnotation'),
                 jobName: "chunkJobWithListenerAnnotationWithin${scope}Scope",
                 jobParameter: "inputFile=${inputFileName}"
         ))
@@ -444,7 +498,7 @@ class ListenerSpec extends Specification {
 
         when:
         def exitValue = launcher.syncJob(new JobRequest(
-                jobFilePath: 'META-INF/jobs/ch04/listener/chunkJobWithListenerAnnotation.xml',
+                jobFilePath: launcher.getBeanDefinitionPath('chunkJobWithListenerAnnotation'),
                 jobName: "chunkJobWithListenerAnnotationWithin${scope}Scope",
                 jobParameter: "inputFile=${inputFileName}"
         ))
@@ -524,7 +578,7 @@ class ListenerSpec extends Specification {
 
         when:
         def exitValue = launcher.syncJob(new JobRequest(
-                jobFilePath: 'META-INF/jobs/ch04/listener/taskletJobWithListenerAnnotation.xml',
+                jobFilePath: launcher.getBeanDefinitionPath('taskletJobWithListenerAnnotation'),
                 jobName: "taskletJobWithListenerAnnotationWithin${scope}Scope",
                 jobParameter: "inputFile=${inputFileName}"
         ))
@@ -591,7 +645,7 @@ class ListenerSpec extends Specification {
 
         when:
         def exitValue = launcher.syncJob(new JobRequest(
-                jobFilePath: 'META-INF/jobs/ch04/listener/taskletJobWithListenerAnnotation.xml',
+                jobFilePath: launcher.getBeanDefinitionPath('taskletJobWithListenerAnnotation'),
                 jobName: "taskletJobWithListenerAnnotationWithin${scope}Scope",
                 jobParameter: "inputFile=${inputFileName}"
         ))
@@ -668,7 +722,7 @@ class ListenerSpec extends Specification {
 
         when:
         def exitValue = launcher.syncJob(new JobRequest(
-                jobFilePath: 'META-INF/jobs/ch04/listener/chunkJobWithMixedListener.xml',
+                jobFilePath: launcher.getBeanDefinitionPath('chunkJobWithMixedListener'),
                 jobName: "chunkJobWithMixedListenerWithin${scope}Scope",
                 jobParameter: "inputFile=${inputFileName}"
         ))
@@ -763,12 +817,33 @@ class ListenerSpec extends Specification {
 
         // xxxI is interface implement listeners, xxxA is annotation base listeners.
         where:
-        scope     || jobI | stepI | chunkL | beforeReadI | afterReadI | processI | writerI | jobA | stepA | chunkA | beforeReadA | afterReadA | processA | writerA
-        "Job"     || 1    | 0     | 0      | 0           | 0          | 0        | 0       | 0    | 1     | 1      | 6            | 5          | 5       | 1
-        "Step"    || 0    | 1     | 1      | 6           | 5          | 5        | 1       | 0    | 1     | 1      | 6            | 5          | 5       | 1
-        "Tasklet" || 0    | 1     | 1      | 6           | 5          | 5        | 1       | 0    | 1     | 1      | 6            | 5          | 5       | 1
-        "Chunk"   || 0    | 1     | 1      | 6           | 5          | 5        | 1       | 0    | 1     | 1      | 6            | 5          | 5       | 1
-        "All"     || 1    | 1     | 1      | 6           | 5          | 5        | 1       | 0    | 1     | 1      | 6            | 5          | 5       | 1
+        [scope, jobI, stepI, chunkL, beforeReadI, afterReadI, processI, writerI, jobA, stepA, chunkA, beforeReadA, afterReadA, processA, writerA]
+                << switchParameterTableForTestCase5_1()
+    }
+    
+    def switchParameterTableForTestCase5_1() {
+        def configurationType = System.getProperty('configurationType')
+        if ("javaconfig".equals(configurationType)) {
+            [
+//        scope     || jobI | stepI | chunkL | beforeReadI | afterReadI | processI | writerI | jobA | stepA | chunkA | beforeReadA | afterReadA | processA | writerA
+                ["Job", 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 6, 5, 5, 1],
+                ["Step", 0, 1, 1, 6, 5, 5, 1, 0, 1, 1, 6, 5, 5, 1],
+                ["Tasklet", 0, 1, 1, 6, 5, 5, 1, 0, 1, 1, 6, 5, 5, 1],
+                ["Chunk", 0, 0, 1, 6, 5, 5, 1, 0, 1, 1, 6, 5, 5, 1],
+                ["All", 1, 1, 1, 6, 5, 5, 1, 0, 1, 1, 6, 5, 5, 1]
+            ]
+        } else if ("xmlconfig".equals(configurationType)) {
+           [
+//        scope     || jobI | stepI | chunkL | beforeReadI | afterReadI | processI | writerI | jobA | stepA | chunkA | beforeReadA | afterReadA | processA | writerA
+                ["Job", 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 6, 5, 5, 1],
+                ["Step", 0, 1, 1, 6, 5, 5, 1, 0, 1, 1, 6, 5, 5, 1],
+                ["Tasklet", 0, 1, 1, 6, 5, 5, 1, 0, 1, 1, 6, 5, 5, 1],
+                ["Chunk", 0, 1, 1, 6, 5, 5, 1, 0, 1, 1, 6, 5, 5, 1],
+                ["All", 1, 1, 1, 6, 5, 5, 1, 0, 1, 1, 6, 5, 5, 1]
+            ]
+        } else {
+            throw new PropertyNotFoundException("property 'configurationType' is not found.")
+        }
     }
 
     // Testcase 5, test no.2
@@ -780,7 +855,7 @@ class ListenerSpec extends Specification {
 
         when:
         def exitValue = launcher.syncJob(new JobRequest(
-                jobFilePath: 'META-INF/jobs/ch04/listener/chunkJobWithMixedListener.xml',
+                jobFilePath: launcher.getBeanDefinitionPath('chunkJobWithMixedListener'),
                 jobName: "chunkJobWithMixedListenerWithin${scope}Scope",
                 jobParameter: "inputFile=${inputFileName}"
         ))
@@ -875,23 +950,54 @@ class ListenerSpec extends Specification {
 
         // xxxI is interface implement listeners, xxxA is annotation base listeners.
         where:
-        scope     | process     || jobI | stepI | beforeChunkI | afterChunkI | afterChunkErrorI | beforeReadI | afterReadI | onReadErrorI | beforeProcessI | afterProcessI | onProcessErrorI | beforeWriteI | afterWriteI | onWriteErrorI | jobA | stepA | beforeChunkA | afterChunkA | afterChunkErrorA | beforeReadA | afterReadA | onReadErrorA | beforeProcessA | afterProcessA | onProcessErrorA | beforeWriteA | afterWriteA | onWriteErrorA
-        "Job"     | "reader"    || 1    | 0     | 0            | 0           | 0                | 0           | 0          | 0            | 0              | 0             | 0               | 0            | 0           | 0             | 0    | 1     | 1            | 0           | 1                | 4           | 3          | 1            | 0              | 0             | 0               | 0            | 0           | 0
-        "Job"     | "processor" || 1    | 0     | 0            | 0           | 0                | 0           | 0          | 0            | 0              | 0             | 0               | 0            | 0           | 0             | 0    | 1     | 1            | 0           | 1                | 6           | 5          | 0            | 4              | 3             | 1               | 0            | 0           | 0
-        "Job"     | "writer"    || 1    | 0     | 0            | 0           | 0                | 0           | 0          | 0            | 0              | 0             | 0               | 0            | 0           | 0             | 0    | 1     | 1            | 0           | 1                | 6           | 5          | 0            | 5              | 5             | 0               | 1            | 0           | 1
-        "Step"    | "reader"    || 0    | 1     | 1            | 0           | 1                | 4           | 3          | 1            | 0              | 0             | 0               | 0            | 0           | 0             | 0    | 1     | 1            | 0           | 1                | 4           | 3          | 1            | 0              | 0             | 0               | 0            | 0           | 0
-        "Step"    | "processor" || 0    | 1     | 1            | 0           | 1                | 6           | 5          | 0            | 4              | 3             | 1               | 0            | 0           | 0             | 0    | 1     | 1            | 0           | 1                | 6           | 5          | 0            | 4              | 3             | 1               | 0            | 0           | 0
-        "Step"    | "writer"    || 0    | 1     | 1            | 0           | 1                | 6           | 5          | 0            | 5              | 5             | 0               | 1            | 0           | 1             | 0    | 1     | 1            | 0           | 1                | 6           | 5          | 0            | 5              | 5             | 0               | 1            | 0           | 1
-        "Tasklet" | "reader"    || 0    | 1     | 1            | 0           | 1                | 4           | 3          | 1            | 0              | 0             | 0               | 0            | 0           | 0             | 0    | 1     | 1            | 0           | 1                | 4           | 3          | 1            | 0              | 0             | 0               | 0            | 0           | 0
-        "Tasklet" | "processor" || 0    | 1     | 1            | 0           | 1                | 6           | 5          | 0            | 4              | 3             | 1               | 0            | 0           | 0             | 0    | 1     | 1            | 0           | 1                | 6           | 5          | 0            | 4              | 3             | 1               | 0            | 0           | 0
-        "Tasklet" | "writer"    || 0    | 1     | 1            | 0           | 1                | 6           | 5          | 0            | 5              | 5             | 0               | 1            | 0           | 1             | 0    | 1     | 1            | 0           | 1                | 6           | 5          | 0            | 5              | 5             | 0               | 1            | 0           | 1
-        "Chunk"   | "reader"    || 0    | 1     | 1            | 0           | 1                | 4           | 3          | 1            | 0              | 0             | 0               | 0            | 0           | 0             | 0    | 1     | 1            | 0           | 1                | 4           | 3          | 1            | 0              | 0             | 0               | 0            | 0           | 0
-        "Chunk"   | "processor" || 0    | 1     | 1            | 0           | 1                | 6           | 5          | 0            | 4              | 3             | 1               | 0            | 0           | 0             | 0    | 1     | 1            | 0           | 1                | 6           | 5          | 0            | 4              | 3             | 1               | 0            | 0           | 0
-        "Chunk"   | "writer"    || 0    | 1     | 1            | 0           | 1                | 6           | 5          | 0            | 5              | 5             | 0               | 1            | 0           | 1             | 0    | 1     | 1            | 0           | 1                | 6           | 5          | 0            | 5              | 5             | 0               | 1            | 0           | 1
-        "All"     | "reader"    || 1    | 1     | 1            | 0           | 1                | 4           | 3          | 1            | 0              | 0             | 0               | 0            | 0           | 0             | 0    | 1     | 1            | 0           | 1                | 4           | 3          | 1            | 0              | 0             | 0               | 0            | 0           | 0
-        "All"     | "processor" || 1    | 1     | 1            | 0           | 1                | 6           | 5          | 0            | 4              | 3             | 1               | 0            | 0           | 0             | 0    | 1     | 1            | 0           | 1                | 6           | 5          | 0            | 4              | 3             | 1               | 0            | 0           | 0
-        "All"     | "writer"    || 1    | 1     | 1            | 0           | 1                | 6           | 5          | 0            | 5              | 5             | 0               | 1            | 0           | 1             | 0    | 1     | 1            | 0           | 1                | 6           | 5          | 0            | 5              | 5             | 0               | 1            | 0           | 1
+        [scope, process, jobI, stepI, beforeChunkI, afterChunkI, afterChunkErrorI, beforeReadI, afterReadI, onReadErrorI, beforeProcessI, afterProcessI, onProcessErrorI, beforeWriteI, afterWriteI, onWriteErrorI, jobA, stepA, beforeChunkA, afterChunkA, afterChunkErrorA, beforeReadA, afterReadA, onReadErrorA, beforeProcessA, afterProcessA, onProcessErrorA, beforeWriteA, afterWriteA, onWriteErrorA]
+                << switchParameterTableForTestCase5_2()
 
+    }
+    
+    def switchParameterTableForTestCase5_2() {
+        def configurationType = System.getProperty('configurationType')
+        if ("javaconfig".equals(configurationType)) {
+            [
+//        scope     | process     || jobI | stepI | beforeChunkI | afterChunkI | afterChunkErrorI | beforeReadI | afterReadI | onReadErrorI | beforeProcessI | afterProcessI | onProcessErrorI | beforeWriteI | afterWriteI | onWriteErrorI | jobA | stepA | beforeChunkA | afterChunkA | afterChunkErrorA | beforeReadA | afterReadA | onReadErrorA | beforeProcessA | afterProcessA | onProcessErrorA | beforeWriteA | afterWriteA | onWriteErrorA
+                ["Job", "reader", 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 4, 3, 1, 0, 0, 0, 0, 0, 0],
+                ["Job", "processor", 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 6, 5, 0, 4, 3, 1, 0, 0, 0],
+                ["Job", "writer", 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 6, 5, 0, 5, 5, 0, 1, 0, 1],
+                ["Step", "reader", 0, 1, 1, 0, 1, 4, 3, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 4, 3, 1, 0, 0, 0, 0, 0, 0],
+                ["Step", "processor", 0, 1, 1, 0, 1, 6, 5, 0, 4, 3, 1, 0, 0, 0, 0, 1, 1, 0, 1, 6, 5, 0, 4, 3, 1, 0, 0, 0],
+                ["Step", "writer", 0, 1, 1, 0, 1, 6, 5, 0, 5, 5, 0, 1, 0, 1, 0, 1, 1, 0, 1, 6, 5, 0, 5, 5, 0, 1, 0, 1],
+                ["Tasklet", "reader", 0, 1, 1, 0, 1, 4, 3, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 4, 3, 1, 0, 0, 0, 0, 0, 0],
+                ["Tasklet", "processor", 0, 1, 1, 0, 1, 6, 5, 0, 4, 3, 1, 0, 0, 0, 0, 1, 1, 0, 1, 6, 5, 0, 4, 3, 1, 0, 0, 0],
+                ["Tasklet", "writer", 0, 1, 1, 0, 1, 6, 5, 0, 5, 5, 0, 1, 0, 1, 0, 1, 1, 0, 1, 6, 5, 0, 5, 5, 0, 1, 0, 1],
+                ["Chunk", "reader", 0, 0, 1, 0, 1, 4, 3, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 4, 3, 1, 0, 0, 0, 0, 0, 0],
+                ["Chunk", "processor", 0, 0, 1, 0, 1, 6, 5, 0, 4, 3, 1, 0, 0, 0, 0, 1, 1, 0, 1, 6, 5, 0, 4, 3, 1, 0, 0, 0],
+                ["Chunk", "writer", 0, 0, 1, 0, 1, 6, 5, 0, 5, 5, 0, 1, 0, 1, 0, 1, 1, 0, 1, 6, 5, 0, 5, 5, 0, 1, 0, 1],
+                ["All", "reader", 1, 1, 1, 0, 1, 4, 3, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 4, 3, 1, 0, 0, 0, 0, 0, 0],
+                ["All", "processor", 1, 1, 1, 0, 1, 6, 5, 0, 4, 3, 1, 0, 0, 0, 0, 1, 1, 0, 1, 6, 5, 0, 4, 3, 1, 0, 0, 0],
+                ["All", "writer", 1, 1, 1, 0, 1, 6, 5, 0, 5, 5, 0, 1, 0, 1, 0, 1, 1, 0, 1, 6, 5, 0, 5, 5, 0, 1, 0, 1]
+            ]
+        } else if ("xmlconfig".equals(configurationType)) {
+           [
+//        scope     | process     || jobI | stepI | beforeChunkI | afterChunkI | afterChunkErrorI | beforeReadI | afterReadI | onReadErrorI | beforeProcessI | afterProcessI | onProcessErrorI | beforeWriteI | afterWriteI | onWriteErrorI | jobA | stepA | beforeChunkA | afterChunkA | afterChunkErrorA | beforeReadA | afterReadA | onReadErrorA | beforeProcessA | afterProcessA | onProcessErrorA | beforeWriteA | afterWriteA | onWriteErrorA
+                ["Job", "reader", 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 4, 3, 1, 0, 0, 0, 0, 0, 0],
+                ["Job", "processor", 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 6, 5, 0, 4, 3, 1, 0, 0, 0],
+                ["Job", "writer", 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 6, 5, 0, 5, 5, 0, 1, 0, 1],
+                ["Step", "reader", 0, 1, 1, 0, 1, 4, 3, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 4, 3, 1, 0, 0, 0, 0, 0, 0],
+                ["Step", "processor", 0, 1, 1, 0, 1, 6, 5, 0, 4, 3, 1, 0, 0, 0, 0, 1, 1, 0, 1, 6, 5, 0, 4, 3, 1, 0, 0, 0],
+                ["Step", "writer", 0, 1, 1, 0, 1, 6, 5, 0, 5, 5, 0, 1, 0, 1, 0, 1, 1, 0, 1, 6, 5, 0, 5, 5, 0, 1, 0, 1],
+                ["Tasklet", "reader", 0, 1, 1, 0, 1, 4, 3, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 4, 3, 1, 0, 0, 0, 0, 0, 0],
+                ["Tasklet", "processor", 0, 1, 1, 0, 1, 6, 5, 0, 4, 3, 1, 0, 0, 0, 0, 1, 1, 0, 1, 6, 5, 0, 4, 3, 1, 0, 0, 0],
+                ["Tasklet", "writer", 0, 1, 1, 0, 1, 6, 5, 0, 5, 5, 0, 1, 0, 1, 0, 1, 1, 0, 1, 6, 5, 0, 5, 5, 0, 1, 0, 1],
+                ["Chunk", "reader", 0, 1, 1, 0, 1, 4, 3, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 4, 3, 1, 0, 0, 0, 0, 0, 0],
+                ["Chunk", "processor", 0, 1, 1, 0, 1, 6, 5, 0, 4, 3, 1, 0, 0, 0, 0, 1, 1, 0, 1, 6, 5, 0, 4, 3, 1, 0, 0, 0],
+                ["Chunk", "writer", 0, 1, 1, 0, 1, 6, 5, 0, 5, 5, 0, 1, 0, 1, 0, 1, 1, 0, 1, 6, 5, 0, 5, 5, 0, 1, 0, 1],
+                ["All", "reader", 1, 1, 1, 0, 1, 4, 3, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 4, 3, 1, 0, 0, 0, 0, 0, 0],
+                ["All", "processor", 1, 1, 1, 0, 1, 6, 5, 0, 4, 3, 1, 0, 0, 0, 0, 1, 1, 0, 1, 6, 5, 0, 4, 3, 1, 0, 0, 0],
+                ["All", "writer", 1, 1, 1, 0, 1, 6, 5, 0, 5, 5, 0, 1, 0, 1, 0, 1, 1, 0, 1, 6, 5, 0, 5, 5, 0, 1, 0, 1]
+            ]
+        } else {
+            throw new PropertyNotFoundException("property 'configurationType' is not found.")
+        }
     }
 
     // Testcase 6, test no.1
@@ -903,7 +1009,7 @@ class ListenerSpec extends Specification {
 
         when:
         def exitValue = launcher.syncJob(new JobRequest(
-                jobFilePath: 'META-INF/jobs/ch04/listener/taskletJobWithMixedListener.xml',
+                jobFilePath: launcher.getBeanDefinitionPath('taskletJobWithMixedListener'),
                 jobName: "taskletJobWithMixedListenerWithin${scope}Scope",
                 jobParameter: "inputFile=${inputFileName}"
         ))
@@ -1014,7 +1120,7 @@ class ListenerSpec extends Specification {
 
         when:
         def exitValue = launcher.syncJob(new JobRequest(
-                jobFilePath: 'META-INF/jobs/ch04/listener/taskletJobWithMixedListener.xml',
+                jobFilePath: launcher.getBeanDefinitionPath('taskletJobWithMixedListener'),
                 jobName: "taskletJobWithMixedListenerWithin${scope}Scope",
                 jobParameter: "inputFile=${inputFileName}"
         ))
@@ -1128,7 +1234,7 @@ class ListenerSpec extends Specification {
     def "Exception occurrs listener is processed (abnormal chunk oriented job)"() {
         when:
         def exitValue = launcher.syncJob(new JobRequest(
-                jobFilePath: 'META-INF/jobs/ch04/listener/chunkJobWithErrorListener.xml',
+                jobFilePath: launcher.getBeanDefinitionPath('chunkJobWithErrorListener'),
                 jobName: "chunkJobWithErrorListener"
         ))
 
@@ -1159,7 +1265,7 @@ class ListenerSpec extends Specification {
 
         when:
         def exitValue = launcher.syncJob(new JobRequest(
-                jobFilePath: "META-INF/jobs/ch04/listener/chunkJobWithAbortListener.xml",
+                jobFilePath: launcher.getBeanDefinitionPath('chunkJobWithAbortListener'),
                 jobName: "chunkJobWithAbortListener",
                 jobParameter: "inputFile=${inputFileName}"
         ))
@@ -1191,7 +1297,7 @@ class ListenerSpec extends Specification {
 
         when:
         def exitValue = launcher.syncJob(new JobRequest(
-                jobFilePath: "META-INF/jobs/ch04/listener/taskletJobWithAbortListener.xml",
+                jobFilePath: launcher.getBeanDefinitionPath('taskletJobWithAbortListener'),
                 jobName: "taskletJobWithAbortListener",
                 jobParameter: "inputFile=${inputFileName}"
         ))

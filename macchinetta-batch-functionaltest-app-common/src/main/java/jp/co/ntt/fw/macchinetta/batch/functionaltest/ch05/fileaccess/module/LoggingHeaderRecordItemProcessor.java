@@ -47,7 +47,7 @@ public class LoggingHeaderRecordItemProcessor implements ItemProcessor<SalesPlan
 
     @Override
     public SalesPlanDetail process(SalesPlanDetail item) throws Exception {
-        logger.info("Header recoed : " + this.stepExecution.getExecutionContext().getString("header"));
+        logger.info("Header recoed : {}", this.stepExecution.getExecutionContext().getString("header"));
         return item;
     }
 }

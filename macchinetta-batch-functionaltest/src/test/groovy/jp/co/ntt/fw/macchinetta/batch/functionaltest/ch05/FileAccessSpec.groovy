@@ -143,7 +143,7 @@ class FileAccessSpec extends Specification {
     def "Reading CSV file supporting RFC - 4180. Ending of record have space. Ending of last record in the file not have line break."() {
         when:
         int exitCode = jobLauncher.syncJob(new JobRequest(
-                jobFilePath: 'META-INF/jobs/common/jobSalesPlan01.xml',
+                jobFilePath: jobLauncher.getBeanDefinitionPath('jobSalesPlan01'),
                 jobName: 'jobSalesPlan01',
                 jobParameter: "inputFile=files/test/input/ch05/fileaccess/sales_plan_detail_01.csv"))
 
@@ -166,7 +166,7 @@ class FileAccessSpec extends Specification {
     def "Reading CSV file supporting RFC - 4180. Ending of record is comma."() {
         when:
         int exitCode = jobLauncher.syncJob(new JobRequest(
-                jobFilePath: 'META-INF/jobs/ch05/fileaccess/jobReadCsvNullField.xml',
+                jobFilePath: jobLauncher.getBeanDefinitionPath('jobReadCsvNullField'),
                 jobName: 'jobReadCsvNullField',
                 jobParameter: "inputFile=files/test/input/ch05/fileaccess/sales_plan_detail_02.csv"))
 
@@ -189,7 +189,7 @@ class FileAccessSpec extends Specification {
     def "Reading CSV file supporting RFC - 4180. Fields are enclosed in double quotes and symbols are included."() {
         when:
         int exitCode = jobLauncher.syncJob(new JobRequest(
-                jobFilePath: 'META-INF/jobs/ch05/fileaccess/jobReadCsvEnclosedFields.xml',
+                jobFilePath: jobLauncher.getBeanDefinitionPath('jobReadCsvEnclosedFields'),
                 jobName: 'jobReadCsvEnclosedFields',
                 jobParameter: "inputFile=files/test/input/ch05/fileaccess/sales_plan_detail_03.csv"))
 
@@ -213,7 +213,7 @@ class FileAccessSpec extends Specification {
     def "Reading TSV file that satisfies the input pattern of the test of CSV. Fields are enclosed in single quart."() {
         when:
         int exitCode = jobLauncher.syncJob(new JobRequest(
-                jobFilePath: 'META-INF/jobs/ch05/fileaccess/jobReadTsv.xml',
+                jobFilePath: jobLauncher.getBeanDefinitionPath('jobReadTsv'),
                 jobName: 'jobReadTsv',
                 jobParameter: "inputFile=files/test/input/ch05/fileaccess/sales_plan_detail_04.tsv"))
 
@@ -237,7 +237,7 @@ class FileAccessSpec extends Specification {
     def "Reading CSV file supporting RFC - 4180. Implement FieldSetMapper and handle Japanese calendars and numbers with commas."() {
         when:
         int exitCode = jobLauncher.syncJob(new JobRequest(
-                jobFilePath: 'META-INF/jobs/ch05/fileaccess/jobReadCsvJpnCalAndCommaNum.xml',
+                jobFilePath: jobLauncher.getBeanDefinitionPath('jobReadCsvJpnCalAndCommaNum'),
                 jobName: 'jobReadCsvJpnCalAndCommaNum',
                 jobParameter: "inputFile=files/test/input/ch05/fileaccess/sales_plan_detail_05.csv"))
 
@@ -273,7 +273,7 @@ class FileAccessSpec extends Specification {
     def "Reading CSV file supporting RFC - 4180. Make sure BeanWrapperFieldSetMapper can not handle Japanese calendar."() {
         when:
         int exitCode = jobLauncher.syncJob(new JobRequest(
-                jobFilePath: 'META-INF/jobs/ch05/fileaccess/jobReadCsvJpnCalByBeanWrapper.xml',
+                jobFilePath: jobLauncher.getBeanDefinitionPath('jobReadCsvJpnCalByBeanWrapper'),
                 jobName: 'jobReadCsvJpnCalByBeanWrapper',
                 jobParameter: "inputFile=files/test/input/ch05/fileaccess/sales_plan_detail_06.csv"))
 
@@ -300,7 +300,7 @@ class FileAccessSpec extends Specification {
     def "Reading CSV file supporting RFC - 4180. Make sure BeanWrapperFieldSetMapper can not handle numbers with commas."() {
         when:
         int exitCode = jobLauncher.syncJob(new JobRequest(
-                jobFilePath: 'META-INF/jobs/ch05/fileaccess/jobReadCsvCommaNumByBeanWrapper.xml',
+                jobFilePath: jobLauncher.getBeanDefinitionPath('jobReadCsvCommaNumByBeanWrapper'),
                 jobName: 'jobReadCsvCommaNumByBeanWrapper',
                 jobParameter: "inputFile=files/test/input/ch05/fileaccess/sales_plan_detail_07.csv"))
 
@@ -341,7 +341,7 @@ class FileAccessSpec extends Specification {
 
         when:
         int exitCode = jobLauncher.syncJob(new JobRequest(
-                jobFilePath: 'META-INF/jobs/common/jobCustomerList01.xml',
+                jobFilePath: jobLauncher.getBeanDefinitionPath('jobCustomerList01'),
                 jobName: 'jobCustomerList01',
                 jobParameter: "outputFile=" + outputPath))
 
@@ -360,7 +360,7 @@ class FileAccessSpec extends Specification {
 
         when:
         int exitCode = jobLauncher.syncJob(new JobRequest(
-                jobFilePath: 'META-INF/jobs/ch05/fileaccess/jobWriteCsvEnclosedFields.xml',
+                jobFilePath: jobLauncher.getBeanDefinitionPath('jobWriteCsvEnclosedFields'),
                 jobName: 'jobWriteCsvEnclosedFields',
                 jobParameter: "inputFile=files/test/input/ch05/fileaccess/sales_plan_detail_03.csv " +
                         "outputFile=" + outputPath))
@@ -380,7 +380,7 @@ class FileAccessSpec extends Specification {
 
         when:
         int exitCode = jobLauncher.syncJob(new JobRequest(
-                jobFilePath: 'META-INF/jobs/ch05/fileaccess/jobWriteCsvEnclosedAllFields.xml',
+                jobFilePath: jobLauncher.getBeanDefinitionPath('jobWriteCsvEnclosedAllFields'),
                 jobName: 'jobWriteCsvEnclosedAllFields',
                 jobParameter: "inputFile=files/test/input/ch05/fileaccess/sales_plan_detail_03.csv " +
                         "outputFile=" + outputPath))
@@ -400,7 +400,7 @@ class FileAccessSpec extends Specification {
 
         when:
         int exitCode = jobLauncher.syncJob(new JobRequest(
-                jobFilePath: 'META-INF/jobs/ch05/fileaccess/jobWriteTsv.xml',
+                jobFilePath: jobLauncher.getBeanDefinitionPath('jobWriteTsv'),
                 jobName: 'jobWriteTsv',
                 jobParameter: "inputFile=files/test/input/ch05/fileaccess/sales_plan_detail_04.tsv " +
                         "outputFile=" + outputPath))
@@ -421,7 +421,7 @@ class FileAccessSpec extends Specification {
 
         when:
         int exitCode = jobLauncher.syncJob(new JobRequest(
-                jobFilePath: 'META-INF/jobs/ch05/fileaccess/jobReadFixedLengthSeparateLineBreaks.xml',
+                jobFilePath: jobLauncher.getBeanDefinitionPath('jobReadFixedLengthSeparateLineBreaks'),
                 jobName: 'jobReadFixedLengthSeparateLineBreaks',
                 jobParameter: "inputFile=" + copyFile.path))
 
@@ -452,7 +452,7 @@ class FileAccessSpec extends Specification {
 
         when:
         int exitCode = jobLauncher.syncJob(new JobRequest(
-                jobFilePath: 'META-INF/jobs/ch05/fileaccess/jobReadFixedLengthSeparateFixedLength.xml',
+                jobFilePath: jobLauncher.getBeanDefinitionPath('jobReadFixedLengthSeparateFixedLength'),
                 jobName: 'jobReadFixedLengthSeparateFixedLength',
                 jobParameter: "inputFile=" + copyFile.path + " readCharsetName=" + charsetName + " tokenizeCharsetName=" + charsetName))
 
@@ -482,7 +482,7 @@ class FileAccessSpec extends Specification {
 
         when:
         int exitCode = jobLauncher.syncJob(new JobRequest(
-                jobFilePath: 'META-INF/jobs/ch05/fileaccess/jobReadFixedLengthSeparateFixedLengthWithLinebreaks.xml',
+                jobFilePath: jobLauncher.getBeanDefinitionPath('jobReadFixedLengthSeparateFixedLengthWithLinebreaks'),
                 jobName: 'jobReadFixedLengthSeparateFixedLengthWithLinebreaks',
                 jobParameter: "inputFile=" + target.path + " readCharsetName=" + charsetName + " tokenizeCharsetName=" + charsetName))
 
@@ -517,7 +517,7 @@ class FileAccessSpec extends Specification {
     def "Reading fixed byte length file. Data including surrogate pair."() {
         when:
         int exitCode = jobLauncher.syncJob(new JobRequest(
-                jobFilePath: 'META-INF/jobs/ch05/fileaccess/jobReadFixedLengthWithSurrogatePair.xml',
+                jobFilePath: jobLauncher.getBeanDefinitionPath('jobReadFixedLengthWithSurrogatePair'),
                 jobName: 'jobReadFixedLengthWithSurrogatePair',
                 jobParameter: "inputFile=files/test/input/ch05/fileaccess/sales_plan_detail_19.txt"))
 
@@ -547,7 +547,7 @@ class FileAccessSpec extends Specification {
 
         when:
         int exitCode = jobLauncher.syncJob(new JobRequest(
-                jobFilePath: 'META-INF/jobs/ch05/fileaccess/jobWriteFixedLengthSeparateLineBreaks.xml',
+                jobFilePath: jobLauncher.getBeanDefinitionPath('jobWriteFixedLengthSeparateLineBreaks'),
                 jobName: 'jobWriteFixedLengthSeparateLineBreaks',
                 jobParameter: "inputFile=files/test/input/ch05/fileaccess/sales_plan_detail_10.csv " +
                         "outputFile=" + outputPath))
@@ -572,7 +572,7 @@ class FileAccessSpec extends Specification {
 
         when:
         int exitCode = jobLauncher.syncJob(new JobRequest(
-                jobFilePath: 'META-INF/jobs/ch05/fileaccess/jobWriteFixedLengthSeparateFixedLength.xml',
+                jobFilePath: jobLauncher.getBeanDefinitionPath('jobWriteFixedLengthSeparateFixedLength'),
                 jobName: 'jobWriteFixedLengthSeparateFixedLength',
                 jobParameter: "inputFile=files/test/input/ch05/fileaccess/sales_plan_detail_10.csv " +
                         "outputFile=" + outputPath))
@@ -595,7 +595,7 @@ class FileAccessSpec extends Specification {
 
         when:
         int exitCode = jobLauncher.syncJob(new JobRequest(
-                jobFilePath: 'META-INF/jobs/ch05/fileaccess/jobWriteFixedLengthWithLineSeparator.xml',
+                jobFilePath: jobLauncher.getBeanDefinitionPath('jobWriteFixedLengthWithLineSeparator'),
                 jobName: 'jobWriteFixedLengthWithLineSeparator',
                 jobParameter: "inputFile=files/test/input/ch05/fileaccess/sales_plan_detail_10.csv " +
                         "outputFile=" + outputPath))
@@ -622,7 +622,7 @@ class FileAccessSpec extends Specification {
     def "Reading single string record."() {
         when:
         int exitCode = jobLauncher.syncJob(new JobRequest(
-                jobFilePath: 'META-INF/jobs/ch05/fileaccess/jobReadSingleStringRecord.xml',
+                jobFilePath: jobLauncher.getBeanDefinitionPath('jobReadSingleStringRecord'),
                 jobName: 'jobReadSingleStringRecord',
                 jobParameter: "inputFile=files/test/input/ch05/fileaccess/sales_plan_detail_01.csv"))
 
@@ -659,7 +659,7 @@ class FileAccessSpec extends Specification {
 
         when:
         int exitCode = jobLauncher.syncJob(new JobRequest(
-                jobFilePath: 'META-INF/jobs/ch05/fileaccess/jobWriteSingleStringRecord.xml',
+                jobFilePath: jobLauncher.getBeanDefinitionPath('jobWriteSingleStringRecord'),
                 jobName: 'jobWriteSingleStringRecord',
                 jobParameter: "outputFile=" + outputPath))
 
@@ -675,7 +675,7 @@ class FileAccessSpec extends Specification {
     def "Read CSV file skipping header record."() {
         when:
         int exitCode = jobLauncher.syncJob(new JobRequest(
-                jobFilePath: 'META-INF/jobs/ch05/fileaccess/jobReadCsvSkipHeader.xml',
+                jobFilePath: jobLauncher.getBeanDefinitionPath('jobReadCsvSkipHeader'),
                 jobName: 'jobReadCsvSkipHeader',
                 jobParameter: "inputFile=files/test/input/ch05/fileaccess/sales_plan_detail_11.csv"))
 
@@ -698,7 +698,7 @@ class FileAccessSpec extends Specification {
     def "Read fixed byte length file skipping header record. (not CSV file)"() {
         when:
         int exitCode = jobLauncher.syncJob(new JobRequest(
-                jobFilePath: 'META-INF/jobs/ch05/fileaccess/jobReadFixedLengthSkipHeader.xml',
+                jobFilePath: jobLauncher.getBeanDefinitionPath('jobReadFixedLengthSkipHeader'),
                 jobName: 'jobReadFixedLengthSkipHeader',
                 jobParameter: "inputFile=files/test/input/ch05/fileaccess/sales_plan_detail_12.txt"))
 
@@ -741,7 +741,7 @@ class FileAccessSpec extends Specification {
 
         when:
         int exitCode2 = jobLauncher.syncJob(new JobRequest(
-                jobFilePath: 'META-INF/jobs/common/jobSalesPlan01.xml',
+                jobFilePath: jobLauncher.getBeanDefinitionPath('jobSalesPlan01'),
                 jobName: 'jobSalesPlan01',
                 jobParameter: "inputFile=" + editedInputPath))
 
@@ -764,7 +764,7 @@ class FileAccessSpec extends Specification {
     def "Read CSV file. ItemProcessor refer to header record."() {
         when:
         int exitCode = jobLauncher.syncJob(new JobRequest(
-                jobFilePath: 'META-INF/jobs/ch05/fileaccess/jobReadCsvSkipAndReferHeader.xml',
+                jobFilePath: jobLauncher.getBeanDefinitionPath('jobReadCsvSkipAndReferHeader'),
                 jobName: 'jobReadCsvSkipAndReferHeader',
                 jobParameter: "inputFile=files/test/input/ch05/fileaccess/sales_plan_detail_14.csv"))
 
@@ -789,7 +789,7 @@ class FileAccessSpec extends Specification {
 
         when:
         int exitCode = jobLauncher.syncJob(new JobRequest(
-                jobFilePath: 'META-INF/jobs/ch05/fileaccess/jobWriteCsvWithHeader.xml',
+                jobFilePath: jobLauncher.getBeanDefinitionPath('jobWriteCsvWithHeader'),
                 jobName: 'jobWriteCsvWithHeader',
                 jobParameter: "outputFile=" + outputPath))
 
@@ -830,7 +830,7 @@ class FileAccessSpec extends Specification {
         when:
         def outputPath = outputDir + "/sales_plan_detail.csv"
         int exitCode2 = jobLauncher.syncJob(new JobRequest(
-                jobFilePath: 'META-INF/jobs/ch05/fileaccess/jobReadAndWriteCsvWithFooter.xml',
+                jobFilePath: jobLauncher.getBeanDefinitionPath('jobReadAndWriteCsvWithFooter'),
                 jobName: 'jobReadAndWriteCsvWithFooter',
                 jobParameter: "dataInputFile=" + dataInputPath + " footerInputFile=" + footerInputPath
                         + " outputFile=" + outputPath))
@@ -847,7 +847,7 @@ class FileAccessSpec extends Specification {
     def "Reading multiple CSV files."() {
         when:
         int exitCode = jobLauncher.syncJob(new JobRequest(
-                jobFilePath: 'META-INF/jobs/ch05/fileaccess/jobReadMultipleCsv.xml',
+                jobFilePath: jobLauncher.getBeanDefinitionPath('jobReadMultipleCsv'),
                 jobName: 'jobReadMultipleCsv',
                 jobParameter: "inputFiles=files/test/input/ch05/fileaccess/sales_plan_detail_for_multi_*.csv"))
 
@@ -909,7 +909,7 @@ class FileAccessSpec extends Specification {
 
         when:
         int exitCode = jobLauncher.syncJob(new JobRequest(
-                jobFilePath: 'META-INF/jobs/ch05/fileaccess/jobWriteMultipleCsv.xml',
+                jobFilePath: jobLauncher.getBeanDefinitionPath('jobWriteMultipleCsv'),
                 jobName: 'jobWriteMultipleCsv',
                 jobParameter: "outputDir=" + outputPath))
 
@@ -967,7 +967,7 @@ class FileAccessSpec extends Specification {
 
         when:
         int exitCode = jobLauncher.syncJob(new JobRequest(
-                jobFilePath: 'META-INF/jobs/ch05/fileaccess/jobWriteMultipleCsvCommitInterval.xml',
+                jobFilePath: jobLauncher.getBeanDefinitionPath('jobWriteMultipleCsvCommitInterval'),
                 jobName: 'jobWriteMultipleCsvCommitInterval',
                 jobParameter: "outputDir=" + outputPath))
 
@@ -992,7 +992,7 @@ class FileAccessSpec extends Specification {
     def "Reading XML file using JAXB."() {
         when:
         int exitCode = jobLauncher.syncJob(new JobRequest(
-                jobFilePath: 'META-INF/jobs/ch05/fileaccess/jobReadXml.xml',
+                jobFilePath: jobLauncher.getBeanDefinitionPath('jobReadXml'),
                 jobName: 'jobReadXml',
                 jobParameter: "inputFile=files/test/input/ch05/fileaccess/sales_plan_detail_16.xml"))
 
@@ -1021,7 +1021,7 @@ class FileAccessSpec extends Specification {
 
         when:
         int exitCode = jobLauncher.syncJob(new JobRequest(
-                jobFilePath: 'META-INF/jobs/ch05/fileaccess/jobWriteXml.xml',
+                jobFilePath: jobLauncher.getBeanDefinitionPath('jobWriteXml'),
                 jobName: 'jobWriteXml',
                 jobParameter: "outputFile=" + outputPath))
 
@@ -1043,7 +1043,7 @@ class FileAccessSpec extends Specification {
 
         when:
         int exitCode = jobLauncher.syncJob(new JobRequest(
-                jobFilePath: 'META-INF/jobs/ch05/fileaccess/jobWriteXml.xml',
+                jobFilePath: jobLauncher.getBeanDefinitionPath('jobWriteXml'),
                 jobName: 'jobWriteXml',
                 jobParameter: "outputFile=" + outputPath))
 
@@ -1064,7 +1064,7 @@ class FileAccessSpec extends Specification {
 
         when:
         int exitCode = jobLauncher.syncJob(new JobRequest(
-                jobFilePath: 'META-INF/jobs/ch05/fileaccess/jobWriteXmlWithHeaderAndFooter.xml',
+                jobFilePath: jobLauncher.getBeanDefinitionPath('jobWriteXmlWithHeaderAndFooter'),
                 jobName: 'jobWriteXmlWithHeaderAndFooter',
                 jobParameter: "outputFile=" + outputPath))
 
@@ -1080,7 +1080,7 @@ class FileAccessSpec extends Specification {
     def "Reading XML file with schema validation using JAXB."() {
         when:
         int exitCode = jobLauncher.syncJob(new JobRequest(
-                jobFilePath: 'META-INF/jobs/ch05/fileaccess/jobReadXmlWithSchemaValidation.xml',
+                jobFilePath: jobLauncher.getBeanDefinitionPath('jobReadXmlWithSchemaValidation'),
                 jobName: 'jobReadXmlWithSchemaValidation',
                 jobParameter: "inputFile=files/test/input/ch05/fileaccess/customer_01.xml"))
 
@@ -1110,7 +1110,7 @@ class FileAccessSpec extends Specification {
     def "Reading Error XML file with schema validation using JAXB."() {
         when:
         int exitCode = jobLauncher.syncJob(new JobRequest(
-                jobFilePath: 'META-INF/jobs/ch05/fileaccess/jobReadXmlWithSchemaValidation.xml',
+                jobFilePath: jobLauncher.getBeanDefinitionPath('jobReadXmlWithSchemaValidation'),
                 jobName: 'jobReadXmlWithSchemaValidation',
                 jobParameter: "inputFile=files/test/input/ch05/fileaccess/customer_02.xml"))
 
@@ -1133,7 +1133,7 @@ class FileAccessSpec extends Specification {
     def "Reading multi format CSV file."() {
         when:
         int exitCode = jobLauncher.syncJob(new JobRequest(
-                jobFilePath: 'META-INF/jobs/ch05/fileaccess/jobReadMultiFormatCsv.xml',
+                jobFilePath: jobLauncher.getBeanDefinitionPath('jobReadMultiFormatCsv'),
                 jobName: 'jobReadMultiFormatCsv',
                 jobParameter: "inputFile=files/test/input/ch05/fileaccess/sales_plan_detail_17.csv"))
 
@@ -1175,7 +1175,7 @@ class FileAccessSpec extends Specification {
 
         when:
         int exitCode = jobLauncher.syncJob(new JobRequest(
-                jobFilePath: 'META-INF/jobs/ch05/fileaccess/jobWriteMultiFormatCsv.xml',
+                jobFilePath: jobLauncher.getBeanDefinitionPath('jobWriteMultiFormatCsv'),
                 jobName: 'jobWriteMultiFormatCsv',
                 jobParameter: "inputFile=files/test/input/ch05/fileaccess/sales_plan_detail_17.csv " +
                         "outputFile=" + outputPath))
@@ -1202,7 +1202,7 @@ class FileAccessSpec extends Specification {
 
         when:
         def exitCode = jobLauncher.syncJob(new JobRequest(
-                jobFilePath: 'META-INF/jobs/ch05/fileaccess/jobControlBreak.xml',
+                jobFilePath: jobLauncher.getBeanDefinitionPath('jobControlBreak'),
                 jobName: 'jobControlBreak',
                 jobParameter: "inputFile=${inputFileName} outputFile=${outputFileName}"
         ))
@@ -1225,7 +1225,7 @@ class FileAccessSpec extends Specification {
         int exitCode = jobLauncher.syncJob({
             JobLauncher.SyncJobArg arg ->
                 arg.jobRequest = new JobRequest(
-                        jobFilePath: "META-INF/jobs/ch05/fileaccess/jobReadCsvByDefaultEncoding.xml",
+                        jobFilePath: jobLauncher.getBeanDefinitionPath('jobReadCsvByDefaultEncoding'),
                         jobName: "jobReadCsvByDefaultEncoding",
                         jobParameter: "inputFile=" + target.path)
         })
@@ -1253,7 +1253,7 @@ class FileAccessSpec extends Specification {
 
         when:
         int exitCode = jobLauncher.syncJob(new JobRequest(
-                jobFilePath: "META-INF/jobs/ch05/fileaccess/jobWriteCsvByDefaultEncoding.xml",
+                jobFilePath: jobLauncher.getBeanDefinitionPath('jobWriteCsvByDefaultEncoding'),
                 jobName: "jobWriteCsvByDefaultEncoding",
                 jobParameter: "inputFile=" + inputFile.path + " outputFile=" + outputFile.path))
 
@@ -1275,7 +1275,7 @@ class FileAccessSpec extends Specification {
         int exitCode = jobLauncher.syncJob({
             JobLauncher.SyncJobArg arg ->
                 arg.jobRequest = new JobRequest(
-                        jobFilePath: "META-INF/jobs/ch05/fileaccess/jobReadXmlByDefaultEncoding.xml",
+                        jobFilePath: jobLauncher.getBeanDefinitionPath('jobReadXmlByDefaultEncoding'),
                         jobName: "jobReadXmlByDefaultEncoding",
                         jobParameter: "inputFile=" + target.path)
         })
@@ -1303,7 +1303,7 @@ class FileAccessSpec extends Specification {
 
         when:
         int exitCode = jobLauncher.syncJob(new JobRequest(
-                jobFilePath: "META-INF/jobs/ch05/fileaccess/jobWriteXmlByDefaultEncoding.xml",
+                jobFilePath: jobLauncher.getBeanDefinitionPath('jobWriteXmlByDefaultEncoding'),
                 jobName: "jobWriteXmlByDefaultEncoding",
                 jobParameter: "inputFile=" + inputFile.path + " outputFile=" + outputFile.path))
 

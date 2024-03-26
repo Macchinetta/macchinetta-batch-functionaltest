@@ -60,7 +60,7 @@ public class InvalidDefaultValSettingTasklet implements Tasklet {
      */
     @Override
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
-        logger.info("str = " + str);
+        logger.info("str = {}", str);
         return null;
     }
 }

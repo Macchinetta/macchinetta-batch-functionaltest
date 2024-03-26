@@ -10,7 +10,7 @@
     <parent>
         <groupId>jp.co.ntt.fw.macchinetta.batch</groupId>
         <artifactId>macchinetta-batch-functionaltest-build</artifactId>
-        <version>2.4.0.RELEASE</version>
+        <version>2.5.0.RELEASE</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -35,10 +35,10 @@
 
         <!-- == Dependency Versions == -->
         <!-- == Spring Boot Dependencies == -->
-        <org.springframework.boot.version>3.0.1</org.springframework.boot.version>
+        <org.springframework.boot.version>3.2.2</org.springframework.boot.version>
 
         <!-- == TERASOLUNA Batch == -->
-        <terasoluna-batch.version>5.5.0.RELEASE</terasoluna-batch.version>
+        <terasoluna-batch.version>5.6.0.RELEASE</terasoluna-batch.version>
 
         <!-- == Mongo Java Driver == -->
         <mongo-java-driver.version>3.12.11</mongo-java-driver.version>
@@ -47,11 +47,14 @@
         <ch.qos.logback.contrib.version>0.1.5</ch.qos.logback.contrib.version>
 
         <!-- == JAXB == -->
-        <jaxb-core.version>4.0.1</jaxb-core.version>
-        <jaxb-impl.version>4.0.1</jaxb-impl.version>
+        <jaxb-core.version>4.0.4</jaxb-core.version>
+        <jaxb-impl.version>4.0.4</jaxb-impl.version>
 
         <!-- == Jakarta == -->
         <jakarta.el.version>4.0.2</jakarta.el.version>
+
+        <!-- == slf4j-api == -->
+        <slf4j-api.version>2.0.12</slf4j-api.version>
 
         <!-- == Project Properties == -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -60,7 +63,7 @@
         <!-- == Environment Properties == -->
         <jdbc.driver.groupId>org.postgresql</jdbc.driver.groupId>
         <jdbc.driver.artifactId>postgresql</jdbc.driver.artifactId>
-        <project.config.resource.directory.rdbms>config/rdbms/postgresql14/local</project.config.resource.directory.rdbms>
+        <project.config.resource.directory.rdbms>config/rdbms/postgresql15/local</project.config.resource.directory.rdbms>
         <project.config.resource.directory.mongo>config/mongo/local</project.config.resource.directory.mongo>
     </properties>
 
@@ -121,6 +124,14 @@
                 <artifactId>jakarta.el</artifactId>
                 <version>${jakarta.el.version}</version>
             </dependency>
+
+            <!-- == Begin slf4j-api == -->
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+                <version>${slf4j-api.version}</version>
+            </dependency>
+            <!-- == End slf4j-api == -->
         </dependencies>
     </dependencyManagement>
 
@@ -193,6 +204,12 @@
         <dependency>
             <groupId>jp.co.ntt.fw.macchinetta.batch</groupId>
             <artifactId>macchinetta-batch-functionaltest-app-common</artifactId>
+        </dependency>
+
+        <!-- == Begin slf4j-api == -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
         </dependency>
     </dependencies>
 
@@ -328,38 +345,38 @@
             </build>
         </profile>
         <profile>
-            <id>postgresql14-local</id>
+            <id>postgresql15-local</id>
             <properties>
                 <jdbc.driver.groupId>org.postgresql</jdbc.driver.groupId>
                 <jdbc.driver.artifactId>postgresql</jdbc.driver.artifactId>
-                <project.config.resource.directory.rdbms>config/rdbms/postgresql14/local</project.config.resource.directory.rdbms>
+                <project.config.resource.directory.rdbms>config/rdbms/postgresql15/local</project.config.resource.directory.rdbms>
                 <project.config.resource.directory.mongo>config/mongo/local</project.config.resource.directory.mongo>
             </properties>
         </profile>
         <profile>
-            <id>postgresql14-it</id>
+            <id>postgresql15-it</id>
             <properties>
                 <jdbc.driver.groupId>org.postgresql</jdbc.driver.groupId>
                 <jdbc.driver.artifactId>postgresql</jdbc.driver.artifactId>
-                <project.config.resource.directory.rdbms>config/rdbms/postgresql14/it</project.config.resource.directory.rdbms>
+                <project.config.resource.directory.rdbms>config/rdbms/postgresql15/it</project.config.resource.directory.rdbms>
                 <project.config.resource.directory.mongo>config/mongo/it</project.config.resource.directory.mongo>
             </properties>
         </profile>
         <profile>
-            <id>oracle21c-local</id>
+            <id>oracle23c-local</id>
             <properties>
                 <jdbc.driver.groupId>com.oracle.database.jdbc</jdbc.driver.groupId>
                 <jdbc.driver.artifactId>${oracle.jdbc.artifactId}</jdbc.driver.artifactId>
-                <project.config.resource.directory.rdbms>config/rdbms/oracle21c/local</project.config.resource.directory.rdbms>
+                <project.config.resource.directory.rdbms>config/rdbms/oracle23c/local</project.config.resource.directory.rdbms>
                 <project.config.resource.directory.mongo>config/mongo/local</project.config.resource.directory.mongo>
             </properties>
         </profile>
         <profile>
-            <id>oracle21c-it</id>
+            <id>oracle23c-it</id>
             <properties>
                 <jdbc.driver.groupId>com.oracle.database.jdbc</jdbc.driver.groupId>
                 <jdbc.driver.artifactId>${oracle.jdbc.artifactId}</jdbc.driver.artifactId>
-                <project.config.resource.directory.rdbms>config/rdbms/oracle21c/it</project.config.resource.directory.rdbms>
+                <project.config.resource.directory.rdbms>config/rdbms/oracle23c/it</project.config.resource.directory.rdbms>
                 <project.config.resource.directory.mongo>config/mongo/it</project.config.resource.directory.mongo>
             </properties>
         </profile>

@@ -120,7 +120,7 @@ class ParallelAndMultipleSpec extends Specification {
 
         when:
         def exitValue = launcher.syncJob(new JobRequest(
-                jobFilePath: 'META-INF/jobs/ch08/parallelandmultiple/parallelSummarizeJob.xml',
+                jobFilePath: launcher.getBeanDefinitionPath('parallelSummarizeJob'),
                 jobName: 'parallelSummarizeJob'
         ))
 
@@ -204,7 +204,7 @@ class ParallelAndMultipleSpec extends Specification {
 
         when:
         def exitValue = launcher.syncJob(new JobRequest(
-                jobFilePath: 'META-INF/jobs/ch08/parallelandmultiple/parallelSummarizeJob.xml',
+                jobFilePath: launcher.getBeanDefinitionPath('parallelSummarizeJob'),
                 jobName: 'parallelSummarizeJob'
         ))
 
@@ -307,7 +307,7 @@ class ParallelAndMultipleSpec extends Specification {
 
         when:
         def exitValue = launcher.syncJob(new JobRequest(
-                jobFilePath: 'META-INF/jobs/ch08/parallelandmultiple/parallelRegisterJob.xml',
+                jobFilePath: launcher.getBeanDefinitionPath('parallelRegisterJob'),
                 jobName: 'parallelRegisterJob',
                 jobParameter: "planInputFile=${planInputFile} performanceInputFile=${performanceInputFile}"
         ))
@@ -429,7 +429,7 @@ class ParallelAndMultipleSpec extends Specification {
         expect:
         def exitValue = launcher.syncJob { JobLauncher.SyncJobArg arg ->
             arg.jobRequest = new JobRequest(
-                    jobFilePath: 'META-INF/jobs/ch08/parallelandmultiple/multipleInvoiceSummarizeJob.xml',
+                    jobFilePath: launcher.getBeanDefinitionPath('multipleInvoiceSummarizeJob'),
                     jobName: 'multipleInvoiceSummarizeJob'
             )
             arg.env = ["grid.size=0", "thread.size=${threadSize}"] as String[]
@@ -501,7 +501,7 @@ class ParallelAndMultipleSpec extends Specification {
         expect:
         def exitValue = launcher.syncJob { JobLauncher.SyncJobArg arg ->
             arg.jobRequest = new JobRequest(
-                    jobFilePath: 'META-INF/jobs/ch08/parallelandmultiple/multipleCreateSalesPlanSummaryJob.xml',
+                    jobFilePath: launcher.getBeanDefinitionPath('multipleCreateSalesPlanSummaryJob'),
                     jobName: 'multipleCreateSalesPlanSummaryJob',
                     jobParameter: 'year=2016 month=12'
             )
@@ -569,7 +569,7 @@ class ParallelAndMultipleSpec extends Specification {
 
         when:
         def exitValue = launcher.syncJob(new JobRequest(
-                jobFilePath: 'META-INF/jobs/ch08/parallelandmultiple/jobEvaluationReport.xml',
+                jobFilePath: launcher.getBeanDefinitionPath('jobEvaluationReport'),
                 jobName: 'jobEvaluationReport',
                 jobParameter: "outputPath=${outputDir} year=2016 month=12"
         ))
@@ -610,7 +610,7 @@ class ParallelAndMultipleSpec extends Specification {
         when:
         def exitValue = launcher.syncJob { JobLauncher.SyncJobArg arg ->
             arg.jobRequest = new JobRequest(
-                    jobFilePath: 'META-INF/jobs/ch08/parallelandmultiple/multiplePartitioninglStepFileJob.xml',
+                    jobFilePath: launcher.getBeanDefinitionPath('multiplePartitioninglStepFileJob'),
                     jobName: 'multiplePartitioninglStepFileJob',
                     jobParameter: "inputdir=${inputDir}"
             )

@@ -55,8 +55,7 @@
 
     <task:executor id="taskExecutor" pool-size="3" queue-capacity="10"/>
 
-    <bean id="jobLauncher" class="org.springframework.batch.core.launch.support.SimpleJobLauncher"
-          p:jobRepository-ref="jobRepository"
-          p:taskExecutor-ref="taskExecutor"/>
+    <bean id="jobLauncher" class="org.springframework.batch.core.launch.support.TaskExecutorJobLauncher"          p:jobRepository-ref="jobRepository"
+          p:taskExecutor-ref="taskExecutor" />
 
 </beans>

@@ -93,7 +93,7 @@ class ExceptionHandlingSpec extends Specification {
 
         when:
         def exitCode = launcher.syncJob(new JobRequest(
-                jobFilePath: 'META-INF/jobs/ch06/exceptionhandling/jobSalesPerfAtComponentsError.xml',
+                jobFilePath: launcher.getBeanDefinitionPath('jobSalesPerfAtComponentsError'),
                 jobName: 'jobSalesPerfAtComponentsError',
                 jobParameter: 'inputFile=./files/test/input/ch06/exceptionhandling/sales_performance.csv'))
         then:
@@ -122,7 +122,7 @@ class ExceptionHandlingSpec extends Specification {
 
         when:
         def exitCode = launcher.syncJob(new JobRequest(
-                jobFilePath: 'META-INF/jobs/ch06/exceptionhandling/jobSalesPerfAtComponentsError.xml',
+                jobFilePath: launcher.getBeanDefinitionPath('jobSalesPerfAtComponentsError'),
                 jobName: 'jobSalesPerfAtComponentsError',
                 jobParameter: 'inputFile=./files/test/input/ch06/exceptionhandling/sales_performance.csv'))
         then:
@@ -155,7 +155,7 @@ class ExceptionHandlingSpec extends Specification {
 
         when:
         def exitCode = launcher.syncJob(new JobRequest(
-                jobFilePath: 'META-INF/jobs/ch06/exceptionhandling/jobSalesPerfAtComponentsError.xml',
+                jobFilePath: launcher.getBeanDefinitionPath('jobSalesPerfAtComponentsError'),
                 jobName: 'jobSalesPerfAtComponentsError',
                 jobParameter: 'inputFile=./files/test/input/ch06/exceptionhandling/sales_performance.csv'))
         then:
@@ -185,8 +185,8 @@ class ExceptionHandlingSpec extends Specification {
 
         when:
         def exitCode = launcher.syncJob(new JobRequest(
-                jobFilePath: 'META-INF/jobs/ch06/exceptionhandling/jobSalesPerfTasklet.xml',
-                jobName: 'jobSalesPerfTask',
+                jobFilePath: launcher.getBeanDefinitionPath('jobSalesPerfTasklet'),
+                jobName: 'jobSalesPerfTasklet',
                 jobParameter: 'inputFile=./files/test/input/ch06/exceptionhandling/sales_performance.csv'))
         then:
         exitCode == 255
@@ -216,7 +216,7 @@ class ExceptionHandlingSpec extends Specification {
 
         when:
         def exitCode = launcher.syncJob(new JobRequest(
-                jobFilePath: 'META-INF/jobs/ch06/exceptionhandling/jobSalesPerfAtChunkError.xml',
+                jobFilePath: launcher.getBeanDefinitionPath('jobSalesPerfAtChunkError'),
                 jobName: 'jobSalesPerfAtChunkError',
                 jobParameter: 'inputFile=./files/test/input/ch06/exceptionhandling/sales_performance.csv'))
         then:
@@ -239,7 +239,7 @@ class ExceptionHandlingSpec extends Specification {
 
         when:
         def exitCode = launcher.syncJob(new JobRequest(
-                jobFilePath: 'META-INF/jobs/ch06/exceptionhandling/jobSalesPerfAtChunkError.xml',
+                jobFilePath: launcher.getBeanDefinitionPath('jobSalesPerfAtChunkError'),
                 jobName: 'jobSalesPerfAtChunkError',
                 jobParameter: 'inputFile=./files/test/input/ch06/exceptionhandling/not-found.csv'))
         then:
@@ -262,7 +262,7 @@ class ExceptionHandlingSpec extends Specification {
 
         when:
         def exitCode = launcher.syncJob(new JobRequest(
-                jobFilePath: 'META-INF/jobs/ch06/exceptionhandling/jobSalesPerfTaskletAtChunkError.xml',
+                jobFilePath: launcher.getBeanDefinitionPath('jobSalesPerfTaskletAtChunkError'),
                 jobName: 'jobSalesPerfTaskletAtChunkError',
                 jobParameter: 'inputFile=./files/test/input/ch06/exceptionhandling/sales_performance.csv'))
         then:
@@ -285,7 +285,7 @@ class ExceptionHandlingSpec extends Specification {
 
         when:
         def exitCode = launcher.syncJob(new JobRequest(
-                jobFilePath: 'META-INF/jobs/ch06/exceptionhandling/jobSalesPerfTaskletAtChunkError.xml',
+                jobFilePath: launcher.getBeanDefinitionPath('jobSalesPerfTaskletAtChunkError'),
                 jobName: 'jobSalesPerfTaskletAtChunkError',
                 jobParameter: 'inputFile=./files/test/input/ch06/exceptionhandling/not-found.csv'))
         then:
@@ -313,7 +313,7 @@ class ExceptionHandlingSpec extends Specification {
 
         when:
         def exitCode = launcher.syncJob(new JobRequest(
-                jobFilePath: 'META-INF/jobs/ch06/exceptionhandling/jobSalesPerfAtStepError.xml',
+                jobFilePath: launcher.getBeanDefinitionPath('jobSalesPerfAtStepError'),
                 jobName: 'jobSalesPerfAtStepError',
                 jobParameter: 'inputFile=./files/test/input/ch06/exceptionhandling/sales_performance.csv'))
         then:
@@ -342,7 +342,7 @@ class ExceptionHandlingSpec extends Specification {
 
         when:
         def exitCode = launcher.syncJob(new JobRequest(
-                jobFilePath: 'META-INF/jobs/ch06/exceptionhandling/jobSalesPerfTaskletAtStepError.xml',
+                jobFilePath: launcher.getBeanDefinitionPath('jobSalesPerfTaskletAtStepError'),
                 jobName: 'jobSalesPerfTaskletAtStepError',
                 jobParameter: 'inputFile=./files/test/input/ch06/exceptionhandling/sales_performance.csv'))
         then:
@@ -371,7 +371,7 @@ class ExceptionHandlingSpec extends Specification {
 
         when:
         def exitCode = launcher.syncJob(new JobRequest(
-                jobFilePath: 'META-INF/jobs/ch06/exceptionhandling/jobSalesPerfAtJobError.xml',
+                jobFilePath: launcher.getBeanDefinitionPath('jobSalesPerfAtJobError'),
                 jobName: 'jobSalesPerfAtJobError',
                 jobParameter: 'inputFile=./files/test/input/ch06/exceptionhandling/sales_performance.csv'))
         then:
@@ -407,7 +407,7 @@ class ExceptionHandlingSpec extends Specification {
 
         when:
         def exitCode = launcher.syncJob(new JobRequest(
-                jobFilePath: 'META-INF/jobs/ch06/exceptionhandling/jobSalesPerfAtSkipAllReadError.xml',
+                jobFilePath: launcher.getBeanDefinitionPath('jobSalesPerfAtSkipAllReadError'),
                 jobName: 'jobSalesPerfAtSkipAllReadError',
                 jobParameter: 'inputFile=./files/test/input/ch06/exceptionhandling/sales_performance.csv'))
         then:
@@ -472,7 +472,7 @@ class ExceptionHandlingSpec extends Specification {
 
         when:
         def exitCode = launcher.syncJob(new JobRequest(
-                jobFilePath: 'META-INF/jobs/ch06/exceptionhandling/jobSalesPerfAtSkipNeverReadError.xml',
+                jobFilePath: launcher.getBeanDefinitionPath('jobSalesPerfAtSkipNeverReadError'),
                 jobName: 'jobSalesPerfAtSkipNeverReadError',
                 jobParameter: 'inputFile=./files/test/input/ch06/exceptionhandling/sales_performance.csv'))
         then:
@@ -518,7 +518,7 @@ class ExceptionHandlingSpec extends Specification {
 
         when:
         def exitCode = launcher.syncJob(new JobRequest(
-                jobFilePath: 'META-INF/jobs/ch06/exceptionhandling/jobSalesPerfAtValidSkipReadError.xml',
+                jobFilePath: launcher.getBeanDefinitionPath('jobSalesPerfAtValidSkipReadError'),
                 jobName: 'jobSalesPerfAtValidSkipReadError',
                 jobParameter: 'inputFile=./files/test/input/ch06/exceptionhandling/sales_performance.csv'))
         then:
@@ -573,7 +573,7 @@ class ExceptionHandlingSpec extends Specification {
 
         when:
         def exitCode = launcher.syncJob(new JobRequest(
-                jobFilePath: 'META-INF/jobs/ch06/exceptionhandling/jobSalesPerfAtValidNolimitSkipReadError.xml',
+                jobFilePath: launcher.getBeanDefinitionPath('jobSalesPerfAtValidNolimitSkipReadError'),
                 jobName: 'jobSalesPerfAtValidNolimitSkipReadError',
                 jobParameter: 'inputFile=./files/test/input/ch06/exceptionhandling/sales_performance.csv'))
         then:
@@ -638,7 +638,7 @@ class ExceptionHandlingSpec extends Specification {
 
         when:
         def exitCode = launcher.syncJob(new JobRequest(
-                jobFilePath: 'META-INF/jobs/ch06/exceptionhandling/jobSalesPerfAtSkipAllProcError.xml',
+                jobFilePath: launcher.getBeanDefinitionPath('jobSalesPerfAtSkipAllProcError'),
                 jobName: 'jobSalesPerfAtSkipAllProcError',
                 jobParameter: 'inputFile=./files/test/input/ch06/exceptionhandling/sales_performance.csv'))
         then:
@@ -711,7 +711,7 @@ class ExceptionHandlingSpec extends Specification {
 
         when:
         def exitCode = launcher.syncJob(new JobRequest(
-                jobFilePath: 'META-INF/jobs/ch06/exceptionhandling/jobSalesPerfAtSkipSpecificProcError.xml',
+                jobFilePath: launcher.getBeanDefinitionPath('jobSalesPerfAtSkipSpecificProcError'),
                 jobName: 'jobSalesPerfAtSkipSpecificProcError',
                 jobParameter: 'inputFile=./files/test/input/ch06/exceptionhandling/sales_performance.csv'))
         then:
@@ -782,8 +782,8 @@ class ExceptionHandlingSpec extends Specification {
 
         when:
         def exitCode = launcher.syncJob(new JobRequest(
-                jobFilePath: 'META-INF/jobs/ch06/exceptionhandling/jobSalesPerfTaskletWithSkip.xml',
-                jobName: 'jobSalesPerfTaskWithSkip',
+                jobFilePath: launcher.getBeanDefinitionPath('jobSalesPerfTaskletWithSkip'),
+                jobName: 'jobSalesPerfTaskletWithSkip',
                 jobParameter: 'inputFile=./files/test/input/ch06/exceptionhandling/sales_performance.csv'))
         then:
         exitCode == 0
@@ -849,7 +849,7 @@ class ExceptionHandlingSpec extends Specification {
 
         when:
         def exitCode = launcher.syncJob(new JobRequest(
-                jobFilePath: 'META-INF/jobs/ch06/exceptionhandling/jobSalesPerfWithRetry.xml',
+                jobFilePath: launcher.getBeanDefinitionPath('jobSalesPerfWithRetry'),
                 jobName: 'jobSalesPerfWithRetry',
                 jobParameter: 'inputFile=./files/test/input/ch06/exceptionhandling/sales_performance.csv adjust-times=2'))
         then:
@@ -916,7 +916,7 @@ class ExceptionHandlingSpec extends Specification {
 
         when:
         def exitCode = launcher.syncJob(new JobRequest(
-                jobFilePath: 'META-INF/jobs/ch06/exceptionhandling/jobSalesPerfWithRetry.xml',
+                jobFilePath: launcher.getBeanDefinitionPath('jobSalesPerfWithRetry'),
                 jobName: 'jobSalesPerfWithRetry',
                 jobParameter: 'inputFile=./files/test/input/ch06/exceptionhandling/sales_performance.csv adjust-times=10'))
         then:
@@ -975,7 +975,7 @@ class ExceptionHandlingSpec extends Specification {
 
         when:
         def exitCode = launcher.syncJob(new JobRequest(
-                jobFilePath: 'META-INF/jobs/ch06/exceptionhandling/jobSalesPerfAtInvalidSkipReadError.xml',
+                jobFilePath: launcher.getBeanDefinitionPath('jobSalesPerfAtInvalidSkipReadError'),
                 jobName: 'jobSalesPerfAtInvalidSkipReadError',
                 jobParameter: 'inputFile=./files/test/input/ch06/exceptionhandling/sales_performance.csv'))
         then:
@@ -1024,7 +1024,7 @@ class ExceptionHandlingSpec extends Specification {
 
         when:
         def exitCode = launcher.syncJob(new JobRequest(
-                jobFilePath: 'META-INF/jobs/ch06/exceptionhandling/jobSalesPerfWithRetryPolicy.xml',
+                jobFilePath: launcher.getBeanDefinitionPath('jobSalesPerfWithRetryPolicy'),
                 jobName: 'jobSalesPerfWithRetryPolicy',
                 jobParameter: 'inputFile=./files/test/input/ch06/exceptionhandling/sales_performance.csv adjust-times=3'))
         then:

@@ -125,7 +125,7 @@ class DBAccessSpec extends Specification {
 
         when:
         int exitCode = launcher.syncJob(new JobRequest(
-                jobFilePath: 'META-INF/jobs/ch05/dbaccess/DBAccessByMapperFactoryBean.xml',
+                jobFilePath: launcher.getBeanDefinitionPath('DBAccessByMapperFactoryBean'),
                 jobName: 'DBAccessByMapperFactoryBean'))
 
         then:
@@ -144,7 +144,7 @@ class DBAccessSpec extends Specification {
 
         when:
         int exitCode = launcher.syncJob(new JobRequest(
-                jobFilePath: 'META-INF/jobs/ch05/dbaccess/DBAccessByMaybatisScan.xml',
+                jobFilePath: launcher.getBeanDefinitionPath('DBAccessByMaybatisScan'),
                 jobName: 'DBAccessByMaybatisScan'))
 
         then:
@@ -163,7 +163,7 @@ class DBAccessSpec extends Specification {
 
         when:
         int exitCode = launcher.syncJob(new JobRequest(
-                jobFilePath: 'META-INF/jobs/ch05/dbaccess/DBAccessByItemWriter.xml',
+                jobFilePath: launcher.getBeanDefinitionPath('DBAccessByItemWriter'),
                 jobName: 'DBAccessByItemWriter'))
 
         then:
@@ -186,7 +186,7 @@ class DBAccessSpec extends Specification {
 
         when:
         int exitCode = launcher.syncJob(new JobRequest(
-                jobFilePath: 'META-INF/jobs/ch05/dbaccess/DBAccessByItemProcessor.xml',
+                jobFilePath: launcher.getBeanDefinitionPath('DBAccessByItemProcessor'),
                 jobName: 'DBAccessByItemProcessor'))
 
         then:
@@ -212,7 +212,7 @@ class DBAccessSpec extends Specification {
 
         when:
         int exitCode = launcher.syncJob(new JobRequest(
-                jobFilePath: 'META-INF/jobs/ch05/dbaccess/DBAccessByItemListener.xml',
+                jobFilePath: launcher.getBeanDefinitionPath('DBAccessByItemListener'),
                 jobName: 'DBAccessByItemListener'))
 
         then:
@@ -235,7 +235,7 @@ class DBAccessSpec extends Specification {
 
         when:
         def exitCode = launcher.syncJob(new JobRequest(
-                jobFilePath: 'META-INF/jobs/ch05/dbaccess/updateMapperAndItemWriterJob.xml',
+                jobFilePath:launcher.getBeanDefinitionPath('updateMapperAndItemWriterJob'),
                 jobName: 'updateMapperAndItemWriterJob'
         ))
 
@@ -259,7 +259,7 @@ class DBAccessSpec extends Specification {
 
         when:
         def exitCode = launcher.syncJob(new JobRequest(
-                jobFilePath: 'META-INF/jobs/ch05/dbaccess/updateMapperAndItemWriterBatchModeJob.xml',
+                jobFilePath: launcher.getBeanDefinitionPath('updateMapperAndItemWriterBatchModeJob'),
                 jobName: 'updateMapperAndItemWriterBatchModeJob'
         ))
 
@@ -323,7 +323,7 @@ class DBAccessSpec extends Specification {
 
         when:
         def exitCode = launcher.syncJob(new JobRequest(
-                jobFilePath: 'META-INF/jobs/ch05/dbaccess/useCompositeItemWriter.xml',
+                jobFilePath: launcher.getBeanDefinitionPath('useCompositeItemWriter'),
                 jobName: 'useCompositeItemWriter',
                 jobParameter: "errorCount=-1"
         ))
@@ -378,7 +378,7 @@ class DBAccessSpec extends Specification {
 
         when:
         def exitCode = launcher.syncJob(new JobRequest(
-                jobFilePath: 'META-INF/jobs/ch05/dbaccess/useCompositeItemWriter.xml',
+                jobFilePath: launcher.getBeanDefinitionPath('useCompositeItemWriter'),
                 jobName: 'useCompositeItemWriter',
                 jobParameter: "errorCount=5"
         ))
@@ -400,8 +400,8 @@ class DBAccessSpec extends Specification {
 
         when:
         def exitCode = launcher.syncJob(new JobRequest(
-                jobFilePath: 'META-INF/jobs/ch05/dbaccess/jobSalesPlanCursorTasklet.xml',
-                jobName: 'jobSalesPlanCursorTasklet'
+                jobFilePath: launcher.getBeanDefinitionPath('jobSalesPlanCursorTasklet'),
+                        jobName: 'jobSalesPlanCursorTasklet'
         ))
 
         then:

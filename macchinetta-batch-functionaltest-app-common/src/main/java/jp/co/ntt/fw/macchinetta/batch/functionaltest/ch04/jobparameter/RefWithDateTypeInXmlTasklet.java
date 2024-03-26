@@ -58,8 +58,10 @@ public class RefWithDateTypeInXmlTasklet implements Tasklet {
      */
     @Override
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
-        logger.info("str = " + str + ", num = " + num + ", date = "
-                + new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss").format(date));
+        if (logger.isInfoEnabled()) {
+            logger.info("str = {}, num = {}, date = {}", str, num,
+                    new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss").format(date));
+        }
         return null;
     }
 

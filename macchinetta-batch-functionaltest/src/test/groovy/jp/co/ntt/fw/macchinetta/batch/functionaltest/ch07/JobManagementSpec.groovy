@@ -21,8 +21,10 @@ import org.springframework.batch.core.ExitStatus
 import org.springframework.batch.core.explore.JobExplorer
 import org.springframework.batch.core.launch.JobOperator
 import org.springframework.batch.core.launch.support.CommandLineJobRunner
-import org.springframework.batch.core.launch.support.SimpleJobLauncher
+import org.springframework.batch.core.launch.support.TaskExecutorJobLauncher
+import org.springframework.context.ApplicationContext
 import org.springframework.context.support.ClassPathXmlApplicationContext
+import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor
 import jp.co.ntt.fw.macchinetta.batch.functionaltest.ch07.jobmanagement.JobMonitor
 import jp.co.ntt.fw.macchinetta.batch.functionaltest.ch07.jobmanagement.MessageGettingTasklet
@@ -32,6 +34,7 @@ import jp.co.ntt.fw.macchinetta.batch.functionaltest.util.JobRequest
 import jp.co.ntt.fw.macchinetta.batch.functionaltest.util.LogCondition
 import jp.co.ntt.fw.macchinetta.batch.functionaltest.util.MongoUtil
 import spock.lang.Narrative
+import spock.lang.Requires
 import spock.lang.Shared
 import spock.lang.Specification
 
@@ -107,12 +110,21 @@ class JobManagementSpec extends Specification {
                 "0012"    | 2016 | 12    | "C0021"     | 1000
             }
         }))
-        def context = new ClassPathXmlApplicationContext('META-INF/jobs/common/jobSalesPlan02.xml')
+        ApplicationContext context
+        def configurationType = System.getProperty('configurationType')
+        if ("javaconfig".equals(configurationType)) {
+            context = new AnnotationConfigApplicationContext(jp.co.ntt.fw.macchinetta.batch.functionaltest.jobs.common.JobSalesPlan02Config.class)
+        } else {
+            context = new ClassPathXmlApplicationContext('META-INF/jobs/common/jobSalesPlan02.xml')
+        }
         def jobOperator = (JobOperator) context.getBean("jobOperator")
         def jobExplorer = (JobExplorer) context.getBean("jobExplorer")
 
         when:
-        def jobExecutionId = jobOperator.start('jobSalesPlan02', 'param1=dummy1 param2=dummy2')
+        def properties = new Properties()
+        properties.setProperty("param1", "dummy1")
+        properties.setProperty("param2", "dummy2")
+        def jobExecutionId = jobOperator.start('jobSalesPlan02', properties)
         def jobExecution = jobExplorer.getJobExecution(jobExecutionId)
 
         then:
@@ -137,7 +149,8 @@ class JobManagementSpec extends Specification {
     }
 
     // Testcase 1, test no.1
-    def "Job status reference by JobExplore (Java App)"() {
+    @Requires({ os.linux })
+    def "Job status reference by JobExplore (Java App)(linux)"() {
         setup:
         adminDB.dropAndCreateTable()
         jobDB.deleteAll(["sales_plan_detail", "sales_plan_summary"] as String[])
@@ -163,12 +176,21 @@ class JobManagementSpec extends Specification {
                 "0012"    | 2016 | 12    | "C0021"     | 1000
             }
         }))
-        def context = new ClassPathXmlApplicationContext('META-INF/jobs/common/jobSalesPlan02.xml')
+        ApplicationContext context
+        def configurationType = System.getProperty('configurationType')
+        if ("javaconfig".equals(configurationType)) {
+            context = new AnnotationConfigApplicationContext(jp.co.ntt.fw.macchinetta.batch.functionaltest.jobs.common.JobSalesPlan02Config.class)
+        } else {
+            context = new ClassPathXmlApplicationContext('META-INF/jobs/common/jobSalesPlan02.xml')
+        }
         def jobOperator = (JobOperator) context.getBean("jobOperator")
 
         when:
-        def jobExecutionId = jobOperator.start('jobSalesPlan02', 'param1=dummy1 param2=dummy2')
-        def command = "java -cp target/dependency/* jp.co.ntt.fw.macchinetta.batch.functionaltest.ch07.jobmanagement.JobMonitor ${jobExecutionId}"
+        def properties = new Properties()
+        properties.setProperty("param1", "dummy1")
+        properties.setProperty("param2", "dummy2")
+        def jobExecutionId = jobOperator.start('jobSalesPlan02', properties)
+        def command = "java -cp target/*:target/dependency/* jp.co.ntt.fw.macchinetta.batch.functionaltest.ch07.jobmanagement.JobMonitor ${jobExecutionId} ${configurationType}"
 
         def p = JobLauncher.executeProcess(command)
         p.waitForOrKill(TimeUnit.MINUTES.toMillis(2))
@@ -176,7 +198,70 @@ class JobManagementSpec extends Specification {
         then:
         p.exitValue() == 0
         mongoUtil.find(new LogCondition(
+               logger: JobMonitor.class.name,
+                level: 'INFO',
+                message: 'Job Name : jobSalesPlan02'
+        )).size() == 1
+        mongoUtil.find(new LogCondition(
                 logger: JobMonitor.class.name,
+                level: 'INFO',
+                message: 'Step Name : jobSalesPlan02.step01'
+        )).size() == 1
+        cleanup:
+        context.close()
+    }
+    
+    // Testcase 1, test no.1
+    @Requires({ os.windows })
+    def "Job status reference by JobExplore (Java App)(windows)"() {
+        setup:
+        adminDB.dropAndCreateTable()
+        jobDB.deleteAll(["sales_plan_detail", "sales_plan_summary"] as String[])
+        jobDB.insert(DBUnitUtil.createDataSet({
+            sales_plan_detail {
+                branch_id | year | month | customer_id | amount
+                "0001"    | 2016 | 12    | "C0001"     | 1000
+                "0001"    | 2016 | 12    | "C0002"     | 2000
+                "0001"    | 2016 | 12    | "C0003"     | 3000
+                "0002"    | 2016 | 12    | "C0011"     | 1100
+                "0002"    | 2016 | 12    | "C0012"     | 1200
+                "0002"    | 2016 | 12    | "C0013"     | 1300
+                "0003"    | 2016 | 12    | "C0011"     | 1500
+                "0003"    | 2016 | 12    | "C0012"     | 1000
+                "0004"    | 2016 | 12    | "C0013"     | 1000
+                "0005"    | 2016 | 12    | "C0014"     | 1000
+                "0006"    | 2016 | 12    | "C0015"     | 1000
+                "0007"    | 2016 | 12    | "C0016"     | 1000
+                "0008"    | 2016 | 12    | "C0017"     | 1000
+                "0009"    | 2016 | 12    | "C0018"     | 1000
+                "0010"    | 2016 | 12    | "C0019"     | 1000
+                "0011"    | 2016 | 12    | "C0020"     | 1000
+                "0012"    | 2016 | 12    | "C0021"     | 1000
+            }
+        }))
+        ApplicationContext context
+        def configurationType = System.getProperty('configurationType')
+        if ("javaconfig".equals(configurationType)) {
+            context = new AnnotationConfigApplicationContext(jp.co.ntt.fw.macchinetta.batch.functionaltest.jobs.common.JobSalesPlan02Config.class)
+        } else {
+            context = new ClassPathXmlApplicationContext('META-INF/jobs/common/jobSalesPlan02.xml')
+        }
+        def jobOperator = (JobOperator) context.getBean("jobOperator")
+
+        when:
+        def properties = new Properties()
+        properties.setProperty("param1", "dummy1")
+        properties.setProperty("param2", "dummy2")
+        def jobExecutionId = jobOperator.start('jobSalesPlan02', properties)
+        def command = "java -cp target/*;target/dependency/* jp.co.ntt.fw.macchinetta.batch.functionaltest.ch07.jobmanagement.JobMonitor ${jobExecutionId} ${configurationType}"
+
+        def p = JobLauncher.executeProcess(command)
+        p.waitForOrKill(TimeUnit.MINUTES.toMillis(2))
+
+        then:
+        p.exitValue() == 0
+        mongoUtil.find(new LogCondition(
+               logger: JobMonitor.class.name,
                 level: 'INFO',
                 message: 'Job Name : jobSalesPlan02'
         )).size() == 1
@@ -222,7 +307,7 @@ class JobManagementSpec extends Specification {
 
         when:
         def exitValue = launcher.syncJob(new JobRequest(
-                jobFilePath: 'META-INF/jobs/common/jobSalesPlan02.xml',
+                jobFilePath: launcher.getBeanDefinitionPath('jobSalesPlan02'),
                 jobName: 'jobSalesPlan02',
                 jobParameter: 'param3=dummy3 param4=dummy4'
         ))
@@ -266,14 +351,14 @@ class JobManagementSpec extends Specification {
         adminDB.dropAndCreateTable() // Reconstruct to simplify the verification procedure.
         setupInitialData()
         def command = "java -cp target/dependency/* ${CommandLineJobRunner.class.name} " +
-                "META-INF/jobs/ch07/jobmanagement/jobSalesPlan02WithLongTermTask.xml jobSalesPlan02WithLongTermTask interval=10000"
+                launcher.getBeanDefinitionPath('jobSalesPlan02WithLongTermTask') + " jobSalesPlan02WithLongTermTask interval=10000"
 
         when:
         def p = JobLauncher.executeProcess(command)
         mongoUtil.waitForOutputLog(new LogCondition(message: 'job started. [JobName:jobSalesPlan02WithLongTermTask]'))
         sleep(1000L)    // wait 1 seconds.
         def stopExitValue = launcher.syncJob(new JobRequest(
-                jobFilePath: 'META-INF/jobs/ch07/jobmanagement/jobSalesPlan02WithLongTermTask.xml',
+                jobFilePath: launcher.getBeanDefinitionPath('jobSalesPlan02WithLongTermTask'),
                 jobName: 'jobSalesPlan02WithLongTermTask',
                 jobParameter: '-stop'
         ))
@@ -293,20 +378,28 @@ class JobManagementSpec extends Specification {
         setup:
         adminDB.dropAndCreateTable() // Reconstruct to simplify the verification procedure.
         setupInitialData()
-        def context = new ClassPathXmlApplicationContext('META-INF/jobs/ch07/jobmanagement/jobSalesPlan02WithLongTermTask.xml')
+        ApplicationContext context
+        def configurationType = System.getProperty('configurationType')
+        if ("javaconfig".equals(configurationType)) {
+            context = new AnnotationConfigApplicationContext(jp.co.ntt.fw.macchinetta.batch.functionaltest.jobs.ch07.jobmanagement.JobSalesPlan02WithLongTermTaskConfig.class)
+        } else {
+            context = new ClassPathXmlApplicationContext('META-INF/jobs/ch07/jobmanagement/jobSalesPlan02WithLongTermTask.xml')
+        }
         def jobOperator = (JobOperator) context.getBean("jobOperator")
-        def jobLauncher = (SimpleJobLauncher) context.getBean("jobLauncher")
+        def jobLauncher = (TaskExecutorJobLauncher) context.getBean("jobLauncher")
         def taskExecutor = new ThreadPoolTaskExecutor()
         taskExecutor.initialize()
         jobLauncher.setTaskExecutor(taskExecutor)
 
         when:
-        def jobExecutionId = jobOperator.start("jobSalesPlan02WithLongTermTask", "interval=10000")
+        def properties = new Properties()
+        properties.setProperty("interval", "10000")
+        def jobExecutionId = jobOperator.start("jobSalesPlan02WithLongTermTask", properties)
         mongoUtil.waitForOutputLog(new LogCondition(message: 'job started. [JobName:jobSalesPlan02WithLongTermTask]'))
         sleep(1000)
 
         def stopExitValue = launcher.syncJob(new JobRequest(
-                jobFilePath: 'META-INF/jobs/ch07/jobmanagement/jobSalesPlan02WithLongTermTask.xml',
+                jobFilePath: launcher.getBeanDefinitionPath('jobSalesPlan02WithLongTermTask'),
                 jobName: jobExecutionId,
                 jobParameter: '-stop'
         ))
@@ -330,15 +423,22 @@ class JobManagementSpec extends Specification {
         setup:
         adminDB.dropAndCreateTable() // Reconstruct to simplify the verification procedure.
         setupInitialData()
-        def context = new ClassPathXmlApplicationContext('META-INF/jobs/ch07/jobmanagement/jobSalesPlan02WithLongTermTask.xml')
+        ApplicationContext context
+        def configurationType = System.getProperty('configurationType')
+        if ("javaconfig".equals(configurationType)) {
+            context = new AnnotationConfigApplicationContext(jp.co.ntt.fw.macchinetta.batch.functionaltest.jobs.ch07.jobmanagement.JobSalesPlan02WithLongTermTaskConfig.class)
+        } else {
+            context = new ClassPathXmlApplicationContext('META-INF/jobs/ch07/jobmanagement/jobSalesPlan02WithLongTermTask.xml')
+        }
         def jobOperator = (JobOperator) context.getBean("jobOperator")
-        def jobLauncher = (SimpleJobLauncher) context.getBean("jobLauncher")
+        def jobLauncher = (TaskExecutorJobLauncher) context.getBean("jobLauncher")
         def taskExecutor = new ThreadPoolTaskExecutor()
         taskExecutor.initialize()
         jobLauncher.setTaskExecutor(taskExecutor)
 
         when:
-        def jobExecutionId = jobOperator.start("jobSalesPlan02WithLongTermTask", "")
+        def properties = new Properties()
+        def jobExecutionId = jobOperator.start("jobSalesPlan02WithLongTermTask", properties)
         mongoUtil.waitForOutputLog(new LogCondition(message: 'job started. [JobName:jobSalesPlan02WithLongTermTask]'))
         sleep(1000)
         jobOperator.stop(jobExecutionId)
@@ -364,7 +464,7 @@ class JobManagementSpec extends Specification {
         adminDB.dropAndCreateTable() // Reconstruct to simplify the verification procedure.
         setupInitialData()
         launcher.syncJob(new JobRequest(
-                jobFilePath: 'META-INF/jobs/ch07/jobmanagement/jobSalesPlan02WithLongTermTask.xml',
+                jobFilePath: launcher.getBeanDefinitionPath('jobSalesPlan02WithLongTermTask'),
                 jobName: 'jobSalesPlan02WithLongTermTask',
                 jobParameter: 'interval=0'
         ))
@@ -378,7 +478,7 @@ class JobManagementSpec extends Specification {
             }
         }))
         def stopExitValue = launcher.syncJob(new JobRequest(
-                jobFilePath: 'META-INF/jobs/ch07/jobmanagement/jobSalesPlan02WithLongTermTask.xml',
+                jobFilePath: launcher.getBeanDefinitionPath('jobSalesPlan02WithLongTermTask'),
                 jobName: 'jobSalesPlan02WithLongTermTask',
                 jobParameter: '-stop'
         ))
@@ -430,7 +530,7 @@ class JobManagementSpec extends Specification {
 
         when:
         def exitValue = launcher.syncJob(new JobRequest(
-                jobFilePath: 'META-INF/jobs/ch07/jobmanagement/customizedJobExitCodeChunkJob.xml',
+                jobFilePath: launcher.getBeanDefinitionPath('customizedJobExitCodeChunkJob'),
                 jobName: 'customizedJobExitCodeChunkJob'
         ))
 
@@ -475,7 +575,7 @@ class JobManagementSpec extends Specification {
 
         when:
         def exitValue = launcher.syncJob(new JobRequest(
-                jobFilePath: 'META-INF/jobs/ch07/jobmanagement/customizedJobExitCodeTaskletJob.xml',
+                jobFilePath: launcher.getBeanDefinitionPath('customizedJobExitCodeTaskletJob'),
                 jobName: 'customizedJobExitCodeTaskletJob'
         ))
 
@@ -493,7 +593,7 @@ class JobManagementSpec extends Specification {
     def "Confirmation of exit code mapping (normal termination)"() {
         when:
         def exitValue = launcher.syncJob(new JobRequest(
-                jobFilePath: 'META-INF/jobs/ch07/jobmanagement/emulateLongTaskJob.xml',
+                jobFilePath: launcher.getBeanDefinitionPath('emulateLongTaskJob'),
                 jobName: 'emulateLongTaskJob'
         ))
 
@@ -505,7 +605,7 @@ class JobManagementSpec extends Specification {
     def "Confirmation of exit code mapping (abnormal termination)"() {
         when:
         def exitValue = launcher.syncJob(new JobRequest(
-                jobFilePath: 'META-INF/jobs/ch07/jobmanagement/emulateLongTaskJob.xml',
+                jobFilePath: launcher.getBeanDefinitionPath('emulateLongTaskJob'),
                 jobName: 'emulateLongTaskJob',
                 jobParameter: 'shouldFail=true'
         ))
@@ -519,14 +619,14 @@ class JobManagementSpec extends Specification {
     def "Confirmation of exit code mapping (stop)"() {
         setup:
         def command = "java -cp target/dependency/* ${CommandLineJobRunner.class.name} " +
-                "META-INF/jobs/ch07/jobmanagement/emulateLongTaskJob.xml emulateLongTaskJob interval=10000"
+                launcher.getBeanDefinitionPath('emulateLongTaskJob') + " emulateLongTaskJob interval=10000"
 
         when:
         def p = JobLauncher.executeProcess(command)
         mongoUtil.waitForOutputLog(new LogCondition(message: 'job started. [JobName:emulateLongTaskJob]'))
         sleep(1000L)    // wait 1 seconds.
         def exitValue = launcher.syncJob(new JobRequest(
-                jobFilePath: 'META-INF/jobs/ch07/jobmanagement/emulateLongTaskJob.xml',
+                jobFilePath: launcher.getBeanDefinitionPath('emulateLongTaskJob'),
                 jobName: 'emulateLongTaskJob',
                 jobParameter: '-stop'
         ))
@@ -541,7 +641,7 @@ class JobManagementSpec extends Specification {
     def "Message getting by MessageSource"() {
         when:
         int exitCode = launcher.syncJob(new JobRequest(
-                jobFilePath: 'META-INF/jobs/ch07/jobmanagement/getMessageJob.xml',
+                jobFilePath: launcher.getBeanDefinitionPath('getMessageJob'),
                 jobName: 'getMessageJob'))
 
         then:

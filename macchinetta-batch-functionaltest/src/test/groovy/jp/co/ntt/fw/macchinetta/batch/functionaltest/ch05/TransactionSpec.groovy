@@ -81,7 +81,7 @@ class TransactionSpec extends Specification {
         setup:
         jobDB.deleteAll(["sales_plan_detail"] as String[])
         def jobRequest = new JobRequest(
-                jobFilePath: 'META-INF/jobs/common/jobSalesPlan01.xml',
+                jobFilePath: launcher.getBeanDefinitionPath('jobSalesPlan01'),
                 jobName: 'jobSalesPlan01',
                 jobParameter: 'inputFile=./files/test/input/ch05/transaction/sales_plan_branch_0002_incorrect.csv'
         )
@@ -114,7 +114,7 @@ class TransactionSpec extends Specification {
         setup:
         jobDB.deleteAll(["sales_plan_detail"] as String[])
         def jobRequest = new JobRequest(
-                jobFilePath: 'META-INF/jobs/ch05/transaction/createSalesPlanChunkTranTask.xml',
+                jobFilePath: launcher.getBeanDefinitionPath('createSalesPlanChunkTranTask'),
                 jobName: 'createSalesPlanChunkTranTask',
                 jobParameter: 'inputFile=./files/test/input/ch05/transaction/sales_plan_branch_0002_incorrect.csv'
         )
@@ -147,7 +147,7 @@ class TransactionSpec extends Specification {
         setup:
         jobDB.deleteAll(["sales_plan_detail"] as String[])
         def jobRequest = new JobRequest(
-                jobFilePath: 'META-INF/jobs/ch05/transaction/createSalesPlanSingleTranTask.xml',
+                jobFilePath: launcher.getBeanDefinitionPath('createSalesPlanSingleTranTask'),
                 jobName: 'createSalesPlanSingleTranTask',
                 jobParameter: 'inputFile=./files/test/input/ch05/transaction/sales_plan_branch_0002_incorrect.csv'
         )
@@ -174,6 +174,72 @@ class TransactionSpec extends Specification {
         stepExecution.getValue(0, 'rollback_count') == 1
     }
 
+    // Testcase 1.2, test no.3
+    def "Transaction control test of tasklet model, Confirm implementation of intermediate commit method, correct"() {
+        setup:
+        jobDB.deleteAll(["sales_plan_detail"] as String[])
+        def jobRequest = new JobRequest(
+                jobFilePath: launcher.getBeanDefinitionPath('createSalesPlanChunkTranTask'),
+                jobName: 'createSalesPlanChunkTranTask',
+                jobParameter: 'inputFile=./files/test/input/ch05/transaction/sales_plan_branch_0002_correct.csv'
+        )
+        def expectDataSet = DBUnitUtil.createDataSetFormCSV("./files/expect/database/ch05/transaction/")
+
+        when:
+        def exitValue = launcher.syncJob(jobRequest)
+
+        def planDetailTable = jobDB.getTable("sales_plan_detail")
+
+        then:
+        exitValue == 0
+        DBUnitUtil.assertEquals(expectDataSet.getTable("sales_plan_branch_0002_correct_expect_chunked"), planDetailTable)
+
+        def log = mongoUtil.findOne(new LogCondition(
+                message: 'Finish Create sales plan by chunk transaction of tasklet model.',
+                level: 'INFO'
+        ))
+        log != null
+        log.throwable == null
+        def stepExecution = adminDB.getTable("batch_step_execution")
+        stepExecution.getValue(0, 'commit_count') == 1
+        stepExecution.getValue(0, 'read_count') == 0
+        stepExecution.getValue(0, 'write_count') == 0
+        stepExecution.getValue(0, 'rollback_count') == 0
+    }
+    
+    // Testcase 1.2, test no.4
+    def "Transaction control test of tasklet model, Confirm implementation of intermediate commit method, correct 99"() {
+        setup:
+        jobDB.deleteAll(["sales_plan_detail"] as String[])
+        def jobRequest = new JobRequest(
+                jobFilePath: launcher.getBeanDefinitionPath('createSalesPlanChunkTranTask'),
+                jobName: 'createSalesPlanChunkTranTask',
+                jobParameter: 'inputFile=./files/test/input/ch05/transaction/sales_plan_branch_0002_correct_99.csv'
+        )
+        def expectDataSet = DBUnitUtil.createDataSetFormCSV("./files/expect/database/ch05/transaction/")
+
+        when:
+        def exitValue = launcher.syncJob(jobRequest)
+
+        def planDetailTable = jobDB.getTable("sales_plan_detail")
+
+        then:
+        exitValue == 0
+        DBUnitUtil.assertEquals(expectDataSet.getTable("sales_plan_branch_0002_99_expect_chunked"), planDetailTable)
+
+        def log = mongoUtil.findOne(new LogCondition(
+                message: 'Finish Create sales plan by chunk transaction of tasklet model.',
+                level: 'INFO'
+        ))
+        log != null
+        log.throwable == null
+        def stepExecution = adminDB.getTable("batch_step_execution")
+        stepExecution.getValue(0, 'commit_count') == 1
+        stepExecution.getValue(0, 'read_count') == 0
+        stepExecution.getValue(0, 'write_count') == 0
+        stepExecution.getValue(0, 'rollback_count') == 0
+    }
+
     // Testcase 1.3, test no.1
     def "Transaction control at file output, transaction enabled"() {
         setup:
@@ -185,7 +251,7 @@ class TransactionSpec extends Specification {
         def expectFile = new File("./files/expect/output/ch05/transaction/sales_plan_detail_branch_0003_expect_tran_enabled.csv")
 
         def jobRequest = new JobRequest(
-                jobFilePath: 'META-INF/jobs/ch05/transaction/outputSalesPlanDetailWithTran.xml',
+                jobFilePath: launcher.getBeanDefinitionPath('outputSalesPlanDetailWithTran'),
                 jobName: 'outputSalesPlanDetailWithTran',
                 jobParameter: "branchId=0003 outputFile=${outputFileName}"
         )
@@ -225,7 +291,7 @@ class TransactionSpec extends Specification {
         def expectFile = new File("./files/expect/output/ch05/transaction/sales_plan_detail_branch_0003_expect_tran_disabled.csv")
 
         def jobRequest = new JobRequest(
-                jobFilePath: 'META-INF/jobs/ch05/transaction/outputSalesPlanDetailWithNoTran.xml',
+                jobFilePath: launcher.getBeanDefinitionPath('outputSalesPlanDetailWithNoTran'),
                 jobName: 'outputSalesPlanDetailWithNoTran',
                 jobParameter: "branchId=0003 outputFile=${outputFileName}"
         )
@@ -265,7 +331,7 @@ class TransactionSpec extends Specification {
         def expectFile = new File("./files/expect/output/ch05/transaction/customer_with_branch_expect.csv")
 
         def jobRequest = new JobRequest(
-                jobFilePath: 'META-INF/jobs/ch05/transaction/outputAllCustomerList01.xml',
+                jobFilePath: launcher.getBeanDefinitionPath('outputAllCustomerList01'),
                 jobName: 'outputAllCustomerList01',
                 jobParameter: "outputFile=${outputFileName}"
         )
@@ -307,7 +373,7 @@ class TransactionSpec extends Specification {
         def expectFile = new File("./files/expect/output/ch05/transaction/customer_with_branch_expect.csv")
 
         def jobRequest = new JobRequest(
-                jobFilePath: 'META-INF/jobs/ch05/transaction/outputAllCustomerList02.xml',
+                jobFilePath: launcher.getBeanDefinitionPath('outputAllCustomerList02'),
                 jobName: 'outputAllCustomerList02',
                 jobParameter: "outputFile=${outputFileName}"
         )
@@ -357,7 +423,7 @@ class TransactionSpec extends Specification {
         customerInputFile << customerIncorrectInputFile.readBytes()
 
         def jobRequest = new JobRequest(
-                jobFilePath: 'META-INF/jobs/ch05/transaction/masterUpdatePerStepJob.xml',
+                jobFilePath: launcher.getBeanDefinitionPath('masterUpdatePerStepJob'),
                 jobName: 'masterUpdatePerStepJob',
                 jobParameter: "branchInputFile=${branchInputFileName} customerInputFile=${customerInputFileName}"
         )
@@ -406,7 +472,7 @@ class TransactionSpec extends Specification {
         inputFile << incorrectInputFile.readBytes()
 
         def jobRequest = new JobRequest(
-                jobFilePath: 'META-INF/jobs/ch05/transaction/masterUpdateChainedTransactionJob.xml',
+                jobFilePath: launcher.getBeanDefinitionPath('masterUpdateChainedTransactionJob'),
                 jobName: 'masterUpdateChainedTransactionJob',
                 jobParameter: "inputFile=${inputFileName}"
         )
@@ -453,7 +519,7 @@ class TransactionSpec extends Specification {
         inputFile << incorrectInputFile.readBytes()
 
         def jobRequest = new JobRequest(
-                jobFilePath: 'META-INF/jobs/ch05/transaction/nonTransactionalResourceEnableTransactionJob.xml',
+                jobFilePath: launcher.getBeanDefinitionPath('nonTransactionalResourceEnableTransactionJob'),
                 jobName: 'nonTransactionalResourceEnableTransactionJob',
                 jobParameter: "inputFile=${inputFileName} outputFile=${outputFileName}"
         )
@@ -491,7 +557,7 @@ class TransactionSpec extends Specification {
         inputFile << incorrectInputFile.readBytes()
 
         def jobRequest = new JobRequest(
-                jobFilePath: 'META-INF/jobs/ch05/transaction/nonTransactionalResourceDisableTransactionJob.xml',
+                jobFilePath: launcher.getBeanDefinitionPath('nonTransactionalResourceDisableTransactionJob'),
                 jobName: 'nonTransactionalResourceDisableTransactionJob',
                 jobParameter: "inputFile=${inputFileName} outputFile=${outputFileName}"
         )

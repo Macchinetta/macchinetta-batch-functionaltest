@@ -16,7 +16,9 @@
 package jp.co.ntt.fw.macchinetta.batch.functionaltest.ch07
 
 import groovy.util.logging.Slf4j
+import jakarta.el.PropertyNotFoundException
 import org.springframework.batch.core.job.AbstractJob
+import org.springframework.core.io.ClassPathResource
 import org.springframework.dao.DuplicateKeyException
 import jp.co.ntt.fw.macchinetta.batch.functionaltest.ch04.jobparameter.RefInXmlTasklet
 import jp.co.ntt.fw.macchinetta.batch.functionaltest.ch08.flowcontrol.ConfirmPromotionalTasklet
@@ -26,6 +28,7 @@ import jp.co.ntt.fw.macchinetta.batch.functionaltest.util.JobRequest
 import jp.co.ntt.fw.macchinetta.batch.functionaltest.util.LogCondition
 import jp.co.ntt.fw.macchinetta.batch.functionaltest.util.MongoUtil
 import spock.lang.Narrative
+import spock.lang.Requires
 import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Unroll
@@ -80,6 +83,7 @@ class SyncJobUsingEmbeddedDBSpec extends Specification {
     }
 
     // 1. Test of JobParameters. JobParameterSpec 4.1.
+    @Requires({ System.getProperty('configurationType') == 'xmlconfig' })
     def "embedded JobParameterSpec Set both job parameters and environment variable with different values, and refer to it in the XML file (bean definition)"() {
         when:
         int exitCode = jobLauncher.syncJob { JobLauncher.SyncJobArg arg ->
@@ -105,7 +109,7 @@ class SyncJobUsingEmbeddedDBSpec extends Specification {
         setup:
         jobDBUnitUtil.deleteAll(["sales_plan_detail"] as String[])
         def jobRequest = new JobRequest(
-                jobFilePath: 'META-INF/jobs/common/jobSalesPlan01.xml',
+                jobFilePath: jobLauncher.getBeanDefinitionPath('jobSalesPlan01'),
                 jobName: 'jobSalesPlan01',
                 jobParameter: 'inputFile=./files/test/input/ch05/transaction/sales_plan_branch_0002_incorrect.csv'
         )
@@ -159,7 +163,7 @@ class SyncJobUsingEmbeddedDBSpec extends Specification {
 
         when:
         int exitCode = jobLauncher.syncJob(new JobRequest(
-                jobFilePath: 'META-INF/jobs/ch05/dbaccess/DBAccessByItemProcessor.xml',
+                jobFilePath: jobLauncher.getBeanDefinitionPath('DBAccessByItemProcessor'),
                 jobName: 'DBAccessByItemProcessor'))
 
         then:
@@ -200,7 +204,7 @@ class SyncJobUsingEmbeddedDBSpec extends Specification {
         def expectAfter = new File("./files/expect/output/ch06/reprocessing/plan_data_on_condition_expect_after_restart.csv")
 
         def jobRequest = new JobRequest(
-                jobFilePath: 'META-INF/jobs/ch06/reprocessing/restartOnConditionBasisJob.xml',
+                jobFilePath: jobLauncher.getBeanDefinitionPath('restartOnConditionBasisJob'),
                 jobName: 'restartOnConditionBasisJob',
                 jobParameter: "outputFile=${outputFileName}"
         )
@@ -316,7 +320,7 @@ class SyncJobUsingEmbeddedDBSpec extends Specification {
         when:
         int actualExitValue = jobLauncher.syncJob(new JobRequest(
                 jobName: 'jobPromotionalFlow',
-                jobFilePath: "META-INF/jobs/ch08/flowcontrol/jobPromotionalFlow.xml"))
+                jobFilePath: jobLauncher.getBeanDefinitionPath('jobPromotionalFlow')))
 
         then: "Test no.1"
         actualExitValue == 0
@@ -331,7 +335,7 @@ class SyncJobUsingEmbeddedDBSpec extends Specification {
         int actualExitValue = jobLauncher.syncJob { JobLauncher.SyncJobArg arg ->
             arg.jobRequest = new JobRequest()
             arg.jobRequest.jobName = 'jobConditionalFlow'
-            arg.jobRequest.jobFilePath = "META-INF/jobs/ch08/flowcontrol/jobConditionalFlow.xml"
+            arg.jobRequest.jobFilePath = jobLauncher.getBeanDefinitionPath('jobConditionalFlow')
             arg.jobRequest.jobParameter = "${jobParameter}"
             arg.sysprop = sysProp
         }
@@ -344,10 +348,8 @@ class SyncJobUsingEmbeddedDBSpec extends Specification {
         expectLog == mongoUtil.findOne(new LogCondition(level: 'ERROR', logger: AbstractJob.class.name, message: 'Encountered fatal error executing job'))?.throwable?.cause?.message
 
         where:
-        flowSequence                                     | jobParameter                                 | sysProp | cleanupTable || exitValue | jobStatus | jobTableRowCount | stepTableRowCount | stepName | stepStatus | exitStatus | expectLog
-        'No.1 normal flow'                               | ''                                           | null    | true         || 0 | ['COMPLETED'] | 1 | 2 | ['jobConditionalFlow.stepA', 'jobConditionalFlow.stepB'] | ['COMPLETED', 'COMPLETED'] | ['COMPLETED', 'COMPLETED'] | null
-        'No.2 step fail and alternative flow'            | 'failExecutionStep=jobConditionalFlow.stepA' | null    | true         || 0 | ['COMPLETED'] | 1 | 2 | ['jobConditionalFlow.stepA', 'jobConditionalFlow.stepC'] | ['ABANDONED', 'COMPLETED'] | ['FAILED', 'COMPLETED'] | null
-        'No.3 abort step because of exit code unmatched' | 'jobConditionalFlow.stepA=DEFAULT'           | null    | true         || 255 | ['FAILED'] | 1 | 1 | ['jobConditionalFlow.stepA'] | ['COMPLETED'] | ['DEFAULT'] | 'Next state not found in flow=jobConditionalFlow for state=jobConditionalFlow.stepA with exit status=DEFAULT'
+        [flowSequence, jobParameter, sysProp, cleanupTable, exitValue, jobStatus, jobTableRowCount, stepTableRowCount, stepName, stepStatus, exitStatus, expectLog]
+                << switchParameterTableForTestCase52()
 
         // delete test No.4, beacause it is not executable
     }
@@ -418,7 +420,7 @@ class SyncJobUsingEmbeddedDBSpec extends Specification {
 
         when:
         def exitValue = jobLauncher.syncJob(new JobRequest(
-                jobFilePath: 'META-INF/jobs/ch08/parallelandmultiple/parallelRegisterJob.xml',
+                jobFilePath: jobLauncher.getBeanDefinitionPath('parallelRegisterJob'),
                 jobName: 'parallelRegisterJob',
                 jobParameter: "planInputFile=${planInputFile} performanceInputFile=${performanceInputFile}"
         ))
@@ -522,7 +524,7 @@ class SyncJobUsingEmbeddedDBSpec extends Specification {
         expect:
         def exitValue = jobLauncher.syncJob { JobLauncher.SyncJobArg arg ->
             arg.jobRequest = new JobRequest(
-                    jobFilePath: 'META-INF/jobs/ch08/parallelandmultiple/multipleInvoiceSummarizeJob.xml',
+                    jobFilePath: jobLauncher.getBeanDefinitionPath('multipleInvoiceSummarizeJob'),
                     jobName: 'multipleInvoiceSummarizeJob'
             )
             arg.env = ["grid.size=0", "thread.size=${threadSize}"] as String[]
@@ -547,6 +549,32 @@ class SyncJobUsingEmbeddedDBSpec extends Specification {
         "divisionNum is equal to threadSize"  | 3           | 3          || true | true | true
         "divisionNum is more than threadSize" | 3           | 4          || true | true | true
     }
+    
+    // Testcase 5-2について、whereブロックのパラメータテーブルを切り替える
+    // 処理内容：
+    // MavenプロファイルがJava Config/XML Configかを判別し、パラメータテーブルを切り替える
+    // 理由:
+    // Java ConfigとXML Configで、テスト結果に差異が発生する
+    def switchParameterTableForTestCase52() {
+        def configurationType = System.getProperty('configurationType')
+        if ("javaconfig".equals(configurationType)) {
+            [
+//                    flowSequence                                                       jobParameter                                                           sysProp            cleanupTable exitValue jobStatus         jobTableRowCount stepTableRowCount stepName                                                 stepStatus                             exitStatus                             expectLog
+                ['No.1 normal flow',                               '',                                           null, true, 0,   ['COMPLETED'], 1, 2, ['jobConditionalFlow.stepA', 'jobConditionalFlow.stepB'],  ['COMPLETED', 'COMPLETED'], ['COMPLETED', 'COMPLETED'], null],
+                ['No.2 step fail and alternative flow',            'failExecutionStep=jobConditionalFlow.stepA', null, true, 0,   ['COMPLETED'], 1, 2, ['jobConditionalFlow.stepA', 'jobConditionalFlow.stepC'],  ['ABANDONED', 'COMPLETED'], ['FAILED', 'COMPLETED'],    null],
+                ['No.3 abort step because of exit code unmatched', 'jobConditionalFlow.stepA=DEFAULT',           null, true, 255, ['FAILED'],    1, 1, ['jobConditionalFlow.stepA'],                              ['COMPLETED'],              ['DEFAULT'],                'Next state not found in flow=jobConditionalFlow for state=jobConditionalFlow.step0 with exit status=DEFAULT']
+            ]
+        } else if ("xmlconfig".equals(configurationType)) {
+            [
+//                    flowSequence                                                       jobParameter                                                           sysProp            cleanupTable exitValue jobStatus         jobTableRowCount stepTableRowCount stepName                                                 stepStatus                             exitStatus                             expectLog
+                ['No.1 normal flow',                               '',                                           null, true, 0,   ['COMPLETED'], 1, 2, ['jobConditionalFlow.stepA', 'jobConditionalFlow.stepB'],  ['COMPLETED', 'COMPLETED'], ['COMPLETED', 'COMPLETED'], null],
+                ['No.2 step fail and alternative flow',            'failExecutionStep=jobConditionalFlow.stepA', null, true, 0,   ['COMPLETED'], 1, 2, ['jobConditionalFlow.stepA', 'jobConditionalFlow.stepC'],  ['ABANDONED', 'COMPLETED'], ['FAILED', 'COMPLETED'],    null],
+                ['No.3 abort step because of exit code unmatched', 'jobConditionalFlow.stepA=DEFAULT',           null, true, 255, ['FAILED'],    1, 1, ['jobConditionalFlow.stepA'],                              ['COMPLETED'],              ['DEFAULT'],                'Next state not found in flow=jobConditionalFlow for state=jobConditionalFlow.stepA with exit status=DEFAULT']
+            ]
+        } else {
+            throw new PropertyNotFoundException("properfy 'configurationType' is not found.")
+        }
+    }
 
     // Specify the profile embedded and start the syncJob
     class UseH2JobLauncher {
@@ -570,6 +598,10 @@ class SyncJobUsingEmbeddedDBSpec extends Specification {
             def syncJobArg = new JobLauncher.SyncJobArg()
             c(syncJobArg)
             syncJob(syncJobArg.jobRequest, syncJobArg.timeout, syncJobArg.timeUnit, syncJobArg.env, syncJobArg.sysprop)
+        }
+        
+        String getBeanDefinitionPath(String key) {
+            delegate.getBeanDefinitionPath(key)
         }
     }
 }

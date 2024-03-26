@@ -160,7 +160,7 @@ class ExclusiveControlSpec extends Specification {
 
         where:
         testcase  | jobFilePath                                                  | jobName              || loggerName
-        "Tasklet" | "META-INF/jobs/ch05/exclusivecontrol/fileLockTaskletJob.xml" | "fileLockTaskletJob" || FileExclusiveTasklet.class.name
+        "Tasklet" | launcher.getBeanDefinitionPath('fileLockTaskletJob') | "fileLockTaskletJob" || FileExclusiveTasklet.class.name
     }
 
     // Testcase 2, test no 1,2,3
@@ -234,9 +234,9 @@ class ExclusiveControlSpec extends Specification {
 
         where:
         testcase  | jobPath                                                                 | jobName                         | assertUpdates || optimisticJobExitValue | lockFailedException
-        "Chunk"   | "META-INF/jobs/ch05/exclusivecontrol/chunkOptimisticLockCheckJob.xml"   | "chunkOptimisticLockCheckJob"   | "false"       || 0                      | null
-        "Chunk"   | "META-INF/jobs/ch05/exclusivecontrol/chunkOptimisticLockCheckJob.xml"   | "chunkOptimisticLockCheckJob"   | "true"        || 255                    | EmptyResultDataAccessException.class
-        "Tasklet" | "META-INF/jobs/ch05/exclusivecontrol/taskletOptimisticLockCheckJob.xml" | "taskletOptimisticLockCheckJob" | "none"        || 0                      | null
+        "Chunk"   | launcher.getBeanDefinitionPath('chunkOptimisticLockCheckJob')   | "chunkOptimisticLockCheckJob"   | "false"       || 0                      | null
+        "Chunk"   | launcher.getBeanDefinitionPath('chunkOptimisticLockCheckJob')   | "chunkOptimisticLockCheckJob"   | "true"        || 255                    | EmptyResultDataAccessException.class
+        "Tasklet" | launcher.getBeanDefinitionPath('taskletOptimisticLockCheckJob') | "taskletOptimisticLockCheckJob" | "none"        || 0                      | null
     }
 
     // Testcase 2, test no 4
@@ -263,7 +263,7 @@ class ExclusiveControlSpec extends Specification {
             sql.firstRow(pessimisticLockSql, ["0001"])
 
             exitValue = launcher.syncJob(new JobRequest(
-                    jobFilePath: 'META-INF/jobs/ch05/exclusivecontrol/chunkPessimisticLockCheckJob.xml',
+                    jobFilePath: launcher.getBeanDefinitionPath('chunkPessimisticLockCheckJob'),
                     jobName: 'chunkPessimisticLockCheckJob',
                     jobParameter: 'identifier=p01 branchName=Tokyo'
             ))
@@ -316,7 +316,7 @@ class ExclusiveControlSpec extends Specification {
 
         when:
         def exitValue = launcher.syncJob(new JobRequest(
-                jobFilePath: 'META-INF/jobs/ch05/exclusivecontrol/chunkPessimisticLockCheckJob.xml',
+                jobFilePath: launcher.getBeanDefinitionPath('chunkPessimisticLockCheckJob'),
                 jobName: 'chunkPessimisticLockCheckJob',
                 jobParameter: 'identifier=p01 branchName=Tokyo'
         ))
@@ -348,7 +348,7 @@ class ExclusiveControlSpec extends Specification {
             sql.firstRow(pessimisticLockSql, ["0001"])
 
             exitValue = launcher.syncJob(new JobRequest(
-                    jobFilePath: 'META-INF/jobs/ch05/exclusivecontrol/taskletPessimisticLockCheckJob.xml',
+                    jobFilePath: launcher.getBeanDefinitionPath('taskletPessimisticLockCheckJob'),
                     jobName: 'taskletPessimisticLockCheckJob',
                     jobParameter: 'branchId=0001 identifier=p01'
             ))
@@ -392,7 +392,7 @@ class ExclusiveControlSpec extends Specification {
 
         when:
         def exitValue = launcher.syncJob(new JobRequest(
-                jobFilePath: 'META-INF/jobs/ch05/exclusivecontrol/taskletPessimisticLockCheckJob.xml',
+                jobFilePath: launcher.getBeanDefinitionPath('taskletPessimisticLockCheckJob'),
                 jobName: 'taskletPessimisticLockCheckJob',
                 jobParameter: 'branchId=0001 identifier=p01'
         ))

@@ -21,7 +21,6 @@ import org.springframework.batch.core.JobParametersInvalidException
 import org.springframework.batch.core.launch.support.CommandLineJobRunner
 import org.springframework.batch.core.step.AbstractStep
 import org.springframework.beans.factory.UnsatisfiedDependencyException
-import org.terasoluna.batch.async.db.AsyncBatchDaemon
 import jp.co.ntt.fw.macchinetta.batch.functionaltest.ch04.jobparameter.AndEnvValRefInJavaTasklet
 import jp.co.ntt.fw.macchinetta.batch.functionaltest.ch04.jobparameter.InvalidDefaultValSettingTasklet
 import jp.co.ntt.fw.macchinetta.batch.functionaltest.ch04.jobparameter.RefInJavaTasklet
@@ -35,6 +34,7 @@ import jp.co.ntt.fw.macchinetta.batch.functionaltest.util.JobRequest
 import jp.co.ntt.fw.macchinetta.batch.functionaltest.util.LogCondition
 import jp.co.ntt.fw.macchinetta.batch.functionaltest.util.MongoUtil
 import spock.lang.Narrative
+import spock.lang.Requires
 import spock.lang.Shared
 import spock.lang.Specification
 
@@ -101,7 +101,7 @@ class JobParameterSpec extends Specification {
 
         def path = "files/test/output/ch04/jobparameter/tmp/CustomerList1.csv"
         def jobRequest = new JobRequest(
-                jobFilePath: 'META-INF/jobs/common/jobCustomerList01.xml',
+                jobFilePath: jobLauncher.getBeanDefinitionPath('jobCustomerList01'),
                 jobName: 'jobCustomerList01',
                 jobParameter: "outputFile=" + path)
 
@@ -174,10 +174,11 @@ class JobParameterSpec extends Specification {
     }
 
     // 2.1
+    @Requires({ System.getProperty('configurationType') == 'xmlconfig' })
     def "Set parameters from the command line and refer to it in the XML file (bean definition)"() {
         when:
         int exitCode = jobLauncher.syncJob(new JobRequest(
-                jobFilePath: 'META-INF/jobs/ch04/jobparameter/jobRefWithDateTypeInXml.xml',
+                jobFilePath: jobLauncher.getBeanDefinitionPath('jobRefWithDateTypeInXml'),
                 jobName: 'jobRefWithDateTypeInXml',
                 jobParameter: "str=Hello num=123 date=2016-01-02_12:34:56"))
 
@@ -195,7 +196,7 @@ class JobParameterSpec extends Specification {
     def "Set parameters from the command line and refer to it in the Java program"() {
         when:
         int exitCode = jobLauncher.syncJob(new JobRequest(
-                jobFilePath: 'META-INF/jobs/ch04/jobparameter/jobRefInJava.xml',
+                jobFilePath: jobLauncher.getBeanDefinitionPath('jobRefInJava'),
                 jobName: 'jobRefInJava',
                 jobParameter: "str=Hello num=123"))
 
@@ -213,7 +214,7 @@ class JobParameterSpec extends Specification {
     def "Set invalid format parameters from the command line and refer to it in the Java program"() {
         when:
         int exitCode = jobLauncher.syncJob(new JobRequest(
-                jobFilePath: 'META-INF/jobs/ch04/jobparameter/jobRefInJava.xml',
+                jobFilePath: jobLauncher.getBeanDefinitionPath('jobRefInJava'),
                 jobName: 'jobRefInJava',
                 jobParameter: "str:Hello num:123"))
 
@@ -244,7 +245,7 @@ num=123
         when:
         def p = new ProcessBuilder("java", "-cp", "target/dependency/*",
                 "org.springframework.batch.core.launch.support.CommandLineJobRunner",
-                "/META-INF/jobs/ch04/jobparameter/jobRefInJava.xml", "jobRefInJava").redirectInput(file).start()
+                jobLauncher.getBeanDefinitionPath('jobRefInJava'), "jobRefInJava").redirectInput(file).start()
         p.consumeProcessOutput(System.out as OutputStream, System.err as OutputStream)
         p.waitFor()
 
@@ -265,7 +266,7 @@ num=123
     def "Set parameters including unreferenced keys from the command line and refer to it in the Java program"() {
         when:
         int exitCode = jobLauncher.syncJob(new JobRequest(
-                jobFilePath: 'META-INF/jobs/ch04/jobparameter/jobRefInJava.xml',
+                jobFilePath: jobLauncher.getBeanDefinitionPath('jobRefInJava'),
                 jobName: 'jobRefInJava',
                 jobParameter: "str=Hello num=123 str2=World"))
 
@@ -283,7 +284,7 @@ num=123
     def "Execute job without specifying required parameters, mandatory error occurs"() {
         when:
         int exitCode = jobLauncher.syncJob(new JobRequest(
-                jobFilePath: 'META-INF/jobs/ch04/jobparameter/jobDefaultJobParametersValidator.xml',
+                jobFilePath: jobLauncher.getBeanDefinitionPath('jobDefaultJobParametersValidator'),
                 jobName: 'jobDefaultJobParametersValidator',
                 jobParameter: "num=123"))
 
@@ -300,31 +301,27 @@ num=123
     }
 
     // 3.2
-    def "Execute job specifying unexpected parameters, invalid parameter error occurs"() {
+    def "Execute job specifying unexpected parameters, job is successful completion"() {
         when:
         int exitCode = jobLauncher.syncJob(new JobRequest(
-                jobFilePath: 'META-INF/jobs/ch04/jobparameter/jobDefaultJobParametersValidator.xml',
+                jobFilePath: jobLauncher.getBeanDefinitionPath('jobDefaultJobParametersValidator'),
                 jobName: 'jobDefaultJobParametersValidator',
                 jobParameter: "str=Hello num=123 str2=World"))
 
         then:
-        exitCode == 255
+        exitCode == 0
         def cursorFindOne = mongoUtil.findOne(
                 new LogCondition(
-                        logger: CommandLineJobRunner.class.name,
-                        level: 'ERROR'
+                        logger: RefWithDefaultInJavaTasklet.class.name
                 ))
-        cursorFindOne.message == 'Job Terminated in error: ' +
-                'The JobParameters contains keys that are not explicitly optional or required: [str2]'
-        cursorFindOne.throwable._class == JobParametersInvalidException
-        cursorFindOne.throwable.message == "The JobParameters contains keys that are not explicitly optional or required: [str2]"
+        cursorFindOne.message == 'str = Hello, num = 123, str2 = World'
     }
 
     // 3.3
     def "Execute job specifying only required parameters, job is successful completion"() {
         when:
         int exitCode = jobLauncher.syncJob(new JobRequest(
-                jobFilePath: 'META-INF/jobs/ch04/jobparameter/jobDefaultJobParametersValidator.xml',
+                jobFilePath: jobLauncher.getBeanDefinitionPath('jobDefaultJobParametersValidator'),
                 jobName: 'jobDefaultJobParametersValidator',
                 jobParameter: "str=Hello"))
 
@@ -342,7 +339,7 @@ num=123
     def "Execute job specifying required parameters and optional parameters, job is successful completion"() {
         when:
         int exitCode = jobLauncher.syncJob(new JobRequest(
-                jobFilePath: 'META-INF/jobs/ch04/jobparameter/jobDefaultJobParametersValidator.xml',
+                jobFilePath: jobLauncher.getBeanDefinitionPath('jobDefaultJobParametersValidator'),
                 jobName: 'jobDefaultJobParametersValidator',
                 jobParameter: "str=Hello num=123"))
 
@@ -360,7 +357,7 @@ num=123
     def "Execute job specifying parameters with incorrect correlation, correlation error occurs"() {
         when:
         int exitCode = jobLauncher.syncJob(new JobRequest(
-                jobFilePath: 'META-INF/jobs/ch04/jobparameter/jobComplexJobParametersValidator.xml',
+                jobFilePath: jobLauncher.getBeanDefinitionPath('jobComplexJobParametersValidator'),
                 jobName: 'jobComplexJobParametersValidator',
                 jobParameter: "str=Hello num=4"))
 
@@ -381,7 +378,7 @@ num=123
     def "Execute job specifying parameters with correct correlation, job is successful completion"() {
         when:
         int exitCode = jobLauncher.syncJob(new JobRequest(
-                jobFilePath: 'META-INF/jobs/ch04/jobparameter/jobComplexJobParametersValidator.xml',
+                jobFilePath: jobLauncher.getBeanDefinitionPath('jobComplexJobParametersValidator'),
                 jobName: 'jobComplexJobParametersValidator',
                 jobParameter: "str=Hello num=5"))
 
@@ -396,6 +393,7 @@ num=123
     }
 
     // 4.1
+    @Requires({ System.getProperty('configurationType') == 'xmlconfig' })
     def "Set both job parameters and environment variable with different values, and refer to it in the XML file (bean definition)"() {
         when:
         int exitCode = jobLauncher.syncJob { JobLauncher.SyncJobArg arg ->
@@ -421,7 +419,7 @@ num=123
         when:
         int exitCode = jobLauncher.syncJob { JobLauncher.SyncJobArg arg ->
             arg.jobRequest = new JobRequest(
-                    jobFilePath: 'META-INF/jobs/ch04/jobparameter/jobAndEnvValRefInJava.xml',
+                    jobFilePath: jobLauncher.getBeanDefinitionPath('jobAndEnvValRefInJava'),
                     jobName: 'jobAndEnvValRefInJava',
                     jobParameter: "num=123")
             arg.env = ['str=Hello']
@@ -438,6 +436,7 @@ num=123
     }
 
     // 4.3
+    @Requires({ System.getProperty('configurationType') == 'xmlconfig' })
     def "Set both job parameters and environment variable with different values, and refer to it in the XML file (bean definition) with specify environment variable as default value"() {
         when:
         int exitCode = jobLauncher.syncJob { JobLauncher.SyncJobArg arg ->
@@ -463,7 +462,7 @@ num=123
         when:
         int exitCode = jobLauncher.syncJob { JobLauncher.SyncJobArg arg ->
             arg.jobRequest = new JobRequest(
-                    jobFilePath: 'META-INF/jobs/ch04/jobparameter/jobRefWithEnvValAsDefaultInJava.xml',
+                    jobFilePath: jobLauncher.getBeanDefinitionPath('jobRefWithEnvValAsDefaultInJava'),
                     jobName: 'jobRefWithEnvValAsDefaultInJava',
                     jobParameter: "str=Hello num=123")
             arg.env = ['envstr=World', 'envnum=456']
@@ -480,6 +479,7 @@ num=123
     }
 
     // 4.5
+    @Requires({ System.getProperty('configurationType') == 'xmlconfig' })
     def "Set environment variable, and refer to it in the XML file (bean definition) with specify environment variable as default value"() {
         when:
         int exitCode = jobLauncher.syncJob { JobLauncher.SyncJobArg arg ->
@@ -504,7 +504,7 @@ num=123
         when:
         int exitCode = jobLauncher.syncJob { JobLauncher.SyncJobArg arg ->
             arg.jobRequest = new JobRequest(
-                    jobFilePath: 'META-INF/jobs/ch04/jobparameter/jobRefWithEnvValAsDefaultInJava.xml',
+                    jobFilePath: jobLauncher.getBeanDefinitionPath('jobRefWithEnvValAsDefaultInJava'),
                     jobName: 'jobRefWithEnvValAsDefaultInJava')
             arg.env = ['envstr=World', 'envnum=456']
         }
@@ -524,7 +524,7 @@ num=123
         when:
         int exitCode = jobLauncher.syncJob { JobLauncher.SyncJobArg arg ->
             arg.jobRequest = new JobRequest(
-                    jobFilePath: 'META-INF/jobs/ch04/jobparameter/jobInvalidDefaultValSetting.xml',
+                    jobFilePath: jobLauncher.getBeanDefinitionPath('jobInvalidDefaultValSetting'),
                     jobName: 'jobInvalidDefaultValSetting')
             arg.env = ['envstr=World']
         }

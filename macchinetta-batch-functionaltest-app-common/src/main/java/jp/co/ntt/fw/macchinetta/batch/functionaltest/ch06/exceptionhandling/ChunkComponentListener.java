@@ -47,7 +47,7 @@ public class ChunkComponentListener extends ItemListenerSupport {
      */
     @Override
     public void afterRead(Object item) {
-        logger.info("Read item: " + item);
+        logger.info("Read item: {}", item);
     }
 
     /**

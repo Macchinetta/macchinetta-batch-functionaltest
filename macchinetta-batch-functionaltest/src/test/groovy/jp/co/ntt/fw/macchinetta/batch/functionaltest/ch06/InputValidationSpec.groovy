@@ -79,7 +79,7 @@ class InputValidationSpec extends Specification {
     def "Perform input check. If an error occurs, throw an input check exception and abort the process."() {
         when:
         int exitCode = jobLauncher.syncJob(new JobRequest(
-                jobFilePath: 'META-INF/jobs/ch06/inputvalidation/jobInputValidationAbort.xml',
+                jobFilePath: jobLauncher.getBeanDefinitionPath('jobInputValidationAbort'),
                 jobName: 'jobInputValidationAbort',
                 jobParameter: "inputFile=files/test/input/ch06/inputvalidation/sales_plan_detail_01.csv"))
 
@@ -121,7 +121,7 @@ class InputValidationSpec extends Specification {
     def "Perform input check using try catch. If an error occurs, throw an input check exception and abort the process."() {
         when:
         int exitCode = jobLauncher.syncJob(new JobRequest(
-                jobFilePath: 'META-INF/jobs/ch06/inputvalidation/jobInputValidationAbortByTryCatch.xml',
+                jobFilePath: jobLauncher.getBeanDefinitionPath('jobInputValidationAbortByTryCatch'),
                 jobName: 'jobInputValidationAbortByTryCatch',
                 jobParameter: "inputFile=files/test/input/ch06/inputvalidation/sales_plan_detail_01.csv"))
 
@@ -164,7 +164,7 @@ class InputValidationSpec extends Specification {
     def "Perform input check. If an error occurs, log output and continue processing."() {
         when:
         int exitCode = jobLauncher.syncJob(new JobRequest(
-                jobFilePath: 'META-INF/jobs/ch06/inputvalidation/jobInputValidationContinue.xml',
+                jobFilePath: jobLauncher.getBeanDefinitionPath('jobInputValidationContinue'),
                 jobName: 'jobInputValidationContinue',
                 jobParameter: "inputFile=files/test/input/ch06/inputvalidation/sales_plan_detail_01.csv"))
 
@@ -225,7 +225,7 @@ class InputValidationSpec extends Specification {
     def "Perfrom input check. If an error occurs, message and log output and continue processing."() {
         when:
         int exitCode = jobLauncher.syncJob(new JobRequest(
-                jobFilePath: 'META-INF/jobs/ch06/inputvalidation/jobInputValidationMessage.xml',
+                jobFilePath: jobLauncher.getBeanDefinitionPath('jobInputValidationMessage'),
                 jobName: 'jobInputValidationMessage',
                 jobParameter: "inputFile=files/test/input/ch06/inputvalidation/sales_plan_detail_01.csv"))
 
@@ -286,7 +286,7 @@ class InputValidationSpec extends Specification {
     def "Perfrom input check. If an error occurs, continue processing and message and log are output at the end"() {
         when:
         int exitCode = jobLauncher.syncJob(new JobRequest(
-                jobFilePath: 'META-INF/jobs/ch06/inputvalidation/jobInputValidationBulkMessage.xml',
+                jobFilePath: jobLauncher.getBeanDefinitionPath('jobInputValidationBulkMessage'),
                 jobName: 'jobInputValidationBulkMessage',
                 jobParameter: "inputFile=files/test/input/ch06/inputvalidation/sales_plan_detail_02.csv"))
 
@@ -358,7 +358,7 @@ class InputValidationSpec extends Specification {
     def "Perfrom input check Tasklet. If an error occurs, continue processing and message and log are output at the end"() {
         when:
         int exitCode = jobLauncher.syncJob(new JobRequest(
-                jobFilePath: 'META-INF/jobs/ch06/inputvalidation/jobInputValidationBulkMessageTask.xml',
+                jobFilePath: jobLauncher.getBeanDefinitionPath('jobInputValidationBulkMessageTask'),
                 jobName: 'jobInputValidationBulkMessageTask',
                 jobParameter: "inputFile=files/test/input/ch06/inputvalidation/sales_plan_detail_02.csv"))
 

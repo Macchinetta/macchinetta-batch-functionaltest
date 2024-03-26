@@ -39,6 +39,8 @@ import jp.co.ntt.fw.macchinetta.batch.functionaltest.app.common.BooleanLatch;
 
 import jakarta.inject.Inject;
 
+import java.util.Properties;
+
 /**
  * Controller for launching jobs and referring job information.
  * <p>
@@ -90,16 +92,25 @@ public class JobController {
         JobOperationResource responseResource = new JobOperationResource();
         responseResource.setJobName(jobName);
         responseResource.setJobParams(jobParams);
+        Properties properties = new Properties();
         if(jobParams == null){
             requestResource.setJobParams("");
         }else {
             // Change the jobParameter's delimiter because of https://github.com/spring-projects/spring-batch/issues/2122
             if (jobParams.contains(",")) {
-                requestResource.setJobParams(jobParams.replace(",", " "));
+                jobParams = jobParams.replace(",", " ");
+                requestResource.setJobParams(jobParams);
+            }
+            if (!jobParams.isEmpty()) {
+                String[] keyValuePairs = jobParams.split(" ");
+                for (String string : keyValuePairs) {
+                    String[] keyValuePair = string.split("=");
+                    properties.setProperty(keyValuePair[0], keyValuePair[1]);
+                }
             }
         }
         try {
-            Long jobExecutionId = jobOperator.start(jobName, requestResource.getJobParams());
+            Long jobExecutionId = jobOperator.start(jobName, properties);
             responseResource.setJobExecutionId(jobExecutionId);
             responseResource.setResultMessage("Job launching task is scheduled.");
             return ResponseEntity.ok().body(responseResource);

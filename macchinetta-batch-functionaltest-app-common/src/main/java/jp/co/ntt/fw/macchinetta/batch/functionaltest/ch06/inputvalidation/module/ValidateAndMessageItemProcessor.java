@@ -17,6 +17,9 @@ package jp.co.ntt.fw.macchinetta.batch.functionaltest.ch06.inputvalidation.modul
 
 import jp.co.ntt.fw.macchinetta.batch.functionaltest.app.model.plan.SalesPlanDetail;
 import jp.co.ntt.fw.macchinetta.batch.functionaltest.ch06.inputvalidation.model.plan.VerificationSalesPlanDetail;
+
+import java.util.Locale;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.item.ItemProcessor;
@@ -57,9 +60,8 @@ public class ValidateAndMessageItemProcessor implements ItemProcessor<Verificati
             BindException errors = (BindException) e.getCause();
 
             for (FieldError fieldError : errors.getFieldErrors()) {
-                logger.warn(messageSource.getMessage(fieldError, null) +
-                                "Skipping item because exception occurred in input validation at the {} th item. [message:{}]",
-                                    item.getCount(), e.getMessage());
+                logger.warn("{}Skipping item because exception occurred in input validation at the {} th item. [message:{}]",
+                        messageSource.getMessage(fieldError, Locale.getDefault()), item.getCount(), e.getMessage());
             }
 
             return null; // skipping item

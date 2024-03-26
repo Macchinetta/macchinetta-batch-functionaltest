@@ -65,7 +65,7 @@ class SyncJobSpec extends Specification {
     def "If set the first and second arguments, the job ends normally."() {
         when:
         int exitCode = jobLauncher.syncJob(new JobRequest(
-                jobFilePath: 'META-INF/jobs/common/jobSimpleJob.xml',
+                jobFilePath: jobLauncher.getBeanDefinitionPath('jobSimpleJob'),
                 jobName: 'jobSimpleJob')
         )
         then:
@@ -77,7 +77,7 @@ class SyncJobSpec extends Specification {
     def "If set only the first argument, the job abends."() {
         when:
         int exitCode = jobLauncher.syncJob(new JobRequest(
-                jobFilePath: 'META-INF/jobs/common/jobSimpleJob.xml',
+                jobFilePath: jobLauncher.getBeanDefinitionPath('jobSimpleJob'),
                 jobName: '')
         )
 
@@ -110,7 +110,7 @@ class SyncJobSpec extends Specification {
     def "If set the first and second argument with -next option, the job ends abnormally."() {
         when:
         int exitCode = jobLauncher.syncJob(new JobRequest(
-                jobFilePath: 'META-INF/jobs/common/jobSimpleJob.xml',
+                jobFilePath: jobLauncher.getBeanDefinitionPath('jobSimpleJob'),
                 jobName: 'jobSimpleJob',
                 jobParameter: '-next')
         )

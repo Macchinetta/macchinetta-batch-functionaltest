@@ -16,6 +16,7 @@
 package jp.co.ntt.fw.macchinetta.batch.functionaltest.ch08
 
 import groovy.util.logging.Slf4j
+import jakarta.el.PropertyNotFoundException
 import org.springframework.batch.core.job.AbstractJob
 import jp.co.ntt.fw.macchinetta.batch.functionaltest.ch08.flowcontrol.ConfirmPromotionalTasklet
 import jp.co.ntt.fw.macchinetta.batch.functionaltest.ch08.flowcontrol.PromotionTargetItemProcessor
@@ -63,8 +64,6 @@ class FlowControlSpec extends Specification {
         mongoUtil.close()
     }
 
-    static final String JOBFILE_ROOT = 'META-INF/jobs/ch08/flowcontrol'
-
     // Testcase 1.
     @Unroll
     def "Test of sequential job flow using 'step' and 'next' attribute. jobName:#jobName fail step target:#failTarget"() {
@@ -89,7 +88,7 @@ class FlowControlSpec extends Specification {
         when:
         int actualExitValue = jobLauncher.syncJob(new JobRequest(
                 jobName: jobName,
-                jobFilePath: "${JOBFILE_ROOT}/jobSequentialFlow.xml",
+                jobFilePath: jobLauncher.getBeanDefinitionPath('jobSequentialFlow'),
                 jobParameter: "${jobParameter}"))
 
         def actualJob = adminDBUnitUtil.getIncludedColumnsTable('batch_job_execution',
@@ -139,7 +138,7 @@ class FlowControlSpec extends Specification {
         int actualExitValue = jobLauncher.syncJob { JobLauncher.SyncJobArg arg ->
             arg.jobRequest = new JobRequest()
             arg.jobRequest.jobName = 'jobConditionalFlow'
-            arg.jobRequest.jobFilePath = "${JOBFILE_ROOT}/jobConditionalFlow.xml"
+            arg.jobRequest.jobFilePath = "${jobLauncher.getBeanDefinitionPath('jobConditionalFlow')}"
             arg.jobRequest.jobParameter = "${jobParameter}"
             arg.sysprop = sysProp
         }
@@ -158,12 +157,8 @@ class FlowControlSpec extends Specification {
         expectLog == mongoUtil.findOne(new LogCondition(level: 'ERROR', logger: AbstractJob.class.name, message: 'Encountered fatal error executing job'))?.throwable?.cause?.message
 
         where:
-        flowSequence                                                        | jobParameter                                                            | sysProp            | cleanupTable || exitValue | jobStatus               |jobTableRowCount | stepTableRowCount | stepName                                                                             | stepStatus                            | exitStatus                              | expectLog
-        'No.1 normal flow'                                                  | ''                                                                      | null               | true         || 0         | ['COMPLETED']           | 1               | 2                 | ['jobConditionalFlow.stepA', 'jobConditionalFlow.stepB']                             | ['COMPLETED', 'COMPLETED' ]           | ['COMPLETED', 'COMPLETED']              | null
-        'No.2 step fail and alternative flow'                               | 'failExecutionStep=jobConditionalFlow.stepA'                            | null               | true         || 0         | ['COMPLETED']           | 1               | 2                 | ['jobConditionalFlow.stepA', 'jobConditionalFlow.stepC']                             | ['ABANDONED', 'COMPLETED' ]           | ['FAILED',    'COMPLETED']              | null
-        'No.3 abort step because of exit code unmatched'                    | 'jobConditionalFlow.stepA=DEFAULT'                                      | null               | true         || 255       | ['FAILED']              | 1               | 1                 | ['jobConditionalFlow.stepA']                                                         | ['COMPLETED' ]                        | ['DEFAULT']                             | 'Next state not found in flow=jobConditionalFlow for state=jobConditionalFlow.stepA with exit status=DEFAULT'
-        'No.4-1 step fail and alternative and fail'                         | 'failExecutionStep=jobConditionalFlow.stepA,jobConditionalFlow.stepC'   | null               | true         || 255       | ['FAILED']              | 1               | 2                 | ['jobConditionalFlow.stepA', 'jobConditionalFlow.stepC']                             | ['ABANDONED', 'FAILED' ]              | ['FAILED',    'FAILED']                 | null
-        'No.4-2 restart and recovery failed step and ignore abandoned one'  | '-restart'                                                              | ['failSkip=true']  | false        || 0         | ['FAILED', 'COMPLETED'] | 2               | 3                 | ['jobConditionalFlow.stepA', 'jobConditionalFlow.stepC', 'jobConditionalFlow.stepC'] | ['ABANDONED', 'FAILED', 'COMPLETED' ] | ['FAILED',    'FAILED', 'COMPLETED']    | null
+        [flowSequence, jobParameter, sysProp, cleanupTable, exitValue, jobStatus, jobTableRowCount, stepTableRowCount, stepName, stepStatus, exitStatus, expectLog]
+                << switchParameterTableForTestCase2()
     }
 
     // Testcase 3.
@@ -191,9 +186,10 @@ class FlowControlSpec extends Specification {
         def expectStep = expectTables.getTable('batch_step_execution')
 
         when:
+        def jobFilePath = jobLauncher.getBeanDefinitionPath('jobStopFlow')
         int actualExitValue = jobLauncher.syncJob(new JobRequest(
                 jobName: 'jobStopFlow',
-                jobFilePath: "${JOBFILE_ROOT}/jobStopFlow.xml",
+                jobFilePath: jobFilePath,
                 jobParameter: "${jobParameter}"))
 
         def actualJob = adminDBUnitUtil.getIncludedColumnsTable('batch_job_execution',
@@ -207,16 +203,79 @@ class FlowControlSpec extends Specification {
         DBUnitUtil.assertEquals(DBUnitUtil.createDynamicTable(expectStep, 0, stepTableRowCount), actualStep)
 
         where:
-        confirm                                                                  | jobParameter                                      | creanupTables || jobTableRowCount | jobStatus                | jobExitStatus                   | exitValue | stepTableRowCount | stepName                                                                             | stepStatus                                           | exitStatus
-        'No.1. Using end element.(undefine exit-code)'                           | 'jobStopFlow.step1=END_WITH_NO_EXIT_CODE'         | true          || 1                | ['COMPLETED', '']        | ['COMPLETED', '']               | 0         | 1                 | ['jobStopFlow.step1', '', '', '']                                                    | ['COMPLETED', '', '', '']                            | ['END_WITH_NO_EXIT_CODE', '', '', '']
-        'No.2. Using end element.(define exit-code)'                             | 'jobStopFlow.step1=END_WITH_EXIT_CODE'            | true          || 1                | ['COMPLETED', '']        | ['COMPLETED_CUSTOM', '']        | 200       | 1                 | ['jobStopFlow.step1', '', '', '']                                                    | ['COMPLETED', '', '', '']                            | ['END_WITH_EXIT_CODE'   , '', '', '']
-        'No.3,6,8. Normal flow(define end, fail and stop element. but non-stop)' | ''                                                | true          || 1                | ['COMPLETED', '']        | ['COMPLETED', '' ]              | 0         | 4                 | ['jobStopFlow.step1', 'jobStopFlow.step2', 'jobStopFlow.step3', 'jobStopFlow.step4'] | ['COMPLETED', 'COMPLETED', 'COMPLETED', 'COMPLETED'] | ['COMPLETED' , 'COMPLETED', 'COMPLETED', 'COMPLETED']
-        'No.4. Using fail element.(undefine exit-code)'                          | 'jobStopFlow.step2=FORCE_FAIL_WITH_NO_EXIT_CODE'  | true          || 1                | ['FAILED', '']           | ['FAILED', '' ]                 | 255       | 2                 | ['jobStopFlow.step1', 'jobStopFlow.step2', '', '']                                   | ['COMPLETED', 'COMPLETED', '', '']                   | ['COMPLETED' , 'FORCE_FAIL_WITH_NO_EXIT_CODE', '', '']
-        'No.5. Using fail element.(define exit-code)'                            | 'jobStopFlow.step2=FORCE_FAIL_WITH_EXIT_CODE'     | true          || 1                | ['FAILED', '']           | ['FAILED_CUSTOM', '']           | 202       | 2                 | ['jobStopFlow.step1', 'jobStopFlow.step2', '', '']                                   | ['COMPLETED', 'COMPLETED', '', '']                   | ['COMPLETED' , 'FORCE_FAIL_WITH_EXIT_CODE', '', '']
-        'No.7-1 Using stop element'                                              | 'jobStopFlow.step3=FORCE_STOP'                    | true          || 1                | ['STOPPED', '']          | ['STOPPED', '']                 | 255       | 3                 | ['jobStopFlow.step1', 'jobStopFlow.step2', 'jobStopFlow.step3', '']                  | ['COMPLETED', 'COMPLETED', 'COMPLETED', '']          | ['COMPLETED' , 'COMPLETED', 'FORCE_STOP', '']
-        'No.7-2 Using stop element(restart)'                                     | '-restart'                                        | false         || 2                | ['STOPPED', 'COMPLETED'] | ['STOPPED', 'COMPLETED']        | 0         | 4                 | ['jobStopFlow.step1', 'jobStopFlow.step2', 'jobStopFlow.step3', 'jobStopFlow.step4'] | ['COMPLETED', 'COMPLETED', 'COMPLETED', 'COMPLETED'] | ['COMPLETED' , 'COMPLETED', 'FORCE_STOP', 'COMPLETED']
-        'No.9-1 TODO can\'t restart @BATCH-2315'                                 | 'jobStopFlow.step3=FORCE_STOP_WITH_EXIT_CODE'     | true          || 1                | ['STOPPED', '']          | ['STOPPED_CUSTOM', '']          | 201       | 3                 | ['jobStopFlow.step1', 'jobStopFlow.step2', 'jobStopFlow.step3', '']                  | ['COMPLETED', 'COMPLETED', 'COMPLETED', '']          | ['COMPLETED' , 'COMPLETED', 'FORCE_STOP_WITH_EXIT_CODE', '']
-        'No.9-2 TODO can\'t restart @BATCH-2315'                                 | '-restart'                                        | false         || 2                | ['STOPPED', 'COMPLETED'] | ['STOPPED_CUSTOM', 'NOOP']      | 0         | 3                 | ['jobStopFlow.step1', 'jobStopFlow.step2', 'jobStopFlow.step3', '']                  | ['COMPLETED', 'COMPLETED', 'COMPLETED', '']          | ['COMPLETED' , 'COMPLETED', 'FORCE_STOP_WITH_EXIT_CODE', '']
+        [confirm, jobParameter, creanupTables, jobTableRowCount, jobStatus, jobExitStatus, exitValue, stepTableRowCount, stepName, stepStatus, exitStatus]
+        << switchParameterTableForTestCase3()
+    }
+
+    // Testcase 2について、whereブロックのパラメータテーブルを切り替える
+    // 処理内容：
+    // MavenプロファイルがJava Config/XML Configかを判別し、パラメータテーブルを切り替える
+    // 理由:
+    // Java ConfigとXML Configで、テスト結果に差異が発生する
+    def switchParameterTableForTestCase2() {
+        def configurationType = System.getProperty('configurationType')
+        if ("javaconfig".equals(configurationType)) {
+            [
+//                flowSequence                                                       jobParameter                                                           sysProp            cleanupTable exitValue jobStatus         jobTableRowCount stepTableRowCount stepName                                                 stepStatus                             exitStatus                             expectLog
+                ['No.1 normal flow',                                                 '',                                                                    null,              true,  0,   ['COMPLETED'],           1, 2, ['jobConditionalFlow.stepA', 'jobConditionalFlow.stepB'],                             ['COMPLETED', 'COMPLETED' ],           ['COMPLETED', 'COMPLETED'],            null],
+                ['No.2 step fail and alternative flow',                              'failExecutionStep=jobConditionalFlow.stepA',                          null,              true,  0,   ['COMPLETED'],           1, 2, ['jobConditionalFlow.stepA', 'jobConditionalFlow.stepC'],                             ['ABANDONED', 'COMPLETED' ],           ['FAILED',    'COMPLETED'],            null],
+                ['No.3 abort step because of exit code unmatched',                   'jobConditionalFlow.stepA=DEFAULT',                                    null,              true,  255, ['FAILED'],              1, 1, ['jobConditionalFlow.stepA'],                                                         ['COMPLETED' ],                        ['DEFAULT'],                           'Next state not found in flow=jobConditionalFlow for state=jobConditionalFlow.step0 with exit status=DEFAULT'],
+                ['No.4-1 step fail and alternative and fail',                        'failExecutionStep=jobConditionalFlow.stepA,jobConditionalFlow.stepC', null,              true,  255, ['FAILED'],              1, 2, ['jobConditionalFlow.stepA', 'jobConditionalFlow.stepC'],                             ['ABANDONED', 'FAILED' ],              ['FAILED',    'FAILED'],               null],
+                ['No.4-2 restart and recovery failed step and ignore abandoned one', '-restart',                                                            ['failSkip=true'], false, 0,   ['FAILED', 'COMPLETED'], 2, 3, ['jobConditionalFlow.stepA', 'jobConditionalFlow.stepC', 'jobConditionalFlow.stepC'], ['ABANDONED', 'FAILED', 'COMPLETED' ], ['FAILED',    'FAILED',  'COMPLETED'], null]
+            ]
+        } else if ("xmlconfig".equals(configurationType)) {
+            [
+//                flowSequence                                                       jobParameter                                                           sysProp            cleanupTable exitValue jobStatus         jobTableRowCount stepTableRowCount stepName                                                 stepStatus                             exitStatus                             expectLog
+                ['No.1 normal flow',                                                 '',                                                                    null,              true,  0,   ['COMPLETED'],           1, 2, ['jobConditionalFlow.stepA', 'jobConditionalFlow.stepB'],                             ['COMPLETED', 'COMPLETED' ],           ['COMPLETED', 'COMPLETED'],            null],
+                ['No.2 step fail and alternative flow',                              'failExecutionStep=jobConditionalFlow.stepA',                          null,              true,  0,   ['COMPLETED'],           1, 2, ['jobConditionalFlow.stepA', 'jobConditionalFlow.stepC'],                             ['ABANDONED', 'COMPLETED' ],           ['FAILED',    'COMPLETED'],            null],
+                ['No.3 abort step because of exit code unmatched',                   'jobConditionalFlow.stepA=DEFAULT',                                    null,              true,  255, ['FAILED'],              1, 1, ['jobConditionalFlow.stepA'],                                                         ['COMPLETED' ],                        ['DEFAULT'],                           'Next state not found in flow=jobConditionalFlow for state=jobConditionalFlow.stepA with exit status=DEFAULT'],
+                ['No.4-1 step fail and alternative and fail',                        'failExecutionStep=jobConditionalFlow.stepA,jobConditionalFlow.stepC', null,              true,  255, ['FAILED'],              1, 2, ['jobConditionalFlow.stepA', 'jobConditionalFlow.stepC'],                             ['ABANDONED', 'FAILED' ],              ['FAILED',    'FAILED'],               null],
+                ['No.4-2 restart and recovery failed step and ignore abandoned one', '-restart',                                                            ['failSkip=true'], false, 0,   ['FAILED', 'COMPLETED'], 2, 3, ['jobConditionalFlow.stepA', 'jobConditionalFlow.stepC', 'jobConditionalFlow.stepC'], ['ABANDONED', 'FAILED', 'COMPLETED' ], ['FAILED',    'FAILED',  'COMPLETED'], null]
+            ]
+        } else {
+            throw new PropertyNotFoundException("properfy 'configurationType' is not found.")
+        }
+    }
+
+    // Testcase 3について、whereブロックのパラメータテーブルを切り替える
+    // 処理内容：
+    // MavenプロファイルがJava Config/XML Configかを判別し、パラメータテーブルを切り替える
+    // 理由:
+    // Java ConfigとXML Configで、テスト結果に差異が発生する（BATCH-2315問題が起因）
+    // BATCH-2315問題はXML Config固有であり、Java Configにおいては発生しない
+    def switchParameterTableForTestCase3() {
+        def configurationType = System.getProperty('configurationType')
+        if ("javaconfig".equals(configurationType)) {
+            [
+//                  confirm,                                                                    jobParameter,                              creanupTables,   jobTableRowCount, jobStatus,    jobExitStatus,              exitValue,      stepTableRowCount, stepName,                                                                stepStatus,                                             exitStatus]
+                ['No.1. Using end element.(undefine exit-code)',                            'jobStopFlow.step1=END_WITH_NO_EXIT_CODE',          true,   1,  ['COMPLETED', ''],          ['COMPLETED', ''],                  0,      1,  ['jobStopFlow.step1', '', '', ''],                                                      ['COMPLETED', '', '', ''],                              ['END_WITH_NO_EXIT_CODE', '', '', '']],
+                ['No.2. Using end element.(define exit-code)',                              'jobStopFlow.step1=END_WITH_EXIT_CODE',             true,   1,  ['COMPLETED', ''],          ['COMPLETED_CUSTOM', ''],           200,    1,  ['jobStopFlow.step1', '', '', ''],                                                      ['COMPLETED', '', '', ''],                              ['END_WITH_EXIT_CODE'   , '', '', '']],
+                ['No.3,6,8. Normal flow(define end, fail and stop element. but non-stop)',  '',                                                 true,   1,  ['COMPLETED', ''],          ['COMPLETED', '' ],                 0,      4,  ['jobStopFlow.step1', 'jobStopFlow.step2', 'jobStopFlow.step3', 'jobStopFlow.step4'],   ['COMPLETED', 'COMPLETED', 'COMPLETED', 'COMPLETED'],   ['COMPLETED' , 'COMPLETED', 'COMPLETED', 'COMPLETED']],
+                ['No.4. Using fail element.(undefine exit-code)',                           'jobStopFlow.step2=FORCE_FAIL_WITH_NO_EXIT_CODE',   true,   1,  ['FAILED', ''],             ['FAILED', '' ],                    255,    2,  ['jobStopFlow.step1', 'jobStopFlow.step2', '', ''],                                     ['COMPLETED', 'COMPLETED', '', ''],                     ['COMPLETED' , 'FORCE_FAIL_WITH_NO_EXIT_CODE', '', '']],
+                ['No.5. Using fail element.(define exit-code)',                             'jobStopFlow.step2=FORCE_FAIL_WITH_EXIT_CODE',      true,   1,  ['FAILED', ''],             ['FAILED_CUSTOM', ''],              202,    2,  ['jobStopFlow.step1', 'jobStopFlow.step2', '', ''],                                     ['COMPLETED', 'COMPLETED', '', ''],                     ['COMPLETED' , 'FORCE_FAIL_WITH_EXIT_CODE', '', '']],
+                ['No.7-1 Using stop element',                                               'jobStopFlow.step3=FORCE_STOP',                     true,   1,  ['STOPPED', ''],            ['STOPPED', ''],                    255 ,   3,  ['jobStopFlow.step1', 'jobStopFlow.step2', 'jobStopFlow.step3', ''],                    ['COMPLETED', 'COMPLETED', 'COMPLETED', ''],            ['COMPLETED' , 'COMPLETED', 'FORCE_STOP', '']],
+                ['No.7-2 Using stop element(restart)',                                      '-restart',                                         false,  2,  ['STOPPED', 'COMPLETED'],   ['STOPPED', 'COMPLETED'],           0,      4,  ['jobStopFlow.step1', 'jobStopFlow.step2', 'jobStopFlow.step3', 'jobStopFlow.step4'],   ['COMPLETED', 'COMPLETED', 'COMPLETED', 'COMPLETED'],   ['COMPLETED' , 'COMPLETED', 'FORCE_STOP', 'COMPLETED']],
+                // TODO : 以下、BATCH-2315問題は発生しないため、ジョブ（リスタート）が成功することを検証する
+                ['No.9-1 can restart',                                                      'jobStopFlow.step3=FORCE_STOP_WITH_EXIT_CODE',      true,   1,  ['STOPPED', ''],            ['STOPPED_CUSTOM', ''],             201,    3,  ['jobStopFlow.step1', 'jobStopFlow.step2', 'jobStopFlow.step3', ''],                    ['COMPLETED', 'COMPLETED', 'COMPLETED', ''],            ['COMPLETED' , 'COMPLETED', 'FORCE_STOP_WITH_EXIT_CODE', '']],
+                ['No.9-2 can restart',                                                      '-restart',                                         false,  2,  ['STOPPED', 'COMPLETED'],   ['STOPPED_CUSTOM', 'COMPLETED'],    0,      4,  ['jobStopFlow.step1', 'jobStopFlow.step2', 'jobStopFlow.step3', 'jobStopFlow.step4'],   ['COMPLETED', 'COMPLETED', 'COMPLETED', 'COMPLETED'],   ['COMPLETED' , 'COMPLETED', 'FORCE_STOP_WITH_EXIT_CODE', 'COMPLETED']]
+            ]
+        } else if ("xmlconfig".equals(configurationType)) {
+            [
+//                  confirm,                                                                    jobParameter,                              creanupTables,   jobTableRowCount, jobStatus,    jobExitStatus,      exitValue,      stepTableRowCount, stepName,                                                                stepStatus,                                             exitStatus]
+                    ['No.1. Using end element.(undefine exit-code)',                            'jobStopFlow.step1=END_WITH_NO_EXIT_CODE',          true,   1,  ['COMPLETED', ''],          ['COMPLETED', ''],          0,      1,  ['jobStopFlow.step1', '', '', ''],                                                      ['COMPLETED', '', '', ''],                              ['END_WITH_NO_EXIT_CODE', '', '', '']],
+                    ['No.2. Using end element.(define exit-code)',                              'jobStopFlow.step1=END_WITH_EXIT_CODE',             true,   1,  ['COMPLETED', ''],          ['COMPLETED_CUSTOM', ''],   200,    1,  ['jobStopFlow.step1', '', '', ''],                                                      ['COMPLETED', '', '', ''],                              ['END_WITH_EXIT_CODE'   , '', '', '']],
+                    ['No.3,6,8. Normal flow(define end, fail and stop element. but non-stop)',  '',                                                 true,   1,  ['COMPLETED', ''],          ['COMPLETED', '' ],         0,      4,  ['jobStopFlow.step1', 'jobStopFlow.step2', 'jobStopFlow.step3', 'jobStopFlow.step4'],   ['COMPLETED', 'COMPLETED', 'COMPLETED', 'COMPLETED'],   ['COMPLETED' , 'COMPLETED', 'COMPLETED', 'COMPLETED']],
+                    ['No.4. Using fail element.(undefine exit-code)',                           'jobStopFlow.step2=FORCE_FAIL_WITH_NO_EXIT_CODE',   true,   1,  ['FAILED', ''],             ['FAILED', '' ],            255,    2,  ['jobStopFlow.step1', 'jobStopFlow.step2', '', ''],                                     ['COMPLETED', 'COMPLETED', '', ''],                     ['COMPLETED' , 'FORCE_FAIL_WITH_NO_EXIT_CODE', '', '']],
+                    ['No.5. Using fail element.(define exit-code)',                             'jobStopFlow.step2=FORCE_FAIL_WITH_EXIT_CODE',      true,   1,  ['FAILED', ''],             ['FAILED_CUSTOM', ''],      202,    2,  ['jobStopFlow.step1', 'jobStopFlow.step2', '', ''],                                     ['COMPLETED', 'COMPLETED', '', ''],                     ['COMPLETED' , 'FORCE_FAIL_WITH_EXIT_CODE', '', '']],
+                    ['No.7-1 Using stop element',                                               'jobStopFlow.step3=FORCE_STOP',                     true,   1,  ['STOPPED', ''],            ['STOPPED', ''],            255 ,   3,  ['jobStopFlow.step1', 'jobStopFlow.step2', 'jobStopFlow.step3', ''],                    ['COMPLETED', 'COMPLETED', 'COMPLETED', ''],            ['COMPLETED' , 'COMPLETED', 'FORCE_STOP', '']],
+                    ['No.7-2 Using stop element(restart)',                                      '-restart',                                         false,  2,  ['STOPPED', 'COMPLETED'],   ['STOPPED', 'COMPLETED'],   0,      4,  ['jobStopFlow.step1', 'jobStopFlow.step2', 'jobStopFlow.step3', 'jobStopFlow.step4'],   ['COMPLETED', 'COMPLETED', 'COMPLETED', 'COMPLETED'],   ['COMPLETED' , 'COMPLETED', 'FORCE_STOP', 'COMPLETED']],
+                    // TODO : 以下、BATCH-2315問題が起因で、ジョブ（リスタート）が失敗することを検証する
+                    ['No.9-1 TODO can\'t restart @BATCH-2315',                                  'jobStopFlow.step3=FORCE_STOP_WITH_EXIT_CODE',      true,   1,  ['STOPPED', ''],            ['STOPPED_CUSTOM', ''],     201,    3,  ['jobStopFlow.step1', 'jobStopFlow.step2', 'jobStopFlow.step3', ''],                    ['COMPLETED', 'COMPLETED', 'COMPLETED', ''],            ['COMPLETED' , 'COMPLETED', 'FORCE_STOP_WITH_EXIT_CODE', '']],
+                    ['No.9-2 TODO can\'t restart @BATCH-2315',                                  '-restart',                                         false,  2,  ['STOPPED', 'COMPLETED'],   ['STOPPED_CUSTOM', 'NOOP'], 0,      3,  ['jobStopFlow.step1', 'jobStopFlow.step2', 'jobStopFlow.step3', ''],                    ['COMPLETED', 'COMPLETED', 'COMPLETED', ''],            ['COMPLETED' , 'COMPLETED', 'FORCE_STOP_WITH_EXIT_CODE', '']]
+            ]
+        } else {
+            throw new PropertyNotFoundException("properfy 'configurationType' is not found.")
+        }
     }
 
     // Testcase 4.
@@ -228,7 +287,7 @@ class FlowControlSpec extends Specification {
         when:
         int actualExitValue = jobLauncher.syncJob(new JobRequest(
                 jobName: jobName,
-                jobFilePath: "${JOBFILE_ROOT}/${jobName}.xml"))
+                jobFilePath: jobLauncher.getBeanDefinitionPath("${jobName}")))
 
         then:
         actualExitValue == 0

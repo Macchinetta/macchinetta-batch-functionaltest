@@ -38,7 +38,8 @@ public class AsyncBatchDaemonCustomizedRepositoryConfig {
     public MapperFactoryBean<CustomizedBatchJobRequestRepository> batchJobRequestRepository(
             @Qualifier("adminSqlSessionFactory") SqlSessionFactory adminSqlSessionFactory) {
         final MapperFactoryBean<CustomizedBatchJobRequestRepository> mapperFactoryBean = new MapperFactoryBean<>();
-        mapperFactoryBean.setMapperInterface(CustomizedBatchJobRequestRepository.class);
+        mapperFactoryBean.setMapperInterface(
+                CustomizedBatchJobRequestRepository.class);
         mapperFactoryBean.setSqlSessionFactory(adminSqlSessionFactory);
         return mapperFactoryBean;
     }

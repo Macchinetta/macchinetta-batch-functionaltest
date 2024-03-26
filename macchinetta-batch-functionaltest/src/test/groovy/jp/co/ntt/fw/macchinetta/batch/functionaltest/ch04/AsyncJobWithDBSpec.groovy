@@ -585,7 +585,7 @@ class AsyncJobWithDBSpec extends Specification {
 
         // Restart job
         def exitValue = launcher.syncJob(new JobRequest(
-                jobFilePath: 'META-INF/jobs/common/jobSalesPerformance01.xml',
+                jobFilePath: launcher.getBeanDefinitionPath('jobSalesPerformance01'),
                 jobName: jobExecutionId,
                 jobParameter: '-restart'
         ))
@@ -674,7 +674,7 @@ class AsyncJobWithDBSpec extends Specification {
         ))
 
         def exitValue = launcher.syncJob(new JobRequest(
-                jobFilePath: 'META-INF/jobs/ch04/asyncjobwithdb/asyncJobEmulateLongProcessing.xml',
+                jobFilePath: launcher.getBeanDefinitionPath('asyncJobEmulateLongProcessing'),
                 jobName: runningJobExecutionId,
                 jobParameter: '-stop'
         ))

@@ -49,7 +49,7 @@ public class LoggingItemWriter implements ItemWriter<Object> {
         String currentThreadName =  Thread.currentThread().getName();
 
         for (Object item : items) {
-            logger.debug(String.format("Item Writer [%s] %s", currentThreadName, item));
+            logger.debug("Item Writer [{}] {}", currentThreadName, item);
         }
 
     }

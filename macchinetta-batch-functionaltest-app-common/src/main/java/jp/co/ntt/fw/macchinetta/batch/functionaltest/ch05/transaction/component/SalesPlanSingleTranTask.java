@@ -76,7 +76,7 @@ public class SalesPlanSingleTranTask implements Tasklet {
 
             while ((item = itemReader.read()) != null) {
 
-                logger.info("Read item: " + item.toString());
+                logger.info("Read item: {}", item);
                 repository.create(item);
             }
         } catch (Exception e) {

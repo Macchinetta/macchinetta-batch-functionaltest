@@ -38,8 +38,8 @@
           p:statementId="jp.co.ntt.fw.macchinetta.batch.functionaltest.app.repository.performance.SalesPerformanceDetailRepository.create"
           p:sqlSessionTemplate-ref="batchModeSqlSessionTemplate"/>
 
-    <batch:job id="jobSalesPerfTaskWithSkip" job-repository="jobRepository">
-        <batch:step id="jobSalesPerfTaskWithSkip.step01">
+    <batch:job id="jobSalesPerfTaskletWithSkip" job-repository="jobRepository">
+        <batch:step id="jobSalesPerfTaskletWithSkip.step01">
             <batch:tasklet ref="salesPerformanceWithSkipTasklet" transaction-manager="jobTransactionManager"/>
         </batch:step>
         <batch:listeners>
