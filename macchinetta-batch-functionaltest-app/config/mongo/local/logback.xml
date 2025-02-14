@@ -34,19 +34,12 @@
 
     <logger name="org.terasoluna.batch" level="TRACE"/>
     <logger name="jp.co.ntt.fw.macchinetta.batch" level="TRACE"/>
-
     <logger name="org.springframework" level="INFO" />
     <logger name="org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler" level="DEBUG" />
     <logger name="org.mybatis.spring" level="INFO" />
 
-    <logger name="org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler" level="DEBUG">
-        <appender-ref ref="consoleLog" />
-    </logger>
-    <logger name="org.mybatis.spring" level="INFO">
-        <appender-ref ref="consoleLog" />
-    </logger>
-
     <root level="INFO">
+        <appender-ref ref="consoleLog" />
         <appender-ref ref="fileLog" />
         <appender-ref ref="mongo" />
     </root>

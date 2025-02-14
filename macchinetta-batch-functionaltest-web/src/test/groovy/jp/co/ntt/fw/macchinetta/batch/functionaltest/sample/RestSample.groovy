@@ -43,7 +43,8 @@ class RestSample {
 
         // case3. get and response processing with GDK only
         def url = "http://macchinetta-ci:10100/view/batch5/api/json"
-        def json = new URL(url).getText("UTF-8")
+        JdkCompatibleUrl jdkCompatibleUrl = new JdkCompatibleUrl();
+        def json = jdkCompatibleUrl.createUrl(url).getText("UTF-8")
         new JsonSlurper().parseText(json).jobs.each {
             println "\"${it.name}\", \"${it.color}\""
         }

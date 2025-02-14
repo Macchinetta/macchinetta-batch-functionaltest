@@ -25,6 +25,6 @@ import org.springframework.batch.item.file.ResourceSuffixCreator;
 public class CustomerListResourceSuffixCreator implements ResourceSuffixCreator {
     @Override
     public String getSuffix(int index) {
-        return String.format("%02d", index) + ".csv";
+        return String.format("%02d.csv", index);
     }
 }

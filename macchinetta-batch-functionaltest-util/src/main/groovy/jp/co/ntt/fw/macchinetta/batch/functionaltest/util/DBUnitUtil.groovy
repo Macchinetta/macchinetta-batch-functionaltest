@@ -28,7 +28,6 @@ import org.dbunit.dataset.ITable
 import org.dbunit.dataset.ReplacementDataSet
 import org.dbunit.dataset.filter.DefaultColumnFilter
 import org.dbunit.dataset.xml.FlatXmlDataSetBuilder
-import org.dbunit.ext.oracle.Oracle10DataTypeFactory
 import org.dbunit.ext.postgresql.PostgresqlDataTypeFactory
 import org.dbunit.operation.DatabaseOperation
 import org.dbunit.util.fileloader.CsvDataFileLoader
@@ -65,8 +64,6 @@ class DBUnitUtil {
         conn = new DatabaseDataSourceConnection(ds, conf.schema as String)
         if (conf.driver.contains('postgresql')) {
             conn.getConfig().setProperty(DatabaseConfig.PROPERTY_DATATYPE_FACTORY, new PostgresqlDataTypeFactory())
-        } else if (conf.driver.contains('oracle')) {
-            conn.getConfig().setProperty(DatabaseConfig.PROPERTY_DATATYPE_FACTORY, new Oracle10DataTypeFactory())
         }
         tables = conf.tables
         dropSqlFilePaths = conf.dropSqlFilePaths

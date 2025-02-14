@@ -1,10 +1,10 @@
-= 同期実行の際にJobRepositoryはH2、業務データは外部DB(PostgreSQL,Oracle等)を使用した場合の機能試験
+= 同期実行の際にJobRepositoryはH2、業務データは外部DB(PostgreSQL等)を使用した場合の機能試験
 :table-caption!:
 :icons: font
 
 == テストケース
 
-同期実行の際にJobRepositoryはH2、業務データは外部DB(PostgreSQL,Oracle等)を使用した場合に各機能が期待通り動作することを確認する。
+同期実行の際にJobRepositoryはH2、業務データは外部DB(PostgreSQL等)を使用した場合に各機能が期待通り動作することを確認する。
 
 テストケースクラス：jp.co.ntt.fw.macchinetta.batch.functionaltest.ch07.SyncJobUsingEmbeddedDBSpec
 

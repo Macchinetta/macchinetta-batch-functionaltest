@@ -368,7 +368,7 @@ class AsyncJobWithDBSpec extends Specification {
     }
 
     // Testcase 1.4, test no.3
-    @IgnoreIf({ os.windows })
+    @Requires({ os.linux })
     def "The asynchronous daemon is normally stopped when send signal SIGINT"() {
         setup:
         def command = "sh scripts/ch04/asyncjobwithdb/send_sigint_async_batch_daemon.sh"

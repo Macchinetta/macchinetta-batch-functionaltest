@@ -33,8 +33,7 @@
           c:automaticJobRegistrar-ref="automaticJobRegistrar" />
 
     <bean id="adminSqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean"
-          p:dataSource-ref="adminDataSource"
-          p:databaseIdProvider-ref="databaseIdProvider">
+          p:dataSource-ref="adminDataSource">
         <property name="configuration">
             <bean class="org.apache.ibatis.session.Configuration"
                   p:localCacheScope="STATEMENT"
@@ -68,13 +67,4 @@
 
     <bean class="org.springframework.batch.core.configuration.support.JobRegistryBeanPostProcessor"
         p:jobRegistry-ref="jobRegistry" />
-
-    <bean id="databaseIdProvider" class="org.apache.ibatis.mapping.VendorDatabaseIdProvider">
-        <property name="properties">
-            <props>
-                <prop key="Oracle">oracle</prop>
-            </props>
-        </property>
-    </bean>
-
 </beans>

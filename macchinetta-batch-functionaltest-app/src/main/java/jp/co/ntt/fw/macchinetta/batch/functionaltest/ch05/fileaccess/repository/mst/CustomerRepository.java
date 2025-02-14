@@ -15,7 +15,7 @@
  */
 package jp.co.ntt.fw.macchinetta.batch.functionaltest.ch05.fileaccess.repository.mst;
 
-import jp.co.ntt.fw.macchinetta.batch.functionaltest.app.model.mst.Customer;
+import jp.co.ntt.fw.macchinetta.batch.functionaltest.ch05.fileaccess.model.mst.CustomerToJaxb;
 import org.apache.ibatis.cursor.Cursor;
 
 /**
@@ -29,5 +29,5 @@ public interface CustomerRepository {
      *
      * @return Cursor for customer master data.
      */
-    Cursor<Customer> findAll();
+    Cursor<CustomerToJaxb> findAll();
 }

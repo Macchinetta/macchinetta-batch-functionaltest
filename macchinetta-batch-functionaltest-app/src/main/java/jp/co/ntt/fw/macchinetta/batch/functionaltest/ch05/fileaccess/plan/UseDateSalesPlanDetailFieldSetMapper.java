@@ -29,7 +29,6 @@ import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Locale;
 
 /**
  * Filed set mapper for sales plan detail.
@@ -63,7 +62,7 @@ public class UseDateSalesPlanDetailFieldSetMapper implements FieldSetMapper<UseD
 
         item.setBranchId(fieldSet.readString("branchId"));
 
-        DateFormat japaneseFormat = new SimpleDateFormat("GGGGy年M月d日", new Locale("ja", "JP", "JP"));
+        DateFormat japaneseFormat = new SimpleDateFormat("yyyy年M月d日");
         try {
             item.setDate(japaneseFormat.parse(fieldSet.readString("date")));
         } catch (ParseException e) {

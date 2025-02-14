@@ -25,6 +25,7 @@ import org.terasoluna.batch.async.db.AsyncBatchDaemon
 import java.nio.file.Files
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeoutException
+import java.util.stream.Stream
 
 /**
  * CAUTION: If you use APIs in IDE:
@@ -60,6 +61,8 @@ class JobLauncher {
 
     static final REMOTE_DEBUG_PROPERTY = 'JobLauncher.remoteDebug'
 
+    static final  CONSOLE_LOG_LEVEL = System.getenv("CONSOLE_LOG_LEVEL")
+
     /**
      * Execute job synchronously.
      *
@@ -72,7 +75,7 @@ class JobLauncher {
      * @throws TimeoutException if exceeds timeout(only positive).
      */
     int syncJob(JobRequest jobRequest, long timeout = 600 * 1000L, TimeUnit timeUnit = TimeUnit.MILLISECONDS,
-                String[] env = [], String[] sysprop = []) {
+                String[] env = null, String[] sysprop = []) {
         assert jobRequest != null
         assert jobRequest.jobName != null
 
@@ -132,7 +135,7 @@ class JobLauncher {
         JobRequest jobRequest
         long timeout = 120 * 1000L
         TimeUnit timeUnit = TimeUnit.MILLISECONDS
-        String[] env = []
+        String[] env = null
         String[] sysprop = []
     }
 
@@ -224,7 +227,12 @@ class JobLauncher {
 
     synchronized static Process executeProcess(String command, String[] env = null, File workingPath = null) {
         log.debug("*** start ext-process. [command:{}] [env:{}] [workingPath:{}]", command, env, workingPath)
-        def p = command.execute(env, workingPath)
+        String[] envNew = null;
+        if (env != null) {
+            envNew = Stream.concat(Arrays.stream(env), Stream.of("CONSOLE_LOG_LEVEL=${CONSOLE_LOG_LEVEL}"))
+                    .toArray()
+        }
+        def p = command.execute(envNew, workingPath)
         p.consumeProcessOutput(System.out as OutputStream, System.err as OutputStream)
         p
     }

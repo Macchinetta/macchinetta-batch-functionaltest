@@ -3,7 +3,7 @@ CREATE TABLE IF NOT EXISTS sales_plan_summary (
     year    integer ,
     month   integer ,
     amount  numeric(10) NOT NULL,
-    CONSTRAINT pk_salples_plan_summary PRIMARY KEY (branch_id, year, month)
+    CONSTRAINT pk_sales_plan_summary PRIMARY KEY (branch_id, year, month)
 );
 
 CREATE TABLE IF NOT EXISTS sales_plan_detail (
@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS sales_plan_detail (
     month   integer ,
     customer_id varchar(10),
     amount  numeric(10) NOT NULL,
-    CONSTRAINT pk_salples_plan_detail PRIMARY KEY (branch_id, year, month, customer_id)
+    CONSTRAINT pk_sales_plan_detail PRIMARY KEY (branch_id, year, month, customer_id)
 );
 
 CREATE TABLE IF NOT EXISTS sales_performance_summary (
@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS sales_performance_summary (
     year    integer ,
     month   integer ,
     amount  numeric(10) NOT NULL,
-    CONSTRAINT pk_salples_performance_summary PRIMARY KEY (branch_id, year, month)
+    CONSTRAINT pk_sales_performance_summary PRIMARY KEY (branch_id, year, month)
 );
 
 CREATE TABLE IF NOT EXISTS sales_performance_detail (
@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS sales_performance_detail (
     month   integer ,
     customer_id varchar(10),
     amount  numeric(10) NOT NULL,
-    CONSTRAINT pk_salples_performance_detail PRIMARY KEY (branch_id, year, month, customer_id)
+    CONSTRAINT pk_sales_performance_detail PRIMARY KEY (branch_id, year, month, customer_id)
 );
 
 CREATE TABLE IF NOT EXISTS invoice (

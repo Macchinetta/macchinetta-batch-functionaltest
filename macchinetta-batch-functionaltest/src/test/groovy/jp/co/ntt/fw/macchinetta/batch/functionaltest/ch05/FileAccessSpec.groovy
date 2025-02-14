@@ -250,10 +250,10 @@ class FileAccessSpec extends Specification {
                 ))
         cursorFind1.size() == 3
 
-        cursorFind1.any{ it.message == "FieldSet : {branchId='000001', date='平成28年1月1日', customerId='0000000001', amount='1,000,000,000'}" }
-        cursorFind1.any{ it.message == """FieldSet : {branchId='00,002', date='平成29年2月2日', customerId='000
+        cursorFind1.any{ it.message == "FieldSet : {branchId='000001', date='2016年1月1日', customerId='0000000001', amount='1,000,000,000'}" }
+        cursorFind1.any{ it.message == """FieldSet : {branchId='00,002', date='2017年2月2日', customerId='000
 000002', amount='2,000,000,000'}""" }
-        cursorFind1.any{ it.message == "FieldSet : {branchId='000003', date='平成30年3月3日', customerId='0000\"00003', amount='3,000,000,000'}" }
+        cursorFind1.any{ it.message == "FieldSet : {branchId='000003', date='2018年3月3日', customerId='0000\"00003', amount='3,000,000,000'}" }
 
         def cursorFind2 = mongoUtil.find(
                 new LogCondition(
@@ -288,7 +288,7 @@ class FileAccessSpec extends Specification {
         throwableCursor.message == "Exception occurred while reading."
 
         throwableCursor.throwable._class == FlatFileParseException
-        throwableCursor.throwable.message == "Parsing error at line: 1 in resource=[URL [file:files/test/input/ch05/fileaccess/sales_plan_detail_06.csv]], input=[000001,\"平成28年1月1日\",\"0000000001\",\"1000000000\"]"
+        throwableCursor.throwable.message == "Parsing error at line: 1 in resource=[URL [file:files/test/input/ch05/fileaccess/sales_plan_detail_06.csv]], input=[000001,\"2016年1月1日\",\"0000000001\",\"1000000000\"]"
         throwableCursor.throwable.stackTrace.size() > 0
 
         throwableCursor.throwable.cause._class == BindException
@@ -717,6 +717,7 @@ class FileAccessSpec extends Specification {
     }
 
     // 4.3
+    @Requires({ os.linux })
     def "Read CSV file skipping header and footer record using shell script."() {
         setup:
         def script = "scripts/ch05/fileaccess/delete_header_and_footer.sh"
@@ -801,6 +802,7 @@ class FileAccessSpec extends Specification {
     }
 
     // 4.6
+    @Requires({ os.linux })
     def "Reading and writing CSV file with footer record."() {
         setup:
         def script = "scripts/ch05/fileaccess/split_footer_and_other.sh"

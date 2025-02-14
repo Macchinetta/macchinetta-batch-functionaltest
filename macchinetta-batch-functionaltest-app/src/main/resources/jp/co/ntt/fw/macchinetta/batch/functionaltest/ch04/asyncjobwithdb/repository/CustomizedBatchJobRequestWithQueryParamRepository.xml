@@ -22,15 +22,8 @@
             group_id = #{groupId}
         ORDER BY
             job_seq_id ASC
+        LIMIT #{pollingRowLimit}
         ]]>
-        <choose>
-            <when test="_databaseId == 'oracle'">
-                FETCH FIRST #{pollingRowLimit} ROWS ONLY
-            </when>
-            <otherwise>
-                LIMIT #{pollingRowLimit}
-            </otherwise>
-        </choose>
     </select>
 
     
