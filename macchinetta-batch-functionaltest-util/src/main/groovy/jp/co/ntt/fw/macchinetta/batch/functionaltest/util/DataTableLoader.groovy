@@ -16,7 +16,7 @@
 package jp.co.ntt.fw.macchinetta.batch.functionaltest.util
 
 import org.dbunit.dataset.IDataSet
-import org.dbunit.dataset.xml.FlatXmlDataSet
+import org.dbunit.dataset.xml.FlatXmlDataSetBuilder
 
 /**
  * To convert the table notation defined in the closure to the DataSet of DBunit.
@@ -78,6 +78,6 @@ class DataTableLoader {
         }
         dataSetBuilder.append("</dataset>")
 
-        return new FlatXmlDataSet(new StringReader(dataSetBuilder.toString()))
+        return new FlatXmlDataSetBuilder().build(new StringReader(dataSetBuilder.toString()))
     }
 }

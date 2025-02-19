@@ -59,10 +59,11 @@ public class JobReadXmlWithSchemaValidationConfig {
     @StepScope
     public StaxEventItemReader<Customer> reader(
             @Value("#{jobParameters['inputFile']}") File inputFile,
+            @Value("${fileaccess.schema-file-path}") String schemaFile,
             CustomerValidationEventHandler customerValidationEventHandler) throws Exception {
         Jaxb2Marshaller unmarshaller = new Jaxb2Marshaller();
         unmarshaller.setClassesToBeBound(Customer.class);
-        unmarshaller.setSchema(new FileSystemResource("files/test/input/ch05/fileaccess/customer.xsd"));
+        unmarshaller.setSchema(new FileSystemResource(schemaFile));
         unmarshaller.setValidationEventHandler(customerValidationEventHandler);
         unmarshaller.afterPropertiesSet();
         return new StaxEventItemReaderBuilder<Customer>()

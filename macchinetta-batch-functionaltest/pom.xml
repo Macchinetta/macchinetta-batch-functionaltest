@@ -10,7 +10,7 @@
     <parent>
         <groupId>jp.co.ntt.fw.macchinetta.batch</groupId>
         <artifactId>macchinetta-batch-functionaltest-build</artifactId>
-        <version>2.5.0.RELEASE</version>
+        <version>2.6.0.RELEASE</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -175,107 +175,17 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-dependencies</artifactId>
-                <version>${org.springframework.boot.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-
-            <dependency>
                 <groupId>jp.co.ntt.fw.macchinetta.batch</groupId>
                 <artifactId>macchinetta-batch-functionaltest-util</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
             <dependency>
-                <groupId>org.spockframework</groupId>
-                <artifactId>spock-core</artifactId>
-                <version>${org.spockframework.spock-core.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.spockframework</groupId>
-                <artifactId>spock-spring</artifactId>
-                <version>${org.spockframework.spock-spring.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>com.athaydes</groupId>
-                <artifactId>spock-reports</artifactId>
-                <version>${com.athaydes.spock-reports.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.dbunit</groupId>
-                <artifactId>dbunit</artifactId>
-                <version>${org.dbunit.dbunit.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>com.oracle.database.jdbc</groupId>
-                        <artifactId>ojdbc8</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-
-            <dependency>
-                <groupId>org.codehaus.groovy.modules.http-builder</groupId>
-                <artifactId>http-builder</artifactId>
-                <version>${org.codehaus.groovy.modules.http-builder.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.mongodb</groupId>
-                <artifactId>mongo-java-driver</artifactId>
-                <version>${mongo-java-driver.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>com.oracle.database.jdbc</groupId>
-                <artifactId>${oracle.jdbc.artifactId}</artifactId>
-                <version>${oracle.jdbc.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.codehaus.groovy</groupId>
-                <artifactId>groovy</artifactId>
-                <version>${groovy.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.codehaus.groovy</groupId>
-                <artifactId>groovy-sql</artifactId>
-                <version>${groovy.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.codehaus.groovy</groupId>
-                <artifactId>groovy-datetime</artifactId>
-                <version>${groovy.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.codehaus.groovy</groupId>
-                <artifactId>groovy-dateutil</artifactId>
-                <version>${groovy.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.codehaus.groovy</groupId>
-                <artifactId>groovy-templates</artifactId>
-                <version>${groovy.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.codehaus.groovy</groupId>
-                <artifactId>groovy-json</artifactId>
-                <version>${groovy.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.codehaus.groovy</groupId>
-                <artifactId>groovy-ant</artifactId>
-                <version>${groovy.version}</version>
+                <groupId>org.terasoluna.bom</groupId>
+                <artifactId>terasoluna-dependencies</artifactId>
+                <version>${terasoluna.gfw.bom.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
             </dependency>
 
             <dependency>
@@ -283,14 +193,6 @@
                 <artifactId>macchinetta-batch-functionaltest-app${appname.suffix}</artifactId>
                 <version>${project.version}</version>
             </dependency>
-
-            <!-- == Begin slf4j-api == -->
-            <dependency>
-                <groupId>org.slf4j</groupId>
-                <artifactId>slf4j-api</artifactId>
-                <version>${slf4j-api.version}</version>
-            </dependency>
-            <!-- == End slf4j-api == -->
         </dependencies>
     </dependencyManagement>
 
@@ -386,12 +288,6 @@
         </dependency>
 
         <dependency>
-            <groupId>org.codehaus.groovy.modules.http-builder</groupId>
-            <artifactId>http-builder</artifactId>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
             <groupId>${jdbc.driver.groupId}</groupId>
             <artifactId>${jdbc.driver.artifactId}</artifactId>
             <scope>runtime</scope>
@@ -411,35 +307,17 @@
 
     <properties>
         <!-- == Maven Plugin Versions == -->
-        <maven-compiler-plugin.version>3.10.1</maven-compiler-plugin.version>
-        <gmavenplus-plugin.version>3.0.2</gmavenplus-plugin.version>
-        <maven-failsafe-plugin.version>3.0.0-M7</maven-failsafe-plugin.version>
-        <maven-resources-plugin.version>3.3.0</maven-resources-plugin.version>
-        <maven-dependency-plugin.version>3.3.0</maven-dependency-plugin.version>
-        <license-maven-plugin.version>4.2.rc3</license-maven-plugin.version>
-        <formatter-maven-plugin.version>2.20.0</formatter-maven-plugin.version>
+        <maven-compiler-plugin.version>3.13.0</maven-compiler-plugin.version>
+        <gmavenplus-plugin.version>4.0.1</gmavenplus-plugin.version>
+        <maven-failsafe-plugin.version>3.5.2</maven-failsafe-plugin.version>
+        <maven-resources-plugin.version>3.3.1</maven-resources-plugin.version>
+        <maven-dependency-plugin.version>3.8.1</maven-dependency-plugin.version>
+        <license-maven-plugin.version>4.6</license-maven-plugin.version>
+        <formatter-maven-plugin.version>2.24.1</formatter-maven-plugin.version>
 
         <!-- == Dependency Versions == -->
-        <!-- == Spring Boot Dependencies == -->
-        <org.springframework.boot.version>3.2.2</org.springframework.boot.version>
-
-        <!-- == Spock == -->
-        <org.spockframework.spock-core.version>2.3-groovy-3.0</org.spockframework.spock-core.version>
-        <org.spockframework.spock-spring.version>2.3-groovy-3.0</org.spockframework.spock-spring.version>
-        <com.athaydes.spock-reports.version>2.5.1-groovy-3.0</com.athaydes.spock-reports.version>
-
-        <!-- == DBUnit == -->
-        <org.dbunit.dbunit.version>2.7.3</org.dbunit.dbunit.version>
-
-        <!-- == Groovy == -->
-        <org.codehaus.groovy.modules.http-builder.version>0.7.1</org.codehaus.groovy.modules.http-builder.version>
-        <groovy.version>3.0.19</groovy.version>
-
-        <!-- == Mongo Java Driver == -->
-        <mongo-java-driver.version>2.14.3</mongo-java-driver.version>
-
-        <!-- == slf4j-api == -->
-        <slf4j-api.version>2.0.12</slf4j-api.version>
+        <!-- == TERASOLUNA Batch == -->
+        <terasoluna.gfw.bom.version>2.0.0.RELEASE</terasoluna.gfw.bom.version>
 
         <!-- == Project Properties == -->
         <project.root.basedir>${project.basedir}</project.root.basedir>
@@ -447,7 +325,7 @@
         <!-- == Environment Properties == -->
         <jdbc.driver.groupId>org.postgresql</jdbc.driver.groupId>
         <jdbc.driver.artifactId>postgresql</jdbc.driver.artifactId>
-        <project.config.resource.directory.rdbms>config/rdbms/postgresql15/local</project.config.resource.directory.rdbms>
+        <project.config.resource.directory.rdbms>config/rdbms/postgresql16/local</project.config.resource.directory.rdbms>
         <project.config.resource.directory.mongo>config/mongo/local</project.config.resource.directory.mongo>
         <project.config.resource.directory.beandefinition>config/beandefinition/${profile-name}</project.config.resource.directory.beandefinition>
 
@@ -457,17 +335,6 @@
     </properties>
 
     <profiles>
-        <profile>
-            <id>jdk17</id>
-            <activation>
-                <jdk>17</jdk>
-            </activation>
-            <properties>
-                <java-version>17</java-version>
-                <oracle.jdbc.artifactId>ojdbc11</oracle.jdbc.artifactId>
-                <oracle.jdbc.version>23.3.0.23.09</oracle.jdbc.version>
-            </properties>
-        </profile>
         <profile>
             <id>javaconfig</id>
             <properties>
@@ -483,38 +350,20 @@
             </properties>
         </profile>
         <profile>
-            <id>postgresql15-local</id>
+            <id>postgresql16-local</id>
             <properties>
                 <jdbc.driver.groupId>org.postgresql</jdbc.driver.groupId>
                 <jdbc.driver.artifactId>postgresql</jdbc.driver.artifactId>
-                <project.config.resource.directory.rdbms>config/rdbms/postgresql15/local</project.config.resource.directory.rdbms>
+                <project.config.resource.directory.rdbms>config/rdbms/postgresql16/local</project.config.resource.directory.rdbms>
                 <project.config.resource.directory.mongo>config/mongo/local</project.config.resource.directory.mongo>
             </properties>
         </profile>
         <profile>
-            <id>postgresql15-it</id>
+            <id>postgresql16-it</id>
             <properties>
                 <jdbc.driver.groupId>org.postgresql</jdbc.driver.groupId>
                 <jdbc.driver.artifactId>postgresql</jdbc.driver.artifactId>
-                <project.config.resource.directory.rdbms>config/rdbms/postgresql15/it</project.config.resource.directory.rdbms>
-                <project.config.resource.directory.mongo>config/mongo/it</project.config.resource.directory.mongo>
-            </properties>
-        </profile>
-        <profile>
-            <id>oracle23c-local</id>
-            <properties>
-                <jdbc.driver.groupId>com.oracle.database.jdbc</jdbc.driver.groupId>
-                <jdbc.driver.artifactId>${oracle.jdbc.artifactId}</jdbc.driver.artifactId>
-                <project.config.resource.directory.rdbms>config/rdbms/oracle23c/local</project.config.resource.directory.rdbms>
-                <project.config.resource.directory.mongo>config/mongo/local</project.config.resource.directory.mongo>
-            </properties>
-        </profile>
-        <profile>
-            <id>oracle23c-it</id>
-            <properties>
-                <jdbc.driver.groupId>com.oracle.database.jdbc</jdbc.driver.groupId>
-                <jdbc.driver.artifactId>${oracle.jdbc.artifactId}</jdbc.driver.artifactId>
-                <project.config.resource.directory.rdbms>config/rdbms/oracle23c/it</project.config.resource.directory.rdbms>
+                <project.config.resource.directory.rdbms>config/rdbms/postgresql16/it</project.config.resource.directory.rdbms>
                 <project.config.resource.directory.mongo>config/mongo/it</project.config.resource.directory.mongo>
             </properties>
         </profile>

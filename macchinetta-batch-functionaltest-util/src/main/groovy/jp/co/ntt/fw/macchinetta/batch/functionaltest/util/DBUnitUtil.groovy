@@ -28,7 +28,6 @@ import org.dbunit.dataset.ITable
 import org.dbunit.dataset.ReplacementDataSet
 import org.dbunit.dataset.filter.DefaultColumnFilter
 import org.dbunit.dataset.xml.FlatXmlDataSetBuilder
-import org.dbunit.ext.oracle.Oracle10DataTypeFactory
 import org.dbunit.ext.postgresql.PostgresqlDataTypeFactory
 import org.dbunit.operation.DatabaseOperation
 import org.dbunit.util.fileloader.CsvDataFileLoader
@@ -67,8 +66,6 @@ class DBUnitUtil {
         conn = new DatabaseDataSourceConnection(ds, conf.schema as String)
         if (conf.driver.contains('postgresql')) {
             conn.getConfig().setProperty(DatabaseConfig.PROPERTY_DATATYPE_FACTORY, new PostgresqlDataTypeFactory())
-        } else if (conf.driver.contains('oracle')) {
-            conn.getConfig().setProperty(DatabaseConfig.PROPERTY_DATATYPE_FACTORY, new Oracle10DataTypeFactory())
         }
         tables = conf.tables
         dropSqlFilePaths = conf.dropSqlFilePaths
@@ -138,14 +135,6 @@ class DBUnitUtil {
     def dropAndCreateTable() {
         executeSqlScriptIgnoreFailedDrops(dropSqlFilePaths)
         executeSqlScript(createSqlFilePaths)
-        // When creating a JobRepository,
-        // Set the starting value of the sequence from 0 to 1 when using oracle
-        // (same condition as postgres)
-        if (this.database.equals("admin") && conf.driver.contains('oracle')) {
-            createQueryTable("result", "SELECT BATCH_STEP_EXECUTION_SEQ.NEXTVAL FROM DUAL")
-            createQueryTable("result", "SELECT BATCH_JOB_EXECUTION_SEQ.NEXTVAL FROM DUAL")
-            createQueryTable("result", "SELECT BATCH_JOB_SEQ.NEXTVAL FROM DUAL")
-        }
     }
 
     def executeSqlScript(String[] scriptFiles) {

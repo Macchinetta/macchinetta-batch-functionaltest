@@ -82,5 +82,5 @@ Run test using maven commands as follows.
 [source, text]
 ----
 $ cd {your repository directory}
-$ mvn verify -P javaconfig,postgresql15-local,tomcat10-local
+$ mvn verify -P javaconfig,postgresql16-local,tomcat10-local
 ----

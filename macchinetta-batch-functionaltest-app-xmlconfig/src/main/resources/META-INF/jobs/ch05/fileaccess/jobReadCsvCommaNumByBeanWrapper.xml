@@ -12,8 +12,9 @@
 
     <import resource="classpath:META-INF/spring/job-base-context.xml"/>
 
-    <context:component-scan base-package="jp.co.ntt.fw.macchinetta.batch.functionaltest.app.common"/>
-    <context:component-scan base-package="jp.co.ntt.fw.macchinetta.batch.functionaltest.ch05.fileaccess.module"/>
+    <context:component-scan
+            base-package="jp.co.ntt.fw.macchinetta.batch.functionaltest.app.common,
+            jp.co.ntt.fw.macchinetta.batch.functionaltest.ch05.fileaccess.module"/>
 
     <bean id="defaultRecordSeparatorPolicy"
           class="org.springframework.batch.item.file.separator.DefaultRecordSeparatorPolicy"/>

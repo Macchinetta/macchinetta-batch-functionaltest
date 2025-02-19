@@ -45,7 +45,7 @@ public class JobDefaultJobParametersValidatorConfig {
     @Bean
     public DefaultJobParametersValidator jobParametersValidator() {
         return new DefaultJobParametersValidator(
-                new String[] {"jsr_batch_run_id", "str"},
+                new String[] {"str"},
                 new String[] {"num"});  
     }
     

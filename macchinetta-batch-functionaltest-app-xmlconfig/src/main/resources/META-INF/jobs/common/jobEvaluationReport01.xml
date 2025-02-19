@@ -14,8 +14,9 @@
 
     <import resource="classpath:META-INF/spring/job-base-context.xml"/>
 
-    <context:component-scan base-package="jp.co.ntt.fw.macchinetta.batch.functionaltest.app.common"/>
-    <context:component-scan base-package="jp.co.ntt.fw.macchinetta.batch.functionaltest.app.evaluation"/>
+    <context:component-scan
+            base-package="jp.co.ntt.fw.macchinetta.batch.functionaltest.app.common,
+            jp.co.ntt.fw.macchinetta.batch.functionaltest.app.evaluation"/>
     <mybatis:scan
             base-package="jp.co.ntt.fw.macchinetta.batch.functionaltest.app.repository.evaluation"
             factory-ref="jobSqlSessionFactory"/>

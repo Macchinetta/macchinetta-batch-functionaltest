@@ -18,6 +18,9 @@ package jp.co.ntt.fw.macchinetta.batch.functionaltest.config;
 import org.springframework.batch.core.configuration.BatchConfigurationException;
 import org.springframework.batch.core.configuration.support.DefaultBatchConfiguration;
 import org.springframework.batch.core.launch.JobOperator;
+import org.springframework.batch.core.configuration.JobRegistry;
+import org.springframework.batch.core.explore.JobExplorer;
+import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.launch.support.JobOperatorFactoryBean;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.JobRepositoryFactoryBean;
@@ -122,24 +125,21 @@ public class TerasolunaBatchConfiguration extends DefaultBatchConfiguration {
     // so override the bean definition and correct it to "JobParametersConverterImpl"
     @Override
     @Bean
-    public JobOperator jobOperator() throws BatchConfigurationException {
+    public JobOperator jobOperator(JobRepository jobRepository, JobExplorer jobExplorer, JobRegistry jobRegistry, JobLauncher jobLauncher) throws BatchConfigurationException {
         JobOperatorFactoryBean jobOperatorFactoryBean = new JobOperatorFactoryBean();
-        jobOperatorFactoryBean.setTransactionManager(
-                getTransactionManager());  // get and set adminTransactionManager
-        jobOperatorFactoryBean.setJobRepository(jobRepository());
-        jobOperatorFactoryBean.setJobExplorer(jobExplorer());
-        jobOperatorFactoryBean.setJobRegistry(jobRegistry());
-        jobOperatorFactoryBean.setJobLauncher(jobLauncher());
+        jobOperatorFactoryBean.setTransactionManager(this.getTransactionManager());
+        jobOperatorFactoryBean.setJobRepository(jobRepository);
+        jobOperatorFactoryBean.setJobExplorer(jobExplorer);
+        jobOperatorFactoryBean.setJobRegistry(jobRegistry);
+        jobOperatorFactoryBean.setJobLauncher(jobLauncher);
         JobParametersConverterImpl jobParametersConverter = new JobParametersConverterImpl(
                 getDataSource());
         jobOperatorFactoryBean.setJobParametersConverter(
                 jobParametersConverter); // changed from JobParametersConverterImpl
-
         try {
             jobParametersConverter.afterPropertiesSet();
             jobOperatorFactoryBean.afterPropertiesSet();
             return jobOperatorFactoryBean.getObject();
-
         } catch (BatchConfigurationException e) {
             throw e;
         } catch (Exception e) {

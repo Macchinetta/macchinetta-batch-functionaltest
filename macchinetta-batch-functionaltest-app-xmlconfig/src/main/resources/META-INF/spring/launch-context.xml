@@ -25,10 +25,14 @@
               p:url="${admin.jdbc.url}"
               p:username="${admin.jdbc.username}"
               p:password="${admin.jdbc.password}"
-              p:maxTotal="10"
               p:minIdle="1"
-              p:maxWaitMillis="5000"
-              p:defaultAutoCommit="false"/>
+              p:defaultAutoCommit="false">
+            <property name="maxWait">
+                <bean class="java.time.Duration" factory-method="ofMillis">
+                    <constructor-arg name="millis" type="long" value="5000" />
+                </bean>
+            </property>
+        </bean>
 
         <jdbc:initialize-database data-source="adminDataSource" enabled="${data-source.initialize.enabled:false}"
                                   ignore-failures="ALL">
@@ -47,8 +51,13 @@
               p:password="${admin.h2.jdbc.password}"
               p:maxTotal="10"
               p:minIdle="1"
-              p:maxWaitMillis="5000"
-              p:defaultAutoCommit="false"/>
+              p:defaultAutoCommit="false">
+            <property name="maxWait">
+                <bean class="java.time.Duration" factory-method="ofMillis">
+                    <constructor-arg name="millis" type="long" value="5000" />
+                </bean>
+            </property>
+        </bean>
 
         <jdbc:initialize-database data-source="adminDataSource" enabled="true" ignore-failures="ALL">
             <jdbc:script location="${spring-batch.h2.schema.script}"/>
@@ -87,7 +96,7 @@
               p:jobParametersConverter-ref="jobParametersConverter"
               p:jobLauncher-ref="jobLauncher"/>
 
-        <bean class="org.springframework.batch.core.configuration.support.JobRegistryBeanPostProcessor"
+        <bean class="org.springframework.batch.core.configuration.support.JobRegistrySmartInitializingSingleton"
               p:jobRegistry-ref="jobRegistry"/>
 
         <bean id="exitCodeMapper" class="org.springframework.batch.core.launch.support.SimpleJvmExitCodeMapper">
@@ -117,8 +126,13 @@
               p:password="${jdbc.password}"
               p:maxTotal="10"
               p:minIdle="1"
-              p:maxWaitMillis="5000"
-              p:defaultAutoCommit="false"/>
+              p:defaultAutoCommit="false">
+            <property name="maxWait">
+                <bean class="java.time.Duration" factory-method="ofMillis">
+                    <constructor-arg name="millis" type="long" value="5000" />
+                </bean>
+            </property>
+        </bean>
 
         <bean id="jobTransactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager"
               p:dataSource-ref="jobDataSource"

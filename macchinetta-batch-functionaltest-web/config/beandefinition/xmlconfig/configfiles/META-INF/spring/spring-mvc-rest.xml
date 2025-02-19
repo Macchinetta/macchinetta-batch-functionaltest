@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:c="http://www.springframework.org/schema/c"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:task="http://www.springframework.org/schema/task"
+       xsi:schemaLocation="http://www.springframework.org/schema/mvc https://www.springframework.org/schema/mvc/spring-mvc.xsd
+        http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/task https://www.springframework.org/schema/task/spring-task.xsd">
+
+    <!-- Spring Batch launch context -->
+    <import resource="classpath:META-INF/spring/launch-context.xml"/>
+
+    <bean id="jsonMessageConverter"
+        class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
+        <property name="objectMapper" ref="objectMapper"/>
+    </bean>
+
+    <bean id="objectMapper"
+        class="org.springframework.http.converter.json.Jackson2ObjectMapperFactoryBean">
+        <property name="dateFormat">
+            <bean class="com.fasterxml.jackson.databind.util.StdDateFormat"/>
+        </property>
+    </bean>
+
+    <mvc:annotation-driven>
+        <mvc:message-converters register-defaults="false">
+            <ref bean="jsonMessageConverter"/>
+        </mvc:message-converters>
+    </mvc:annotation-driven>
+
+    <mvc:default-servlet-handler/>
+
+    <context:component-scan base-package="jp.co.ntt.fw.macchinetta.batch.functionaltest.api"/>
+
+    <bean class="org.springframework.batch.core.configuration.support.AutomaticJobRegistrar">
+        <property name="applicationContextFactories">
+            <bean class="org.springframework.batch.core.configuration.support.ClasspathXmlApplicationContextsFactoryBean">
+                <property name="resources">
+                    <list>
+                        <value>classpath:/META-INF/jobs/common/*.xml</value>
+                        <value>classpath:/META-INF/jobs/ch04/asyncjobwithweb/*.xml</value>
+                    </list>
+                </property>
+            </bean>
+        </property>
+        <property name="jobLoader">
+            <bean class="org.springframework.batch.core.configuration.support.DefaultJobLoader"
+                  p:jobRegistry-ref="jobRegistry"/>
+        </property>
+    </bean>
+
+    <task:executor id="taskExecutor" pool-size="3" queue-capacity="10"/>
+
+    <bean id="jobLauncher" class="org.springframework.batch.core.launch.support.TaskExecutorJobLauncher"          p:jobRepository-ref="jobRepository"
+          p:taskExecutor-ref="taskExecutor" />
+
+</beans>

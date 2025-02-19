@@ -11,8 +11,9 @@
 
     <import resource="classpath:META-INF/spring/job-base-context.xml"/>
 
-    <context:component-scan base-package="jp.co.ntt.fw.macchinetta.batch.functionaltest.app.common"/>
-    <context:component-scan base-package="jp.co.ntt.fw.macchinetta.batch.functionaltest.ch07.jobmanagement"/>
+    <context:component-scan
+            base-package="jp.co.ntt.fw.macchinetta.batch.functionaltest.app.common,
+            jp.co.ntt.fw.macchinetta.batch.functionaltest.ch07.jobmanagement"/>
 
     <batch:job id="emulateLongTaskJob" job-repository="jobRepository">
         <batch:step id="emulateLongTaskJob.step01">

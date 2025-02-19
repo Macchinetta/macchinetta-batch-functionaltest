@@ -15,13 +15,7 @@
  */
 package jp.co.ntt.fw.macchinetta.batch.functionaltest.config;
 
-import java.io.IOException;
-import java.util.Properties;
-
-import javax.sql.DataSource;
-
-import org.apache.ibatis.mapping.DatabaseIdProvider;
-import org.apache.ibatis.mapping.VendorDatabaseIdProvider;
+import jp.co.ntt.fw.macchinetta.batch.functionaltest.config.helper.ApplicationContextFactoryHelper;
 import org.apache.ibatis.session.ExecutorType;
 import org.apache.ibatis.session.LocalCacheScope;
 import org.apache.ibatis.session.SqlSessionFactory;
@@ -31,7 +25,6 @@ import org.springframework.batch.core.configuration.JobRegistry;
 import org.springframework.batch.core.configuration.support.ApplicationContextFactory;
 import org.springframework.batch.core.configuration.support.AutomaticJobRegistrar;
 import org.springframework.batch.core.configuration.support.DefaultJobLoader;
-import org.springframework.batch.core.configuration.support.JobRegistryBeanPostProcessor;
 import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -39,8 +32,6 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
-import org.springframework.context.annotation.PropertySource;
-import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.core.io.Resource;
 import org.springframework.jdbc.datasource.init.DataSourceInitializer;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
@@ -51,23 +42,18 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.terasoluna.batch.async.db.JobRequestPollTask;
 import org.terasoluna.batch.async.db.repository.BatchJobRequestRepository;
 
-import jp.co.ntt.fw.macchinetta.batch.functionaltest.config.helper.ApplicationContextFactoryHelper;
+import javax.sql.DataSource;
+import java.io.IOException;
+import java.util.Properties;
 
 /**
  * Acync Batch Daemon Configuration.
- *
  * @since 2.4.0
  */
 @Configuration
 @Import(LaunchContextConfig.class)
-@PropertySource(value = "classpath:batch-application.properties")
 @EnableScheduling
 public class AsyncBatchDaemonConfig {
-
-    @Bean
-    public static PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer() {
-        return new PropertySourcesPlaceholderConfigurer();
-    }
 
     @Bean
     public ThreadPoolTaskExecutor daemonTaskExecutor(
@@ -111,17 +97,16 @@ public class AsyncBatchDaemonConfig {
             BatchJobRequestRepository batchJobRequestRepository,
             @Qualifier("daemonTaskExecutor") ThreadPoolTaskExecutor daemonTaskExecutor,
             AutomaticJobRegistrar automaticJobRegistrar) {
-        return new JobRequestPollTask(batchJobRequestRepository, adminTransactionManager,
+        return new JobRequestPollTask(batchJobRequestRepository,
+                adminTransactionManager,
                 daemonTaskExecutor, jobOperator, automaticJobRegistrar);
     }
 
     @Bean
     public SqlSessionFactory adminSqlSessionFactory(
-            @Qualifier("adminDataSource") DataSource adminDataSource,
-            DatabaseIdProvider databaseIdProvider) throws Exception {
+            @Qualifier("adminDataSource") DataSource adminDataSource) throws Exception {
         final SqlSessionFactoryBean sqlSessionFactoryBean = new SqlSessionFactoryBean();
         sqlSessionFactoryBean.setDataSource(adminDataSource);
-        sqlSessionFactoryBean.setDatabaseIdProvider(databaseIdProvider);
         final org.apache.ibatis.session.Configuration configuration = new org.apache.ibatis.session.Configuration();
         configuration.setLocalCacheScope(LocalCacheScope.STATEMENT);
         configuration.setLazyLoadingEnabled(true);
@@ -143,7 +128,7 @@ public class AsyncBatchDaemonConfig {
 
     @Bean
     public AutomaticJobRegistrar automaticJobRegistrar(JobRegistry jobRegistry,
-            ApplicationContextFactory[] applicationContextFactories) throws Exception {
+                                                       ApplicationContextFactory[] applicationContextFactories) throws Exception {
         final AutomaticJobRegistrar automaticJobRegistrar = new AutomaticJobRegistrar();
         final DefaultJobLoader defaultJobLoader = new DefaultJobLoader();
         defaultJobLoader.setJobRegistry(jobRegistry);
@@ -160,22 +145,5 @@ public class AsyncBatchDaemonConfig {
         return new ApplicationContextFactoryHelper(ctx).load(
                 "classpath:jp/co/ntt/fw/macchinetta/batch/functionaltest/jobs/common/*.class",
                 "classpath:jp/co/ntt/fw/macchinetta/batch/functionaltest/jobs/ch04/asyncjobwithdb/*.class");
-    }
-
-    @Bean
-    public JobRegistryBeanPostProcessor jobRegistryBeanPostProcessor(
-            JobRegistry jobRegistry) {
-        final JobRegistryBeanPostProcessor jobRegistryBeanPostProcessor = new JobRegistryBeanPostProcessor();
-        jobRegistryBeanPostProcessor.setJobRegistry(jobRegistry);
-        return jobRegistryBeanPostProcessor;
-    }
-
-    @Bean
-    public VendorDatabaseIdProvider databaseIdProvider() {
-        final VendorDatabaseIdProvider vendorDatabaseIdProvider = new VendorDatabaseIdProvider();
-        final Properties properties = new Properties();
-        properties.setProperty("Oracle", "oracle");
-        vendorDatabaseIdProvider.setProperties(properties);
-        return vendorDatabaseIdProvider;
     }
 }

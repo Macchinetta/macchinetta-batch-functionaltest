@@ -16,7 +16,7 @@
 package jp.co.ntt.fw.macchinetta.batch.functionaltest.ch04
 
 import groovy.util.logging.Slf4j
-import org.springframework.batch.core.launch.support.SimpleJobLauncher
+import org.springframework.batch.core.launch.support.TaskExecutorJobLauncher
 import org.springframework.batch.core.launch.support.SimpleJobOperator
 import org.springframework.core.task.TaskRejectedException
 import jp.co.ntt.fw.macchinetta.batch.functionaltest.ch04.asyncjobwithweb.EmulatedLongBatchTask
@@ -140,7 +140,7 @@ class AsyncJobWithWebContainerSpec extends Specification {
         // Wait for a while till the job complete.
         mongoUtil.waitForOutputLog(new LogCondition(
                 level: 'INFO',
-                logger: "${SimpleJobLauncher.class.name}",
+                logger: "${TaskExecutorJobLauncher.class.name}",
                 message: ~/completed with the following parameters:.*value=${currentTimeMilllis}/))
         restJobExecution = restUtil.getJobExecution(jobExecutionId)
 
@@ -249,7 +249,7 @@ class AsyncJobWithWebContainerSpec extends Specification {
         def result = restUtil.get("signal")
         while (true) {
             List<LogCursor> logs = mongoUtil.find(new LogCondition(level: 'INFO',
-                    logger: "${SimpleJobLauncher.class.name}", message: ~/Job: \[FlowJob: \[name=jobEmulatedLongBatchTask]] completed/))
+                    logger: "${TaskExecutorJobLauncher.class.name}", message: ~/Job: \[(FlowJob|SimpleJob): \[name=jobEmulatedLongBatchTask]] completed/))
             if (logs?.size() == 5) {
                 break
             }
@@ -335,7 +335,7 @@ class AsyncJobWithWebContainerSpec extends Specification {
         then:
         actualExecution.status == 200
         actualExecution.jobExecution.status == 'FAILED'
-        actualExecution.jobExecution.exitStatus ==~ /(?s).*${TaskRejectedException.class.name}.*did not accept task: ${SimpleJobLauncher.class.name}.*/
+        actualExecution.jobExecution.exitStatus ==~ /(?s).*${TaskRejectedException.class.name}.*did not accept task: ${TaskExecutorJobLauncher.class.name}.*/
 
         cleanup:
         def result = restUtil.get('signal')
@@ -343,7 +343,7 @@ class AsyncJobWithWebContainerSpec extends Specification {
         assert result.status == 200
         assert result.data == 'sent signal.'
         // Await jobs completion.
-        mongoUtil.waitForOutputLog(new LogCondition(level: 'INFO', logger: "${SimpleJobLauncher.class.name}",
+        mongoUtil.waitForOutputLog(new LogCondition(level: 'INFO', logger: "${TaskExecutorJobLauncher.class.name}",
                 message: ~/completed with the following parameters:.*and the following status: \[COMPLETED]/))
     }
 

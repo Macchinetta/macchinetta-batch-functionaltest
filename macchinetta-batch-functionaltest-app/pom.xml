@@ -10,7 +10,7 @@
     <parent>
         <groupId>jp.co.ntt.fw.macchinetta.batch</groupId>
         <artifactId>macchinetta-batch-functionaltest-build</artifactId>
-        <version>2.5.0.RELEASE</version>
+        <version>2.6.0.RELEASE</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -27,34 +27,16 @@
 
     <properties>
         <!-- == Maven Plugin Versions == -->
-        <maven-compiler-plugin.version>3.10.1</maven-compiler-plugin.version>
-        <maven-jar-plugin.version>3.2.2</maven-jar-plugin.version>
-        <maven-resources-plugin.version>3.3.0</maven-resources-plugin.version>
-        <license-maven-plugin.version>4.2.rc3</license-maven-plugin.version>
-        <formatter-maven-plugin.version>2.20.0</formatter-maven-plugin.version>
+        <maven-compiler-plugin.version>3.13.0</maven-compiler-plugin.version>
+        <maven-jar-plugin.version>3.4.2</maven-jar-plugin.version>
+        <maven-resources-plugin.version>3.3.1</maven-resources-plugin.version>
+        <license-maven-plugin.version>4.6</license-maven-plugin.version>
+        <formatter-maven-plugin.version>2.24.1</formatter-maven-plugin.version>
 
         <!-- == Dependency Versions == -->
-        <!-- == Spring Boot Dependencies == -->
-        <org.springframework.boot.version>3.2.2</org.springframework.boot.version>
-
         <!-- == TERASOLUNA Batch == -->
-        <terasoluna-batch.version>5.6.0.RELEASE</terasoluna-batch.version>
-
-        <!-- == Mongo Java Driver == -->
-        <mongo-java-driver.version>3.12.11</mongo-java-driver.version>
-
-        <!-- == Logback Contrib == -->
-        <ch.qos.logback.contrib.version>0.1.5</ch.qos.logback.contrib.version>
-
-        <!-- == JAXB == -->
-        <jaxb-core.version>4.0.4</jaxb-core.version>
-        <jaxb-impl.version>4.0.4</jaxb-impl.version>
-
-        <!-- == Jakarta == -->
-        <jakarta.el.version>4.0.2</jakarta.el.version>
-
-        <!-- == slf4j-api == -->
-        <slf4j-api.version>2.0.12</slf4j-api.version>
+        <terasoluna-batch.version>5.7.0.RELEASE</terasoluna-batch.version>
+        <terasoluna.gfw.bom.version>2.0.0.RELEASE</terasoluna.gfw.bom.version>
 
         <!-- == Project Properties == -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -63,20 +45,12 @@
         <!-- == Environment Properties == -->
         <jdbc.driver.groupId>org.postgresql</jdbc.driver.groupId>
         <jdbc.driver.artifactId>postgresql</jdbc.driver.artifactId>
-        <project.config.resource.directory.rdbms>config/rdbms/postgresql15/local</project.config.resource.directory.rdbms>
+        <project.config.resource.directory.rdbms>config/rdbms/postgresql16/local</project.config.resource.directory.rdbms>
         <project.config.resource.directory.mongo>config/mongo/local</project.config.resource.directory.mongo>
     </properties>
 
     <dependencyManagement>
         <dependencies>
-            <dependency>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-dependencies</artifactId>
-                <version>${org.springframework.boot.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-
             <dependency>
                 <groupId>org.terasoluna.batch</groupId>
                 <artifactId>terasoluna-batch</artifactId>
@@ -84,33 +58,11 @@
             </dependency>
 
             <dependency>
-                <groupId>ch.qos.logback.contrib</groupId>
-                <artifactId>logback-mongodb-classic</artifactId>
-                <version>${ch.qos.logback.contrib.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.mongodb</groupId>
-                <artifactId>mongo-java-driver</artifactId>
-                <version>${mongo-java-driver.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>com.sun.xml.bind</groupId>
-                <artifactId>jaxb-core</artifactId>
-                <version>${jaxb-core.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>com.sun.xml.bind</groupId>
-                <artifactId>jaxb-impl</artifactId>
-                <version>${jaxb-impl.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>com.oracle.database.jdbc</groupId>
-                <artifactId>${oracle.jdbc.artifactId}</artifactId>
-                <version>${oracle.jdbc.version}</version>
+                <groupId>org.terasoluna.bom</groupId>
+                <artifactId>terasoluna-dependencies</artifactId>
+                <version>${terasoluna.gfw.bom.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
             </dependency>
 
             <dependency>
@@ -118,20 +70,6 @@
                 <artifactId>macchinetta-batch-functionaltest-app-common</artifactId>
                 <version>${project.version}</version>
             </dependency>
-
-            <dependency>
-                <groupId>org.glassfish</groupId>
-                <artifactId>jakarta.el</artifactId>
-                <version>${jakarta.el.version}</version>
-            </dependency>
-
-            <!-- == Begin slf4j-api == -->
-            <dependency>
-                <groupId>org.slf4j</groupId>
-                <artifactId>slf4j-api</artifactId>
-                <version>${slf4j-api.version}</version>
-            </dependency>
-            <!-- == End slf4j-api == -->
         </dependencies>
     </dependencyManagement>
 
@@ -147,8 +85,8 @@
         </dependency>
 
         <dependency>
-            <groupId>org.glassfish</groupId>
-            <artifactId>jakarta.el</artifactId>
+            <groupId>org.apache.tomcat.embed</groupId>
+            <artifactId>tomcat-embed-el</artifactId>
             <scope>runtime</scope>
         </dependency>
 
@@ -186,12 +124,6 @@
         <dependency>
             <groupId>${jdbc.driver.groupId}</groupId>
             <artifactId>${jdbc.driver.artifactId}</artifactId>
-            <scope>runtime</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>com.sun.xml.bind</groupId>
-            <artifactId>jaxb-core</artifactId>
             <scope>runtime</scope>
         </dependency>
 
@@ -307,17 +239,6 @@
     </build>
 
     <profiles>
-        <profile>
-            <id>jdk17</id>
-            <activation>
-                <jdk>17</jdk>
-            </activation>
-            <properties>
-                <java-version>17</java-version>
-                <oracle.jdbc.artifactId>ojdbc11</oracle.jdbc.artifactId>
-                <oracle.jdbc.version>23.3.0.23.09</oracle.jdbc.version>
-            </properties>
-        </profile>
         <!-- Including application properties and log settings into package. (default) -->
         <profile>
             <id>IncludeSettings</id>
@@ -356,38 +277,20 @@
             </build>
         </profile>
         <profile>
-            <id>postgresql15-local</id>
+            <id>postgresql16-local</id>
             <properties>
                 <jdbc.driver.groupId>org.postgresql</jdbc.driver.groupId>
                 <jdbc.driver.artifactId>postgresql</jdbc.driver.artifactId>
-                <project.config.resource.directory.rdbms>config/rdbms/postgresql15/local</project.config.resource.directory.rdbms>
+                <project.config.resource.directory.rdbms>config/rdbms/postgresql16/local</project.config.resource.directory.rdbms>
                 <project.config.resource.directory.mongo>config/mongo/local</project.config.resource.directory.mongo>
             </properties>
         </profile>
         <profile>
-            <id>postgresql15-it</id>
+            <id>postgresql16-it</id>
             <properties>
                 <jdbc.driver.groupId>org.postgresql</jdbc.driver.groupId>
                 <jdbc.driver.artifactId>postgresql</jdbc.driver.artifactId>
-                <project.config.resource.directory.rdbms>config/rdbms/postgresql15/it</project.config.resource.directory.rdbms>
-                <project.config.resource.directory.mongo>config/mongo/it</project.config.resource.directory.mongo>
-            </properties>
-        </profile>
-        <profile>
-            <id>oracle23c-local</id>
-            <properties>
-                <jdbc.driver.groupId>com.oracle.database.jdbc</jdbc.driver.groupId>
-                <jdbc.driver.artifactId>${oracle.jdbc.artifactId}</jdbc.driver.artifactId>
-                <project.config.resource.directory.rdbms>config/rdbms/oracle23c/local</project.config.resource.directory.rdbms>
-                <project.config.resource.directory.mongo>config/mongo/local</project.config.resource.directory.mongo>
-            </properties>
-        </profile>
-        <profile>
-            <id>oracle23c-it</id>
-            <properties>
-                <jdbc.driver.groupId>com.oracle.database.jdbc</jdbc.driver.groupId>
-                <jdbc.driver.artifactId>${oracle.jdbc.artifactId}</jdbc.driver.artifactId>
-                <project.config.resource.directory.rdbms>config/rdbms/oracle23c/it</project.config.resource.directory.rdbms>
+                <project.config.resource.directory.rdbms>config/rdbms/postgresql16/it</project.config.resource.directory.rdbms>
                 <project.config.resource.directory.mongo>config/mongo/it</project.config.resource.directory.mongo>
             </properties>
         </profile>

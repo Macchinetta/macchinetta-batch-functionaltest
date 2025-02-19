@@ -63,7 +63,7 @@ public class UseDateSalesPlanDetailFieldSetMapper implements FieldSetMapper<UseD
 
         item.setBranchId(fieldSet.readString("branchId"));
 
-        DateFormat japaneseFormat = new SimpleDateFormat("GGGGy年M月d日", new Locale("ja", "JP", "JP"));
+        DateFormat japaneseFormat = new SimpleDateFormat("yyyy年M月d日");
         try {
             item.setDate(japaneseFormat.parse(fieldSet.readString("date")));
         } catch (ParseException e) {

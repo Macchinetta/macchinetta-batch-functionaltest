@@ -37,8 +37,7 @@
             <batch:next on="*" to="jobStopFlow.step3"/>
         </batch:step>
         <batch:step id="jobStopFlow.step3" parent="stopFlow.parentStep">
-            <batch:stop on="FORCE_STOP" restart="jobStopFlow.step4"
-                        exit-code=""/> <!-- https://jira.spring.io/browse/BATCH-2315 -->
+            <batch:stop on="FORCE_STOP" restart="jobStopFlow.step4"/>
             <batch:stop on="FORCE_STOP_WITH_EXIT_CODE" restart="jobStopFlow.step4" exit-code="STOPPED_CUSTOM"/>
             <batch:next on="*" to="jobStopFlow.step4"/>
         </batch:step>

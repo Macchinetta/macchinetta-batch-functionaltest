@@ -12,9 +12,10 @@
 
     <import resource="classpath:META-INF/spring/job-base-context.xml"/>
 
-    <context:component-scan base-package="jp.co.ntt.fw.macchinetta.batch.functionaltest.app.common"/>
-    <context:component-scan base-package="jp.co.ntt.fw.macchinetta.batch.functionaltest.ch05.transaction.component"/>
-    <context:component-scan base-package="jp.co.ntt.fw.macchinetta.batch.functionaltest.ch05.transaction.listener"/>
+    <context:component-scan
+            base-package="jp.co.ntt.fw.macchinetta.batch.functionaltest.app.common,
+            jp.co.ntt.fw.macchinetta.batch.functionaltest.ch05.transaction.component,
+            jp.co.ntt.fw.macchinetta.batch.functionaltest.ch05.transaction.listener"/>
     <mybatis:scan
             base-package="jp.co.ntt.fw.macchinetta.batch.functionaltest.ch05.transaction.repository.admin"
             factory-ref="adminSqlSessionFactory"/>

@@ -6,7 +6,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>jp.co.ntt.fw.macchinetta.batch</groupId>
     <artifactId>macchinetta-batch-functionaltest-build</artifactId>
-    <version>2.5.0.RELEASE</version>
+    <version>2.6.0.RELEASE</version>
     <packaging>pom</packaging>
 
     <name>root</name>
@@ -30,9 +30,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <archetype.test.skip>true</archetype.test.skip>
         <encoding>UTF-8</encoding>
-        <java-version>21</java-version>
-        <oracle.jdbc.artifactId>ojdbc11</oracle.jdbc.artifactId>
-        <oracle.jdbc.version>23.3.0.23.09</oracle.jdbc.version>
+        <java-version>17</java-version>
 
         <!-- == Configuration Properties == -->
         <profile-name>javaconfig</profile-name>
@@ -49,14 +47,12 @@
 
     <profiles>
         <profile>
-            <id>jdk17</id>
+            <id>jdk21</id>
             <activation>
-                <jdk>17</jdk>
+                <jdk>21</jdk>
             </activation>
             <properties>
-                <java-version>17</java-version>
-                <oracle.jdbc.artifactId>ojdbc11</oracle.jdbc.artifactId>
-                <oracle.jdbc.version>23.3.0.23.09</oracle.jdbc.version>
+                <java-version>21</java-version>
             </properties>
         </profile>
         <profile>
