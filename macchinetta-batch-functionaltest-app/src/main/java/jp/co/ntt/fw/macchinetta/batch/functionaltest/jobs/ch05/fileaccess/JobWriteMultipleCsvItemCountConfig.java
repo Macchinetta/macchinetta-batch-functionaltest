@@ -49,7 +49,7 @@ import jp.co.ntt.fw.macchinetta.batch.functionaltest.ch05.fileaccess.module.Cust
 import jp.co.ntt.fw.macchinetta.batch.functionaltest.config.JobBaseContextConfig;
 
 /**
- * JavaConfig class for JobWriteMultipleCsv job.
+ * JavaConfig class for JobWriteMultipleCsvItemCount job.
  *
  * @since 2.5.0
  */
@@ -57,7 +57,7 @@ import jp.co.ntt.fw.macchinetta.batch.functionaltest.config.JobBaseContextConfig
 @Import(JobBaseContextConfig.class)
 @ComponentScan("jp.co.ntt.fw.macchinetta.batch.functionaltest.app.common")
 @MapperScan(basePackages = "jp.co.ntt.fw.macchinetta.batch.functionaltest.app.repository.mst", sqlSessionFactoryRef = "jobSqlSessionFactory")
-public class JobWriteMultipleCsvConfig {
+public class JobWriteMultipleCsvItemCountConfig {
 
     @Bean
     @StepScope
@@ -109,19 +109,19 @@ public class JobWriteMultipleCsvConfig {
                        @Qualifier("jobTransactionManager") PlatformTransactionManager transactionManager,
                        MyBatisCursorItemReader<Customer> reader,
                        MultiResourceItemWriter<Customer> multiResourceItemWriter) {
-        return new StepBuilder("jobWriteMultipleCsv.step01",
+        return new StepBuilder("jobWriteMultipleCsvItemCount.step01",
                 jobRepository)
-                .<Customer, Customer> chunk(5, transactionManager)
+                .<Customer, Customer> chunk(6, transactionManager)
                 .reader(reader)
                 .writer(multiResourceItemWriter)
                 .build();
     }
 
     @Bean
-    public Job jobWriteMultipleCsv(JobRepository jobRepository,
+    public Job jobWriteMultipleCsvItemCount(JobRepository jobRepository,
                                             Step step01,
                                             JobExecutionLoggingListener listener) {
-        return new JobBuilder("jobWriteMultipleCsv",jobRepository)
+        return new JobBuilder("jobWriteMultipleCsvItemCount",jobRepository)
                 .start(step01)
                 .listener(listener)
                 .build();

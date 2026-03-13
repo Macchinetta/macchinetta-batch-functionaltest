@@ -15,10 +15,11 @@
  */
 package jp.co.ntt.fw.macchinetta.batch.functionaltest.util
 
-import com.gmongo.GMongo
+
 import com.mongodb.*
 import org.springframework.core.io.ClassPathResource
 
+import java.time.Instant
 import java.util.concurrent.TimeoutException
 
 /**
@@ -26,16 +27,18 @@ import java.util.concurrent.TimeoutException
  */
 class MongoUtil {
 
-    final GMongo mongo
+    final MongoClient mongoClient
     final DB db
     final DBCollection col
 
     MongoUtil() {
         def conf = new ConfigSlurper().parse(
                 new ClassPathResource('mongo-config.groovy').URL).mongoutil
-        mongo = new GMongo(conf.host as String, conf.port as int)
-        db = mongo.getDB(conf.database as String)
-        col = this.db.getCollection(conf.collection as String)
+
+        // MongoClient を使う（mongo-java-driver対応）
+        mongoClient = new MongoClient(new ServerAddress(conf.host as String, conf.port as int))
+        db = mongoClient.getDB(conf.database as String)
+        col = db.getCollection(conf.collection as String)
     }
 
     def find(Map condition=[:]){
@@ -86,8 +89,8 @@ class MongoUtil {
         list
     }
 
-    def findOne(Map condition=[:]){
-        col.findOne(condition)
+    def findOne(Map condition = [:]) {
+        col.findOne(BasicDBObjectBuilder.start(condition).get())
     }
 
     LogCursor findOne(LogCondition c) {
@@ -107,18 +110,18 @@ class MongoUtil {
     }
 
     def close() {
-        mongo.close()
+        mongoClient.close()
     }
 
     LogCursor waitForOutputLog(long timeout = 60*1000L, LogCondition cond) {
-        long startTime = System.currentTimeMillis()
+        long startTime = Instant.now().toEpochMilli()
         LogCursor cursor
         while (true) {
             cursor = findOne(cond)
             if (cursor != null) {
                 break
             }
-            long currentTime = System.currentTimeMillis()
+            long currentTime = Instant.now().toEpochMilli()
             long nowTime = currentTime - startTime
             if (timeout > 0L && nowTime > timeout) {
                 throw new TimeoutException(

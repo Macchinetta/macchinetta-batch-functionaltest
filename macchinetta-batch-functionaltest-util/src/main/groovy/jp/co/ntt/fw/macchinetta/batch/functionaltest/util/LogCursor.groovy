@@ -15,6 +15,9 @@
  */
 package jp.co.ntt.fw.macchinetta.batch.functionaltest.util
 
+import java.time.LocalDateTime
+import java.time.ZoneId
+
 class LogCursor {
 
     String _id
@@ -22,7 +25,7 @@ class LogCursor {
     String message
     String logger
     String thread
-    Date timestamp
+    LocalDateTime timestamp
     ThrowableLog throwable
 
     static class ThrowableLog {
@@ -30,5 +33,16 @@ class LogCursor {
         String message
         List<StackTraceElement> stackTrace
         ThrowableLog cause
+    }
+
+    LogCursor(Map map) {
+        this._id = map._id
+        this.level = map.level
+        this.message = map.message
+        this.logger = map.logger
+        this.thread = map.thread
+        Date date = map.timestamp as Date
+        this.timestamp = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime()
+        this.throwable = map.throwable as ThrowableLog
     }
 }

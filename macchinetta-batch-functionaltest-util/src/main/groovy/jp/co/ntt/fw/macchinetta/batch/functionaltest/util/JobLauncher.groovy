@@ -23,6 +23,9 @@ import org.springframework.core.io.ClassPathResource
 import org.terasoluna.batch.async.db.AsyncBatchDaemon
 
 import java.nio.file.Files
+import java.sql.Timestamp
+import java.time.Instant
+import java.time.LocalDateTime
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeoutException
 import java.util.stream.Stream
@@ -176,7 +179,7 @@ class JobLauncher {
     synchronized long registerAsyncJob(DBUnitUtil dbUnitUtil, JobRequest jobRequest) {
         def sql = dbUnitUtil.sql
         long jobSeqId
-        def createDate = new Date().toTimestamp()
+        def createDate = LocalDateTime.now().format("yyyy-MM-dd HH:mm:ss.SSS")
         sql.withTransaction {
             dbUnitUtil.insert(DataTableLoader.loadDataSet {
                 batch_job_request {
@@ -185,7 +188,7 @@ class JobLauncher {
                 }
             })
             def row = sql.firstRow("SELECT job_seq_id FROM batch_job_request WHERE job_name = ${jobRequest.jobName} " +
-                    "AND job_parameter = ${jobRequest.jobParameter} AND create_date = ${createDate}")
+                    "AND job_parameter = ${jobRequest.jobParameter} AND create_date = ${Timestamp.valueOf(createDate)}")
             jobSeqId = row.get("job_seq_id")
         }
         jobSeqId
@@ -194,7 +197,7 @@ class JobLauncher {
     synchronized void waitAsyncJob(DBUnitUtil dbUnitUtil, long jobSeqId,
                                    long timeout = 180 * 1000L,
                                    TimeUnit timeUnit = TimeUnit.MILLISECONDS) {
-        long startTime = System.currentTimeMillis()
+        long startTime = Instant.now().toEpochMilli()
         long limit = timeUnit.toMillis(timeout)
         while (true) {
             def row = dbUnitUtil.sql.firstRow("SELECT COUNT(job_seq_id) AS count FROM batch_job_request " +
@@ -203,7 +206,7 @@ class JobLauncher {
             if (count > 0) {
                 break
             }
-            long currentTime = System.currentTimeMillis()
+            long currentTime = Instant.now().toEpochMilli()
             if (limit > 0 && currentTime - startTime > limit) {
                 throw new TimeoutException("exceeded time limit [timeout:${timeout}]")
             }

@@ -22,8 +22,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import java.sql.Timestamp;
 import java.time.Clock;
+import java.time.LocalDateTime;
 
 /**
  * Item processor of editing branch master data.
@@ -60,7 +60,7 @@ public class BranchEditItemProcessor implements ItemProcessor<Branch, ExclusiveB
         branch.setBranchAddress(item.getBranchAddress() + " - " + identifier);
         branch.setBranchTel(item.getBranchTel());
         branch.setCreateDate(item.getUpdateDate());
-        branch.setUpdateDate(new Timestamp(clock.millis()));
+        branch.setUpdateDate(LocalDateTime.now(clock));
         branch.setOldBranchName(item.getBranchName());
 
         return branch;

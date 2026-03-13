@@ -132,23 +132,23 @@ class ExclusiveControlSpec extends Specification {
         outputFile.readLines() == expectFile.readLines()
 
         mongoUtil.find(new LogCondition(
-                message: "Acquire lock. [processName=${lockedProcess}]",
+                message: String.format("Acquire lock. [processName=%s]", lockedProcess),
                 logger: loggerName,
                 level: 'INFO'
         )).size() == 1
         mongoUtil.find(new LogCondition(
-                message: "Acquire lock. [processName=${exclusiveProcess}]",
+                message: String.format("Acquire lock. [processName=%s]", exclusiveProcess),
                 logger: loggerName,
                 level: 'INFO'
         )).size() == 0
 
         mongoUtil.find(new LogCondition(
-                message: "Failed to acquire lock. [lockFile=${lockFileName}] [processName=${lockedProcess}]",
+                message: String.format("Failed to acquire lock. [lockFile=%s] [processName=%s]", lockFileName, lockedProcess),
                 logger: loggerName,
                 level: 'ERROR'
         )).size() == 0
         mongoUtil.find(new LogCondition(
-                message: "Failed to acquire lock. [lockFile=${lockFileName}] [processName=${exclusiveProcess}]",
+                message: String.format("Failed to acquire lock. [lockFile=%s] [processName=%s]", lockFileName, exclusiveProcess),
                 logger: loggerName,
                 level: 'ERROR'
         )).size() == 1

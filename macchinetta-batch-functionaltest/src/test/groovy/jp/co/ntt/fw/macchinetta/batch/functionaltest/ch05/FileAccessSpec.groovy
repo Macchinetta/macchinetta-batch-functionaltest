@@ -80,7 +80,9 @@ A list of test cases is shown below.
 4.6 Read and write of footer records using FlatFileFooterCallback.
 5. Test of multiple files.
 5.1 Read multiple files of the same record format using MultiResourceItemReader.
-5.2 Write to multiple files per fixed number of cases using MultiResourceItemWriter (Read 21 records from DB, chunk-interval=5, itemCountLimitPerResource=4).
+5.2 Write to multiple files per fixed number of cases using MultiResourceItemWriter (Read 21 records from DB, chunk-interval=5, itemCountLimitPerResource=5).
+5.3 Write to multiple files per fixed number of cases using MultiResourceItemWriter (Read 21 records from DB, chunk-interval=3, itemCountLimitPerResource=6).
+5.4 Write to multiple files per fixed number of cases using MultiResourceItemWriter (Read 21 records from DB, chunk-interval=6, itemCountLimitPerResource=5).
 6. Test of XML file.
 6.1 Input using JAXB.
 6.2 Output using JAXB.
@@ -293,7 +295,7 @@ class FileAccessSpec extends Specification {
         throwableCursor.throwable.stackTrace.size() > 0
 
         throwableCursor.throwable.cause._class == BindException
-        throwableCursor.throwable.cause.message.contains("Cannot convert value of type 'java.lang.String' to required type 'java.util.Date' for property 'date'")
+        throwableCursor.throwable.cause.message.contains("Cannot convert value of type 'java.lang.String' to required type 'java.time.LocalDate' for property 'date'")
     }
 
     // 1.1.7
@@ -877,7 +879,7 @@ class FileAccessSpec extends Specification {
     }
 
     // 5.2
-    def "Writing multiple CSV files."() {
+    def "Writing multiple CSV files when commit-interval equals itemCountLimitPerResource."() {
         setup:
         def initCustomerMstDataSet = DBUnitUtil.createDataSet {
             customer_mst {
@@ -989,6 +991,65 @@ class FileAccessSpec extends Specification {
         def expect4 = new File("files/expect/output/ch05/fileaccess/customer_list_15.csv").readLines()
         actual4 == expect4
     }
+
+     // 5.4
+    def "Writing multiple CSV files when itemCountLimitPerResource is less than commit-interval."() {
+        setup:
+        def initCustomerMstDataSet = DBUnitUtil.createDataSet {
+            customer_mst {
+                customer_id | customer_name | customer_address | customer_tel | charge_branch_id | create_date | update_date
+                "001" | "CustomerName001" | "CustomerAddress001" | "11111111111" | "001" | "[now]" | "[now]"
+                "002" | "CustomerName002" | "CustomerAddress002" | "11111111111" | "002" | "[now]" | "[now]"
+                "003" | "CustomerName003" | "CustomerAddress003" | "11111111111" | "003" | "[now]" | "[now]"
+                "004" | "CustomerName004" | "CustomerAddress004" | "11111111111" | "004" | "[now]" | "[now]"
+                "005" | "CustomerName005" | "CustomerAddress005" | "11111111111" | "005" | "[now]" | "[now]"
+                "006" | "CustomerName006" | "CustomerAddress006" | "11111111111" | "006" | "[now]" | "[now]"
+                "007" | "CustomerName007" | "CustomerAddress007" | "11111111111" | "007" | "[now]" | "[now]"
+                "008" | "CustomerName008" | "CustomerAddress008" | "11111111111" | "008" | "[now]" | "[now]"
+                "009" | "CustomerName009" | "CustomerAddress009" | "11111111111" | "009" | "[now]" | "[now]"
+                "010" | "CustomerName010" | "CustomerAddress010" | "11111111111" | "010" | "[now]" | "[now]"
+                "011" | "CustomerName011" | "CustomerAddress011" | "11111111111" | "011" | "[now]" | "[now]"
+                "012" | "CustomerName012" | "CustomerAddress012" | "11111111111" | "012" | "[now]" | "[now]"
+                "013" | "CustomerName013" | "CustomerAddress013" | "11111111111" | "013" | "[now]" | "[now]"
+                "014" | "CustomerName014" | "CustomerAddress014" | "11111111111" | "014" | "[now]" | "[now]"
+                "015" | "CustomerName015" | "CustomerAddress015" | "11111111111" | "015" | "[now]" | "[now]"
+                "016" | "CustomerName016" | "CustomerAddress016" | "11111111111" | "016" | "[now]" | "[now]"
+                "017" | "CustomerName017" | "CustomerAddress017" | "11111111111" | "017" | "[now]" | "[now]"
+                "018" | "CustomerName018" | "CustomerAddress018" | "11111111111" | "018" | "[now]" | "[now]"
+                "019" | "CustomerName019" | "CustomerAddress019" | "11111111111" | "019" | "[now]" | "[now]"
+                "020" | "CustomerName020" | "CustomerAddress020" | "11111111111" | "020" | "[now]" | "[now]"
+                "021" | "CustomerName021" | "CustomerAddress021" | "11111111111" | "021" | "[now]" | "[now]"
+            }
+        }
+        jobDBUnitUtil.insert(initCustomerMstDataSet)
+
+        def outputPath = outputDir + "/customer_list_"
+
+        when:
+        int exitCode = jobLauncher.syncJob(new JobRequest(
+                jobFilePath: jobLauncher.getBeanDefinitionPath('jobWriteMultipleCsvItemCount'),
+                jobName: 'jobWriteMultipleCsvItemCount',
+                jobParameter: "outputDir=" + outputPath))
+
+        then:
+        exitCode == 0
+
+        def actual1 = new File(outputPath + "01.csv").readLines()
+        def expect1 = new File("files/expect/output/ch05/fileaccess/customer_list_17.csv").readLines()
+        actual1 == expect1
+        def actual2 = new File(outputPath + "02.csv").readLines()
+        def expect2 = new File("files/expect/output/ch05/fileaccess/customer_list_18.csv").readLines()
+        actual2 == expect2
+        def actual3 = new File(outputPath + "03.csv").readLines()
+        def expect3 = new File("files/expect/output/ch05/fileaccess/customer_list_19.csv").readLines()
+        actual3 == expect3
+        def actual4 = new File(outputPath + "04.csv").readLines()
+        def expect4 = new File("files/expect/output/ch05/fileaccess/customer_list_20.csv").readLines()
+        actual4 == expect4
+        def actual5 = new File(outputPath + "05.csv").readLines()
+        def expect5 = new File("files/expect/output/ch05/fileaccess/customer_list_21.csv").readLines()
+        actual5 == expect5
+    } 
 
     // 6.1
     def "Reading XML file using JAXB."() {

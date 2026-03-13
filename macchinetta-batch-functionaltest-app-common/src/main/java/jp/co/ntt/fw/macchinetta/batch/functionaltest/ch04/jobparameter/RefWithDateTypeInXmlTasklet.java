@@ -23,8 +23,8 @@ import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
 
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 /**
  * Tasklet to output the field to the log
@@ -51,7 +51,7 @@ public class RefWithDateTypeInXmlTasklet implements Tasklet {
     /**
      * Holds a Date type value
      */
-    private Date date;
+    private LocalDateTime date;
 
     /**
      * {@inheritDoc}
@@ -60,7 +60,7 @@ public class RefWithDateTypeInXmlTasklet implements Tasklet {
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
         if (logger.isInfoEnabled()) {
             logger.info("str = {}, num = {}, date = {}", str, num,
-                    new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss").format(date));
+                    DateTimeFormatter.ofPattern("yyyy-MM-dd_HH:mm:ss").format(date));
         }
         return null;
     }
@@ -74,6 +74,7 @@ public class RefWithDateTypeInXmlTasklet implements Tasklet {
     }
 
     public void setDate(String date) throws ParseException {
-        this.date = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss").parse(date);
+        DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH:mm:ss");
+        this.date = LocalDateTime.parse(date, format);
     }
 }

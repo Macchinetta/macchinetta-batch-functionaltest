@@ -15,7 +15,7 @@
  */
 package jp.co.ntt.fw.macchinetta.batch.functionaltest.app.model.mst;
 
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 /**
  * Model of Customer master.
@@ -52,12 +52,12 @@ public class Customer {
     /**
      * Timestamp of created record.
      */
-    private Timestamp createDate;
+    private LocalDateTime createDate;
 
     /**
      * Timestamp of updated record.
      */
-    private Timestamp updateDate;
+    private LocalDateTime updateDate;
 
     /**
      * Customer id.
@@ -154,7 +154,7 @@ public class Customer {
      *
      * @return The current timestamp of created record.
      */
-    public Timestamp getCreateDate() {
+    public LocalDateTime getCreateDate() {
         return createDate;
     }
 
@@ -163,7 +163,7 @@ public class Customer {
      *
      * @param createDate New timestamp of created record.
      */
-    public void setCreateDate(Timestamp createDate) {
+    public void setCreateDate(LocalDateTime createDate) {
         this.createDate = createDate;
     }
 
@@ -172,7 +172,7 @@ public class Customer {
      *
      * @return The current timestamp of updated record.
      */
-    public Timestamp getUpdateDate() {
+    public LocalDateTime getUpdateDate() {
         return updateDate;
     }
 
@@ -181,7 +181,7 @@ public class Customer {
      *
      * @param updateDate New timestamp of updated record.
      */
-    public void setUpdateDate(Timestamp updateDate) {
+    public void setUpdateDate(LocalDateTime updateDate) {
         this.updateDate = updateDate;
     }
 

@@ -37,6 +37,7 @@ import jakarta.inject.Inject;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Tasklet that perform input check and if an error occurs, continue processing and message and log are output at the end.
@@ -82,7 +83,7 @@ public class ValidateAndBulkMessageTasklet implements Tasklet {
                     BindException errors = (BindException) e.getCause();
 
                     for (FieldError fieldError : errors.getFieldErrors()) {
-                        errorMessageList.add(messageSource.getMessage(fieldError, null) + MessageFormat
+                        errorMessageList.add(messageSource.getMessage(fieldError, Locale.getDefault()) + MessageFormat
                                 .format(" Skipping item because exception occurred in input validation at the {0} th item. [message:{1}]",
                                         item.getCount(), e.getMessage()));
                     }

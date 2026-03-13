@@ -29,8 +29,8 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import jakarta.inject.Inject;
-import java.sql.Timestamp;
 import java.time.Clock;
+import java.time.LocalDateTime;
 
 /**
  * Tasket to check DB optimistic lock.
@@ -86,7 +86,7 @@ public class OptimisticLockTasklet implements Tasklet {
         exclusiveBranch.setBranchAddress(branch.getBranchAddress() + " - " + identifier);
         exclusiveBranch.setBranchTel(branch.getBranchTel());
         exclusiveBranch.setCreateDate(branch.getUpdateDate());
-        exclusiveBranch.setUpdateDate(new Timestamp(clock.millis()));
+        exclusiveBranch.setUpdateDate(LocalDateTime.now(clock));
         exclusiveBranch.setOldBranchName(branch.getBranchName());
 
         int result = repository.branchExclusiveUpdate(exclusiveBranch);

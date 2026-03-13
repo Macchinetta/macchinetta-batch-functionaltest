@@ -29,6 +29,7 @@ import jp.co.ntt.fw.macchinetta.batch.functionaltest.config.AsyncBatchDaemonConf
 import org.terasoluna.batch.async.db.repository.BatchJobRequestRepository;
 
 import java.time.Clock;
+import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
@@ -53,9 +54,8 @@ public class AsyncBatchDaemonClockConfig {
         JobRequestPollTask jobRequestPollTask = new JobRequestPollTask(
                 batchJobRequestRepository.getObject(), adminTransactionManager,
                 daemonTaskExecutor, jobOperator, automaticJobRegistrar);
-        jobRequestPollTask.setClock(Clock.fixed(ZonedDateTime.parse(
-                        "2016-12-31T16:00-08:00[America/Los_Angeles]").toInstant(),
-                ZoneId.of("PST", ZoneId.SHORT_IDS)));
+        jobRequestPollTask.setClock(Clock.fixed(Instant.parse("2017-01-01T00:00:00Z"),
+                ZoneId.systemDefault()));
         return jobRequestPollTask;
     }
 

@@ -23,7 +23,7 @@
           p:clock-ref="clock" />
 
     <bean id="clock" class="java.time.Clock" factory-method="fixed"
-          c:fixedInstant="#{T(java.time.ZonedDateTime).parse('2016-12-31T16:00-08:00[America/Los_Angeles]').toInstant()}"
-          c:zone="#{T(java.time.ZoneId).of('PST', T(java.time.ZoneId).SHORT_IDS)}"/>
+          c:fixedInstant="#{T(java.time.Instant).parse('2017-01-01T00:00:00Z')}"
+          c:zone="#{T(java.time.ZoneId).systemDefault()}"/>
 
 </beans>

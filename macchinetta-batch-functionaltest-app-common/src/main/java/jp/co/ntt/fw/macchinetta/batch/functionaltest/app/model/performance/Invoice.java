@@ -16,7 +16,7 @@
 package jp.co.ntt.fw.macchinetta.batch.functionaltest.app.model.performance;
 
 import java.math.BigDecimal;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 /**
  * Model of Invoice.
@@ -33,7 +33,7 @@ public class Invoice {
     /**
      * Invoice date.
      */
-    private Date invoiceDate;
+    private LocalDateTime invoiceDate;
 
     /**
      * Invoice amount.
@@ -68,7 +68,7 @@ public class Invoice {
      *
      * @return The current invoice date.
      */
-    public Date getInvoiceDate() {
+    public LocalDateTime getInvoiceDate() {
         return invoiceDate;
     }
 
@@ -77,7 +77,7 @@ public class Invoice {
      *
      * @param invoiceDate New invoice date.
      */
-    public void setInvoiceDate(Date invoiceDate) {
+    public void setInvoiceDate(LocalDateTime invoiceDate) {
         this.invoiceDate = invoiceDate;
     }
 

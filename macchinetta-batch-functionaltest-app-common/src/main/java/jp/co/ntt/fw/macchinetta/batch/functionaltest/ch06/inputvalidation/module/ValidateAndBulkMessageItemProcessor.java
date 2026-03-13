@@ -36,6 +36,7 @@ import jakarta.inject.Inject;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Item processor that perform input check and if an error occurs, continue processing and message and log are output at the end.
@@ -84,7 +85,7 @@ public class ValidateAndBulkMessageItemProcessor implements ItemProcessor<Verifi
             for (FieldError fieldError : errors.getFieldErrors()) {
                 String message = MessageFormat
                         .format("{0} Skipping item because exception occurred in input validation at the {1}. [message:{2}]",
-                                messageSource.getMessage(fieldError, null), item.getCount() + " th item", e.getMessage());
+                                messageSource.getMessage(fieldError, Locale.getDefault()), item.getCount() + " th item", e.getMessage());
 
                 errorMessageList.add(message);
             }

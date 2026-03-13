@@ -19,8 +19,8 @@ import jp.co.ntt.fw.macchinetta.batch.functionaltest.app.model.mst.Branch;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.stereotype.Component;
 
-import java.sql.Timestamp;
 import java.time.Clock;
+import java.time.LocalDateTime;
 
 /**
  * Process business logic for branch master.
@@ -45,7 +45,7 @@ public class BranchItemProcessor implements ItemProcessor<Branch, Branch> {
     @Override
     public Branch process(Branch item) throws Exception {
 
-        item.setCreateDate(new Timestamp(clock.millis()));
+        item.setCreateDate(LocalDateTime.now(clock));
 
         return item;
     }

@@ -99,7 +99,7 @@ public class JobWriteMultipleCsvCommitIntervalConfig {
                 .name(ClassUtils.getShortName(MultiResourceItemWriter.class))
                 .resource(new FileSystemResource(outputDir))
                 .resourceSuffixCreator(customerListResourceSuffixCreator)
-                .itemCountLimitPerResource(4)
+                .itemCountLimitPerResource(6)
                 .delegate(writer)
                 .build();
     }

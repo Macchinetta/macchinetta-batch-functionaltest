@@ -15,7 +15,7 @@
  */
 package jp.co.ntt.fw.macchinetta.batch.functionaltest.ch05.exclusivecontrol.model;
 
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 /**
  * Model of Branch master.
@@ -47,12 +47,12 @@ public class ExclusiveBranch {
     /**
      * Timestamp of created record.
      */
-    private Timestamp createDate;
+    private LocalDateTime createDate;
 
     /**
      * Timestamp of updated record.
      */
-    private Timestamp updateDate;
+    private LocalDateTime updateDate;
 
     /**
      * Old branch name.
@@ -136,7 +136,7 @@ public class ExclusiveBranch {
      *
      * @return The current timestamp of created record.
      */
-    public Timestamp getCreateDate() {
+    public LocalDateTime getCreateDate() {
         return createDate;
     }
 
@@ -145,7 +145,7 @@ public class ExclusiveBranch {
      *
      * @param createDate New timestamp of created record.
      */
-    public void setCreateDate(Timestamp createDate) {
+    public void setCreateDate(LocalDateTime createDate) {
         this.createDate = createDate;
     }
 
@@ -154,7 +154,7 @@ public class ExclusiveBranch {
      *
      * @return The current timestamp of updated record.
      */
-    public Timestamp getUpdateDate() {
+    public LocalDateTime getUpdateDate() {
         return updateDate;
     }
 
@@ -163,7 +163,7 @@ public class ExclusiveBranch {
      *
      * @param updateDate New timestamp of updated record.
      */
-    public void setUpdateDate(Timestamp updateDate) {
+    public void setUpdateDate(LocalDateTime updateDate) {
         this.updateDate = updateDate;
     }
 

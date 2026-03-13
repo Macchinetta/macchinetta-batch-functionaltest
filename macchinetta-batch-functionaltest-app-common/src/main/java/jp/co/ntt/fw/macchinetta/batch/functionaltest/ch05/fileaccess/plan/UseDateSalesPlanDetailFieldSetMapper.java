@@ -25,11 +25,11 @@ import org.springframework.stereotype.Component;
 import org.springframework.validation.BindException;
 
 import java.math.BigDecimal;
-import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Locale;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 
 /**
  * Filed set mapper for sales plan detail.
@@ -63,10 +63,10 @@ public class UseDateSalesPlanDetailFieldSetMapper implements FieldSetMapper<UseD
 
         item.setBranchId(fieldSet.readString("branchId"));
 
-        DateFormat japaneseFormat = new SimpleDateFormat("yyyy年M月d日");
+        DateTimeFormatter japaneseFormat = DateTimeFormatter.ofPattern("yyyy年M月d日");
         try {
-            item.setDate(japaneseFormat.parse(fieldSet.readString("date")));
-        } catch (ParseException e) {
+            item.setDate(LocalDate.parse(fieldSet.readString("date"), japaneseFormat));
+        } catch (DateTimeParseException e) {
             throw new IncorrectFieldFormatException("The format of field date is invalid. " + "[value:"
                     + fieldSet.readString("date") + "]", e);
         }

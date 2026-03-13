@@ -35,8 +35,8 @@ import org.springframework.core.io.ClassPathResource
 import org.springframework.core.io.support.EncodedResource
 import org.springframework.jdbc.datasource.init.ScriptUtils
 
-import java.sql.Timestamp
 import java.time.Clock
+import java.time.LocalDateTime
 
 /**
  * Utility for DBUnit.
@@ -233,7 +233,7 @@ class DBUnitUtil {
 
     static final Map<String, Closure> defaultReplaceRule = [
             '[null]': { null },
-            '[now]' : { new Timestamp(clock.millis()) }
+            '[now]' : { LocalDateTime.now(clock).format("yyyy-MM-dd HH:mm:ss.SSS") }
     ].asImmutable()
 
     static ReplacementDataSet createDataSet(Closure c, Map<String, Closure> replaceRule = defaultReplaceRule) {

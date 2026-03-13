@@ -15,18 +15,24 @@
  */
 package jp.co.ntt.fw.macchinetta.batch.functionaltest.util
 
-import groovyx.net.http.ContentType
-import groovyx.net.http.RESTClient
+import groovy.json.JsonBuilder
+import groovy.json.JsonSlurper
 import org.springframework.core.io.ClassPathResource
+
+import java.net.http.HttpClient
+import java.net.http.HttpRequest
+import java.net.http.HttpResponse
 
 class RestUtil {
 
-    final RESTClient restClient
+    final String baseUrl
+    final HttpClient httpClient = HttpClient.newHttpClient()
+    final JsonSlurper jsonSlurper = new JsonSlurper()
 
     RestUtil() {
         def conf = new ConfigSlurper().parse(
                 new ClassPathResource('rest-config.groovy').URL).restutil
-        this.restClient = new RESTClient("${conf.schema ?: 'http'}://${conf.host}:${conf.port}/${conf.appName ?: 'macchinetta-batch-functionaltest-web'}/${conf.rootPath ?: 'api/v1/job'}/")
+        this.baseUrl = "${conf.schema ?: 'http'}://${conf.host}:${conf.port}/${conf.appName ?: 'macchinetta-batch-functionaltest-web'}/${conf.rootPath ?: 'api/v1/job'}"
     }
 
     RestSubmitResult submitJob(String jobName, String jobParams = null) {
@@ -35,15 +41,25 @@ class RestUtil {
         if (jobParams != null) {
             bodyMap['jobParams'] = jobParams
         }
+        String jsonBody = new JsonBuilder(bodyMap).toString()
+        def url = "${baseUrl}/${jobName}"
 
-        def res = restClient.post(path: jobName, contentType: ContentType.JSON, body: bodyMap)
+        def request = HttpRequest.newBuilder()
+                .uri(URI.create(url))
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(jsonBody))
+                .build()
+
+        def response = httpClient.send(request, HttpResponse.BodyHandlers.ofString())
+        def statusCode = response.statusCode()
+        def parsedData = parseJsonSafe(response.body())
+
         def result = new RestSubmitResult()
-        result.status = res?.status
-        def data = res?.data
-        if (data != null && data instanceof Map) {
-            result.data = new RestSubmitResult.JobExecutionData(data as Map)
+        result.status = statusCode
+        if (parsedData instanceof Map) {
+            result.data = new RestSubmitResult.JobExecutionData(parsedData)
         }
-        result
+        return result
     }
 
     def stopJob(long jobExecutionId) {
@@ -58,26 +74,61 @@ class RestUtil {
 
     def putJob(String path) {
         assert path != null
-        def rest = restClient.put(path: path)
+        def url = "${baseUrl}/${path}"
+        def request = HttpRequest.newBuilder()
+                .uri(URI.create(url))
+                .PUT(HttpRequest.BodyPublishers.noBody())
+                .build()
+
+        def response = httpClient.send(request, HttpResponse.BodyHandlers.ofString())
+        def statusCode = response.statusCode()
+        def parsedData = parseJsonSafe(response.body())
+
         def result = new RestJobExecution()
-        result.status = rest?.status
-        result.jobExecution = retrieveJobExecution(rest?.data)
-        result
+        result.status = statusCode
+        result.jobExecution = retrieveJobExecution(parsedData)
+        return result
     }
 
-    def getJobExecution(Long jobExecutionId) {
-        def res = restClient.get(path: jobExecutionId, contentType: ContentType.JSON)
+    RestJobExecution getJobExecution(Long jobExecutionId) {
+        def url = "${baseUrl}/${jobExecutionId}"
+        def request = HttpRequest.newBuilder()
+                .uri(URI.create(url))
+                .header("Accept", "application/json")
+                .GET()
+                .build()
+
+        def response = httpClient.send(request, HttpResponse.BodyHandlers.ofString())
+        def statusCode = response.statusCode()
+        def parsedData = parseJsonSafe(response.body())
+
         def result = new RestJobExecution()
-        result.status = res?.status
-        def data = res?.data
-        if (data != null && data instanceof Map) {
-            result.jobExecution = new RestJobExecution.JobExecution(data as Map)
+        result.status = statusCode
+        if (parsedData instanceof Map) {
+            result.jobExecution = new RestJobExecution.JobExecution(parsedData)
         }
-        result
+        return result
     }
 
     def get(String param) {
-        restClient.get(path: param, contentType: ContentType.JSON)
+        def cleanBase = baseUrl.endsWith('/') ? baseUrl[0..-2] : baseUrl
+        def url = "${cleanBase}/${param}"
+        def request = HttpRequest.newBuilder()
+                .uri(URI.create(url))
+                .header("Accept", "application/json")
+                .GET()
+                .build()
+
+        def response = httpClient.send(request, HttpResponse.BodyHandlers.ofString())
+        def statusCode = response.statusCode()
+        def responseBody = response.body()
+
+        def parsedData = parseJsonSafe(responseBody)
+        if (parsedData == null) {
+            parsedData = responseBody
+        }
+
+        return [status: statusCode, data: parsedData]
     }
 
     RestJobExecution.JobExecution retrieveJobExecution(Object data) {
@@ -88,5 +139,13 @@ class RestUtil {
         def execution = new RestJobExecution.JobExecution()
         execution.jobExecutionId = map['jobExecutionId'] as long
         execution
+    }
+
+    private Object parseJsonSafe(String body) {
+        try {
+            return jsonSlurper.parseText(body)
+        } catch (Exception e) {
+            return body
+        }
     }
 }

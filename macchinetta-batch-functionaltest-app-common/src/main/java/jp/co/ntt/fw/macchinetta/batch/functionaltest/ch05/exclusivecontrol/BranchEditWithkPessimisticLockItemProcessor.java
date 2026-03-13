@@ -26,8 +26,8 @@ import jp.co.ntt.fw.macchinetta.batch.functionaltest.ch05.exclusivecontrol.model
 import jp.co.ntt.fw.macchinetta.batch.functionaltest.ch05.exclusivecontrol.repository.ExclusiveControlRepository;
 
 import jakarta.inject.Inject;
-import java.sql.Timestamp;
 import java.time.Clock;
+import java.time.LocalDateTime;
 
 /**
  * Item processor of editing branch master data.
@@ -85,7 +85,7 @@ public class BranchEditWithkPessimisticLockItemProcessor implements ItemProcesso
             updatedBranch.setBranchAddress(branch.getBranchAddress() + " - " + identifier);
             updatedBranch.setBranchTel(branch.getBranchTel());
             updatedBranch.setCreateDate(branch.getUpdateDate());
-            updatedBranch.setUpdateDate(new Timestamp(clock.millis()));
+            updatedBranch.setUpdateDate(LocalDateTime.now(clock));
             updatedBranch.setOldBranchName(branch.getBranchName());
 
             return updatedBranch;

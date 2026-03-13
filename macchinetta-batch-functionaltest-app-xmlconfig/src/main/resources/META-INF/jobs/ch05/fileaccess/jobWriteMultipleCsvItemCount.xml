@@ -41,11 +41,11 @@
           p:itemCountLimitPerResource="5"
           p:delegate-ref="writer"/>
 
-    <batch:job id="jobWriteMultipleCsv" job-repository="jobRepository">
-        <batch:step id="jobWriteMultipleCsv.step01">
+    <batch:job id="jobWriteMultipleCsvItemCount" job-repository="jobRepository">
+        <batch:step id="jobWriteMultipleCsvItemCount.step01">
             <batch:tasklet transaction-manager="jobTransactionManager">
                 <batch:chunk reader="reader"
-                             writer="multiResourceItemWriter" commit-interval="5"/>
+                             writer="multiResourceItemWriter" commit-interval="6"/>
             </batch:tasklet>
         </batch:step>
         <batch:listeners>

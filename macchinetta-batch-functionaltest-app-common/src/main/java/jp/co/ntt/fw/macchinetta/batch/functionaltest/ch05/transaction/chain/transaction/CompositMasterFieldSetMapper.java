@@ -23,8 +23,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.validation.BindException;
 import jp.co.ntt.fw.macchinetta.batch.functionaltest.app.model.mst.Branch;
 
-import java.sql.Timestamp;
 import java.time.Clock;
+import java.time.LocalDateTime;
 
 /**
  * Field set mapper for master composite model.
@@ -52,7 +52,7 @@ public class CompositMasterFieldSetMapper implements FieldSetMapper<CompositeMas
         Customer customer = new Customer();
         Branch branch = new Branch();
 
-        Timestamp createDate = new Timestamp(clock.millis());
+        LocalDateTime createDate = LocalDateTime.now(clock);
 
         customer.setCustomerId(fieldSet.readString("customerId"));
         customer.setChargeBranchId(fieldSet.readString("branchId"));

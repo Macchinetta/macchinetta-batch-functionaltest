@@ -10,7 +10,7 @@
     <parent>
         <groupId>jp.co.ntt.fw.macchinetta.batch</groupId>
         <artifactId>macchinetta-batch-functionaltest-build</artifactId>
-        <version>2.6.0.RELEASE</version>
+        <version>2.6.1.RELEASE</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -41,6 +41,9 @@
                     <groupId>org.codehaus.gmavenplus</groupId>
                     <artifactId>gmavenplus-plugin</artifactId>
                     <version>${gmavenplus-plugin.version}</version>
+                    <configuration>
+                        <targetBytecode>${java-version}</targetBytecode>
+                    </configuration>
                     <executions>
                         <execution>
                             <goals>
@@ -131,23 +134,28 @@
         </dependency>
 
         <dependency>
-            <groupId>org.codehaus.groovy</groupId>
+            <groupId>org.apache.groovy</groupId>
             <artifactId>groovy</artifactId>
         </dependency>
 
         <dependency>
-            <groupId>org.codehaus.groovy</groupId>
+            <groupId>org.apache.groovy</groupId>
             <artifactId>groovy-sql</artifactId>
         </dependency>
 
         <dependency>
-            <groupId>org.codehaus.groovy</groupId>
+            <groupId>org.apache.groovy</groupId>
             <artifactId>groovy-datetime</artifactId>
         </dependency>
 
         <dependency>
-            <groupId>org.codehaus.groovy</groupId>
+            <groupId>org.apache.groovy</groupId>
             <artifactId>groovy-dateutil</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.groovy</groupId>
+            <artifactId>groovy-json</artifactId>
         </dependency>
 
         <dependency>
@@ -167,8 +175,8 @@
         </dependency>
 
         <dependency>
-            <groupId>com.gmongo</groupId>
-            <artifactId>gmongo</artifactId>
+            <groupId>org.mongodb</groupId>
+            <artifactId>mongo-java-driver</artifactId>
         </dependency>
 
         <dependency>
@@ -198,8 +206,8 @@
 
         <!-- == Dependency Versions == -->
         <!-- == TERASOLUNA Batch == -->
-        <terasoluna-batch.version>5.7.0.RELEASE</terasoluna-batch.version>
-        <terasoluna.gfw.bom.version>2.0.0.RELEASE</terasoluna.gfw.bom.version>
+        <terasoluna-batch.version>5.7.1.RELEASE</terasoluna-batch.version>
+        <terasoluna.gfw.bom.version>2.0.1.RELEASE</terasoluna.gfw.bom.version>
 
         <!-- == Project Properties == -->
         <project.root.basedir>${project.basedir}</project.root.basedir>

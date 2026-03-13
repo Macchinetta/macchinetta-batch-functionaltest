@@ -36,6 +36,7 @@ import java.nio.file.Files
 import java.sql.Timestamp
 import java.time.ZoneId
 import java.time.ZonedDateTime
+import java.time.temporal.ChronoUnit
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeoutException
 
@@ -165,11 +166,11 @@ class AsyncJobWithDBSpec extends Specification {
         def cursorSecondPollingLog = pollingLog.get(1)
 
         // Confirm Delay of Approximately 10 Seconds over.(initial-delay)
-        def diffInitialInterval = (cursorFirstPollingLog.timestamp.time - schedulerStartLog.timestamp.time) / 1000
+        def diffInitialInterval = schedulerStartLog.timestamp.until(cursorFirstPollingLog.timestamp, ChronoUnit.MILLIS) / 1000
         diffInitialInterval > 10.0
 
         // Make sure the polling interval is approximately 5 seconds.
-        def diffPollingInterval = (cursorSecondPollingLog.timestamp.time - cursorFirstPollingLog.timestamp.time) / 1000
+        def diffPollingInterval = cursorFirstPollingLog.timestamp.until(cursorSecondPollingLog.timestamp, ChronoUnit.MILLIS) / 1000
         diffPollingInterval > 5.0
 
         // Assertion to the data from database.
@@ -325,7 +326,7 @@ class AsyncJobWithDBSpec extends Specification {
 
         then:
         jobRequestTable.getValue(0, "polling_status") == 'EXECUTED'
-        daemonStopLog.timestamp.after(jobFinishLog.timestamp)
+        daemonStopLog.timestamp.isAfter(jobFinishLog.timestamp)
         p.exitValue() == 0
     }
 
@@ -416,7 +417,7 @@ class AsyncJobWithDBSpec extends Specification {
         Files.createDirectory(stopFile.toPath())
 
         try {
-            mongoUtil.waitForOutputLog(new LogCondition(message: "Polling stop file must be a regular file. [Path:${stopFile.toPath()}]"))
+            mongoUtil.waitForOutputLog(new LogCondition(message: String.format("Polling stop file must be a regular file. [Path:%s]", stopFile.toPath())))
         } catch (TimeoutException e) {
             result = -1
         }
@@ -835,12 +836,12 @@ class AsyncJobWithDBSpec extends Specification {
         then:
         def polledLog = mongoUtil.findOne(
                 new LogCondition(
-                        message: "==> Parameters: POLLED(String), null, ${updateDate}, 1(Long), INIT(String)"
+                        message: String.format("==> Parameters: POLLED(String), null, %s, 1(Long), INIT(String)", updateDate)
                 )
         )
         def executedLog = mongoUtil.findOne(
                 new LogCondition(
-                        message: "==> Parameters: EXECUTED(String), 1(Long), ${updateDate}, 1(Long), POLLED(String)"
+                        message: String.format("==> Parameters: EXECUTED(String), 1(Long), %s, 1(Long), POLLED(String)", updateDate)
                 )
         )
 
@@ -853,8 +854,8 @@ class AsyncJobWithDBSpec extends Specification {
 
         where :
         timezone                | updateDate
-        "UTC"                   | "2017-01-01 00:00:00.0(Timestamp)"
-        "America/Los_Angeles"   | "2016-12-31 16:00:00.0(Timestamp)"
+        "UTC"                   | "2017-01-01T00:00(LocalDateTime)"
+        "America/Los_Angeles"   | "2016-12-31T16:00(LocalDateTime)"
     }
 
     // Testcase 7, test no.1 and Testcase 2, test no.2

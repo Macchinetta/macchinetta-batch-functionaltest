@@ -22,6 +22,8 @@ import jp.co.ntt.fw.macchinetta.batch.functionaltest.util.JobRequest
 import jp.co.ntt.fw.macchinetta.batch.functionaltest.util.LogCondition
 import jp.co.ntt.fw.macchinetta.batch.functionaltest.util.MongoUtil
 
+import java.time.Instant
+
 class JobLauncherSample {
 
     final JobLauncher jobLauncher
@@ -79,7 +81,7 @@ class JobLauncherSample {
             arg.jobRequest = new JobRequest(
                     jobFilePath: 'META-INF/jobs/common/jobForSample.xml',
                     jobName: 'jobForSample',
-                    jobParameter: "xxx=${System.currentTimeMillis()}")
+                    jobParameter: "xxx=${Instant.now().toEpochMilli()}")
             arg.env = []
         }
         def syncLog = mongoUtil.findOne(new LogCondition(logger: ForSampleTasklet.class.name, level: 'INFO'))
@@ -89,7 +91,7 @@ class JobLauncherSample {
     }
 
     def "launch asyncJob"() {
-        def jobRequest = new JobRequest(jobName: 'jobForSample', jobParameter: "xxx=${System.currentTimeMillis()}")
+        def jobRequest = new JobRequest(jobName: 'jobForSample', jobParameter: "xxx=${Instant.now().toEpochMilli()}")
 
         def jobSeqId = jobLauncher.registerAsyncJob(dbUnitUtil, jobRequest)
 

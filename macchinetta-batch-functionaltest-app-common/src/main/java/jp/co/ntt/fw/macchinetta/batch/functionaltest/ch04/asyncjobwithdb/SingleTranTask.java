@@ -28,7 +28,7 @@ import org.springframework.stereotype.Component;
 import jakarta.inject.Inject;
 import java.math.BigDecimal;
 import java.security.SecureRandom;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -67,7 +67,7 @@ public class SingleTranTask implements Tasklet {
             Invoice invoice = new Invoice();
             String invoiceNo = String.format("invoice-%04d", i + 1);
             invoice.setInvoiceNo(invoiceNo);
-            invoice.setInvoiceDate(new Date());
+            invoice.setInvoiceDate(LocalDateTime.now());
             invoice.setInvoiceAmount(new BigDecimal(random.nextInt(10000000)));
             invoice.setCustomerId("dummy");
             invoiceRepository.create(invoice);

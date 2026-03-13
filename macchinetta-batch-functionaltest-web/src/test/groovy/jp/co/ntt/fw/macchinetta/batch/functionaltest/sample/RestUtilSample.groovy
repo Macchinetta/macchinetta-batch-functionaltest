@@ -17,6 +17,8 @@ package jp.co.ntt.fw.macchinetta.batch.functionaltest.sample
 
 import jp.co.ntt.fw.macchinetta.batch.functionaltest.util.RestUtil
 
+import java.time.Instant
+
 /**
  * This sample uses RestUtil.
  * CAUTION: To work this sample, deploy macchinetta-batch-functionaltest-web war file to application server.
@@ -27,7 +29,7 @@ class RestUtilSample {
 
         final RestUtil restUtil = new RestUtil()
 
-        def resultSubmit = restUtil.submitJob('jobForSample', "xxx=${System.currentTimeMillis()}")
+        def resultSubmit = restUtil.submitJob('jobForSample', "xxx=${Instant.now().toEpochMilli()}")
         resultSubmit.with {
             assert status == 200
             assert data.jobName == 'jobForSample'

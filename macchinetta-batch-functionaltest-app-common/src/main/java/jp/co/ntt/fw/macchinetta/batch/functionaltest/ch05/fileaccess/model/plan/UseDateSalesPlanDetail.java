@@ -16,8 +16,8 @@
 package jp.co.ntt.fw.macchinetta.batch.functionaltest.ch05.fileaccess.model.plan;
 
 import java.math.BigDecimal;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 /**
  * Model of Sales Performance Detail using Date type.
@@ -34,7 +34,7 @@ public class UseDateSalesPlanDetail {
     /**
      * Date.
      */
-    private Date date;
+    private LocalDate date;
 
     /**
      * Customer ID.
@@ -69,7 +69,7 @@ public class UseDateSalesPlanDetail {
      *
      * @return The current date.
      */
-    public Date getDate() {
+    public LocalDate getDate() {
         return date;
     }
 
@@ -78,7 +78,7 @@ public class UseDateSalesPlanDetail {
      *
      * @param date New date.
      */
-    public void setDate(Date date) {
+    public void setDate(LocalDate date) {
         this.date = date;
     }
 
@@ -126,7 +126,7 @@ public class UseDateSalesPlanDetail {
     @Override
     public String toString() {
         return "SalesPlanDetail{" + "branchId='" + branchId + '\'' + ", " + "date="
-                + new SimpleDateFormat("yyyy-MM-dd").format(date) + ", " + "customerId='" + customerId + '\''
+                + date.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) + ", " + "customerId='" + customerId + '\''
                 + ", amount=" + amount + '}';
     }
 }

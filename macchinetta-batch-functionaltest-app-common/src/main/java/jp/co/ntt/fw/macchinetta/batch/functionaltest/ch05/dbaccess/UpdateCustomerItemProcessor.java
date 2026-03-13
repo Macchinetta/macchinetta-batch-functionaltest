@@ -23,8 +23,8 @@ import jp.co.ntt.fw.macchinetta.batch.functionaltest.app.model.mst.Customer;
 import jp.co.ntt.fw.macchinetta.batch.functionaltest.ch05.dbaccess.repository.DBAccessCustomerRepository;
 
 import jakarta.inject.Inject;
-import java.sql.Timestamp;
 import java.time.Clock;
+import java.time.LocalDateTime;
 
 /**
  * Update customer info processor.
@@ -64,7 +64,7 @@ public class UpdateCustomerItemProcessor implements ItemProcessor<Customer, Cust
     public Customer process(Customer item) throws Exception {
         item.setCustomerName(String.format("%s updated by mapper if", item.getCustomerName()));
         item.setCustomerAddress(String.format("%s updated by item writer", item.getCustomerAddress()));
-        item.setUpdateDate(new Timestamp(clock.millis()));
+        item.setUpdateDate(LocalDateTime.now(clock));
 
         long cnt = customerRepository.updateName(item);
 

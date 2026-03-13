@@ -32,6 +32,7 @@ import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Stepwise
 
+import java.time.Instant
 import java.util.concurrent.TimeUnit
 
 /**
@@ -103,7 +104,7 @@ class AsyncJobWithWebContainerSpec extends Specification {
 
         when:
         // Submit new asynchronous job with REST API.
-        String currentTimeMilllis = System.currentTimeMillis()
+        String currentTimeMilllis = Instant.now().toEpochMilli()
         RestSubmitResult restSubmitResult = restUtil.submitJob('jobEmulatedLongBatchTask', "xxx=${currentTimeMilllis}")
         Long jobExecutionId = restSubmitResult?.data?.jobExecutionId
 
@@ -113,8 +114,8 @@ class AsyncJobWithWebContainerSpec extends Specification {
         jobExecutionId > 0
 
         when:
-        mongoUtil.waitForOutputLog(new LogCondition(level: 'INFO', logger: "${EmulatedLongBatchTask.class.name}",
-                message: "start tasklet. [jobExecutionId=${jobExecutionId}]"))
+        mongoUtil.waitForOutputLog(new LogCondition(level: 'INFO', logger: EmulatedLongBatchTask.class.name,
+                message: String.format("start tasklet. [jobExecutionId=%s]", jobExecutionId)))
 
         // Retrieve jobExecution in RUNNING status.
         RestJobExecution restJobExecution = restUtil.getJobExecution(jobExecutionId)
@@ -140,7 +141,7 @@ class AsyncJobWithWebContainerSpec extends Specification {
         // Wait for a while till the job complete.
         mongoUtil.waitForOutputLog(new LogCondition(
                 level: 'INFO',
-                logger: "${TaskExecutorJobLauncher.class.name}",
+                logger: TaskExecutorJobLauncher.class.name,
                 message: ~/completed with the following parameters:.*value=${currentTimeMilllis}/))
         restJobExecution = restUtil.getJobExecution(jobExecutionId)
 
@@ -171,8 +172,8 @@ class AsyncJobWithWebContainerSpec extends Specification {
 
         when: "Submit new asynchronous job concurrently."
         RestSubmitResult submitResult = restUtil.submitJob(jobName)
-        mongoUtil.waitForOutputLog(new LogCondition(level: 'INFO', logger: "${EmulatedLongBatchTask.class.name}",
-                message: "start tasklet. [jobExecutionId=${submitResult.data.jobExecutionId}]"))
+        mongoUtil.waitForOutputLog(new LogCondition(level: 'INFO', logger: EmulatedLongBatchTask.class.name,
+                message: String.format("start tasklet. [jobExecutionId=%s]", submitResult.data.jobExecutionId)))
 
         then: "Validate REST status and jobExecutionId."
         submitResult.status == sts
@@ -214,7 +215,7 @@ class AsyncJobWithWebContainerSpec extends Specification {
         when: "Submit new asynchronous job concurrently."
         RestSubmitResult submitResult = restUtil.submitJob(jobName)
         mongoUtil.waitForOutputLog(new LogCondition(level: 'INFO',
-                logger: "${SimpleJobOperator.class.name}",
+                logger: SimpleJobOperator.class.name,
                 message: ~/Attempting to launch job with name=jobEmulatedLongBatchTask/))
 
         then: "Validate REST status and jobExecutionId."
@@ -249,7 +250,7 @@ class AsyncJobWithWebContainerSpec extends Specification {
         def result = restUtil.get("signal")
         while (true) {
             List<LogCursor> logs = mongoUtil.find(new LogCondition(level: 'INFO',
-                    logger: "${TaskExecutorJobLauncher.class.name}", message: ~/Job: \[(FlowJob|SimpleJob): \[name=jobEmulatedLongBatchTask]] completed/))
+                    logger: TaskExecutorJobLauncher.class.name, message: ~/Job: \[(FlowJob|SimpleJob): \[name=jobEmulatedLongBatchTask]] completed/))
             if (logs?.size() == 5) {
                 break
             }
@@ -343,7 +344,7 @@ class AsyncJobWithWebContainerSpec extends Specification {
         assert result.status == 200
         assert result.data == 'sent signal.'
         // Await jobs completion.
-        mongoUtil.waitForOutputLog(new LogCondition(level: 'INFO', logger: "${TaskExecutorJobLauncher.class.name}",
+        mongoUtil.waitForOutputLog(new LogCondition(level: 'INFO', logger: TaskExecutorJobLauncher.class.name,
                 message: ~/completed with the following parameters:.*and the following status: \[COMPLETED]/))
     }
 
@@ -379,8 +380,8 @@ class AsyncJobWithWebContainerSpec extends Specification {
         jobExecutionId > 0
 
         when:
-        mongoUtil.waitForOutputLog(new LogCondition(level: 'INFO', logger: "${EmulatedLongBatchTask.class.name}",
-                message: "start tasklet. [jobExecutionId=${jobExecutionId}]"))
+        mongoUtil.waitForOutputLog(new LogCondition(level: 'INFO', logger: EmulatedLongBatchTask.class.name,
+                message: String.format("start tasklet. [jobExecutionId=%s]", jobExecutionId)))
 
         // Retrieve jobExecution in RUNNING status.
         RestJobExecution restJobExecution = restUtil.getJobExecution(jobExecutionId)

@@ -94,24 +94,24 @@ class ListenerSpec extends Specification {
         when:
         def exitValue = launcher.syncJob(new JobRequest(
                 jobFilePath: launcher.getBeanDefinitionPath('chunkJobWithListener'),
-                jobName: "chunkJobWithListenerWithin${scope}Scope",
+                jobName: String.format("chunkJobWithListenerWithin%sScope", scope),
                 jobParameter: "inputFile=${inputFileName}"
         ))
 
         then:
         exitValue == 0
         mongoUtil.find(new LogCondition(
-                message: "Common Logging: job started. [chunkJobWithListenerWithin${scope}Scope]",
+                message: String.format("Common Logging: job started. [chunkJobWithListenerWithin%sScope]", scope),
                 logger: AllProcessListener.class.name)).size() == jobListener
         mongoUtil.find(new LogCondition(
-                message: "Common Logging: job finished. [chunkJobWithListenerWithin${scope}Scope]",
+                message: String.format("Common Logging: job finished. [chunkJobWithListenerWithin%sScope]", scope),
                 logger: AllProcessListener.class.name)).size() == jobListener
 
         mongoUtil.find(new LogCondition(
-                message: "Common Logging: step started. [chunkJobWithListenerWithin${scope}Scope.step01]",
+                message: String.format("Common Logging: step started. [chunkJobWithListenerWithin%sScope.step01]", scope),
                 logger: AllProcessListener.class.name)).size() == stepListener
         mongoUtil.find(new LogCondition(
-                message: "Common Logging: step finished. [chunkJobWithListenerWithin${scope}Scope.step01]",
+                message: String.format("Common Logging: step finished. [chunkJobWithListenerWithin%sScope.step01]", scope),
                 logger: AllProcessListener.class.name)).size() == stepListener
 
         mongoUtil.find(new LogCondition(message: 'Common Logging: before chunk.',
@@ -183,24 +183,24 @@ class ListenerSpec extends Specification {
         when:
         def exitValue = launcher.syncJob(new JobRequest(
                 jobFilePath: launcher.getBeanDefinitionPath('chunkJobWithListener'),
-                jobName: "chunkJobWithListenerWithin${scope}Scope",
+                jobName: String.format("chunkJobWithListenerWithin%sScope", scope),
                 jobParameter: "inputFile=${inputFileName}"
         ))
 
         then:
         exitValue == 255
         mongoUtil.find(new LogCondition(
-                message: "Common Logging: job started. [chunkJobWithListenerWithin${scope}Scope]",
+                message: String.format("Common Logging: job started. [chunkJobWithListenerWithin%sScope]", scope),
                 logger: AllProcessListener.class.name)).size() == jobListener
         mongoUtil.find(new LogCondition(
-                message: "Common Logging: job finished. [chunkJobWithListenerWithin${scope}Scope]",
+                message: String.format("Common Logging: job finished. [chunkJobWithListenerWithin%sScope]", scope),
                 logger: AllProcessListener.class.name)).size() == jobListener
 
         mongoUtil.find(new LogCondition(
-                message: "Common Logging: step started. [chunkJobWithListenerWithin${scope}Scope.step01]",
+                message: String.format("Common Logging: step started. [chunkJobWithListenerWithin%sScope.step01]", scope),
                 logger: AllProcessListener.class.name)).size() == stepListener
         mongoUtil.find(new LogCondition(
-                message: "Common Logging: step finished. [chunkJobWithListenerWithin${scope}Scope.step01]",
+                message: String.format("Common Logging: step finished. [chunkJobWithListenerWithin%sScope.step01]", scope),
                 logger: AllProcessListener.class.name)).size() == stepListener
 
         mongoUtil.find(new LogCondition(message: 'Common Logging: before chunk.',
@@ -291,24 +291,24 @@ class ListenerSpec extends Specification {
         when:
         def exitValue = launcher.syncJob(new JobRequest(
                 jobFilePath: launcher.getBeanDefinitionPath('taskletJobWithListener'),
-                jobName: "taskletJobWithListenerWithin${scope}Scope",
+                jobName: String.format("taskletJobWithListenerWithin%sScope", scope),
                 jobParameter: "inputFile=${inputFileName}"
         ))
 
         then:
         exitValue == 0
         mongoUtil.find(new LogCondition(
-                message: "Common Logging: job started. [taskletJobWithListenerWithin${scope}Scope]",
+                message: String.format("Common Logging: job started. [taskletJobWithListenerWithin%sScope]", scope),
                 logger: AllProcessListener.class.name)).size() == jobListener
         mongoUtil.find(new LogCondition(
-                message: "Common Logging: job finished. [taskletJobWithListenerWithin${scope}Scope]",
+                message: String.format("Common Logging: job finished. [taskletJobWithListenerWithin%sScope]", scope),
                 logger: AllProcessListener.class.name)).size() == jobListener
 
         mongoUtil.find(new LogCondition(
-                message: "Common Logging: step started. [taskletJobWithListenerWithin${scope}Scope.step01]",
+                message: String.format("Common Logging: step started. [taskletJobWithListenerWithin%sScope.step01]", scope),
                 logger: AllProcessListener.class.name)).size() == stepListener
         mongoUtil.find(new LogCondition(
-                message: "Common Logging: step finished. [taskletJobWithListenerWithin${scope}Scope.step01]",
+                message: String.format("Common Logging: step finished. [taskletJobWithListenerWithin%sScope.step01]", scope),
                 logger: AllProcessListener.class.name)).size() == stepListener
 
         mongoUtil.find(new LogCondition(message: 'Common Logging: before chunk.',
@@ -357,24 +357,24 @@ class ListenerSpec extends Specification {
         when:
         def exitValue = launcher.syncJob(new JobRequest(
                 jobFilePath: launcher.getBeanDefinitionPath('taskletJobWithListener'),
-                jobName: "taskletJobWithListenerWithin${scope}Scope",
+                jobName: String.format("taskletJobWithListenerWithin%sScope", scope),
                 jobParameter: "inputFile=${inputFileName}"
         ))
 
         then:
         exitValue == 255
         mongoUtil.find(new LogCondition(
-                message: "Common Logging: job started. [taskletJobWithListenerWithin${scope}Scope]",
+                message: String.format("Common Logging: job started. [taskletJobWithListenerWithin%sScope]", scope),
                 logger: AllProcessListener.class.name)).size() == jobListener
         mongoUtil.find(new LogCondition(
-                message: "Common Logging: job finished. [taskletJobWithListenerWithin${scope}Scope]",
+                message: String.format("Common Logging: job finished. [taskletJobWithListenerWithin%sScope]", scope),
                 logger: AllProcessListener.class.name)).size() == jobListener
 
         mongoUtil.find(new LogCondition(
-                message: "Common Logging: step started. [taskletJobWithListenerWithin${scope}Scope.step01]",
+                message: String.format("Common Logging: step started. [taskletJobWithListenerWithin%sScope.step01]", scope),
                 logger: AllProcessListener.class.name)).size() == stepListener
         mongoUtil.find(new LogCondition(
-                message: "Common Logging: step finished. [taskletJobWithListenerWithin${scope}Scope.step01]",
+                message: String.format("Common Logging: step finished. [taskletJobWithListenerWithin%sScope.step01]", scope),
                 logger: AllProcessListener.class.name)).size() == stepListener
 
         mongoUtil.find(new LogCondition(message: 'Common Logging: before chunk.',
@@ -431,24 +431,24 @@ class ListenerSpec extends Specification {
         when:
         def exitValue = launcher.syncJob(new JobRequest(
                 jobFilePath: launcher.getBeanDefinitionPath('chunkJobWithListenerAnnotation'),
-                jobName: "chunkJobWithListenerAnnotationWithin${scope}Scope",
+                jobName: String.format("chunkJobWithListenerAnnotationWithin%sScope", scope),
                 jobParameter: "inputFile=${inputFileName}"
         ))
 
         then:
         exitValue == 0
         ( mongoUtil.find(new LogCondition(
-                message: "Annotation Logging: job started. [chunkJobWithListenerAnnotationWithin${scope}Scope]",
+                message: String.format("Annotation Logging: job started. [chunkJobWithListenerAnnotationWithin%sScope]", scope),
                 logger: AnnotationAmountCheckProcessor.class.name)).size() !=0 ) == jobListener
         ( mongoUtil.find(new LogCondition(
-                message: "Annotation Logging: job finished. [chunkJobWithListenerAnnotationWithin${scope}Scope]",
+                message: String.format("Annotation Logging: job finished. [chunkJobWithListenerAnnotationWithin%sScope]", scope),
                 logger: AnnotationAmountCheckProcessor.class.name)).size() !=0 ) == jobListener
 
         ( mongoUtil.find(new LogCondition(
-                message: "Annotation Logging: step started. [chunkJobWithListenerAnnotationWithin${scope}Scope.step01]",
+                message: String.format("Annotation Logging: step started. [chunkJobWithListenerAnnotationWithin%sScope.step01]", scope),
                 logger: AnnotationAmountCheckProcessor.class.name)).size() !=0 ) == stepListener
         ( mongoUtil.find(new LogCondition(
-                message: "Annotation Logging: step finished. [chunkJobWithListenerAnnotationWithin${scope}Scope.step01]",
+                message: String.format("Annotation Logging: step finished. [chunkJobWithListenerAnnotationWithin%sScope.step01]", scope),
                 logger: AnnotationAmountCheckProcessor.class.name)).size() !=0 ) == stepListener
 
         ( mongoUtil.find(new LogCondition(message: 'Annotation Logging: before chunk.',
@@ -499,24 +499,24 @@ class ListenerSpec extends Specification {
         when:
         def exitValue = launcher.syncJob(new JobRequest(
                 jobFilePath: launcher.getBeanDefinitionPath('chunkJobWithListenerAnnotation'),
-                jobName: "chunkJobWithListenerAnnotationWithin${scope}Scope",
+                jobName: String.format("chunkJobWithListenerAnnotationWithin%sScope", scope),
                 jobParameter: "inputFile=${inputFileName}"
         ))
 
         then:
         exitValue == 255
         ( mongoUtil.find(new LogCondition(
-                message: "Annotation Logging: job started. [chunkJobWithListenerAnnotationWithin${scope}Scope]",
+                message: String.format("Annotation Logging: job started. [chunkJobWithListenerAnnotationWithin%sScope]", scope),
                 logger: AnnotationAmountCheckProcessor.class.name)).size() !=0 ) == jobListener
         ( mongoUtil.find(new LogCondition(
-                message: "Annotation Logging: job finished. [chunkJobWithListenerAnnotationWithin${scope}Scope]",
+                message: String.format("Annotation Logging: job finished. [chunkJobWithListenerAnnotationWithin%sScope]", scope),
                 logger: AnnotationAmountCheckProcessor.class.name)).size() !=0 ) == jobListener
 
         ( mongoUtil.find(new LogCondition(
-                message: "Annotation Logging: step started. [chunkJobWithListenerAnnotationWithin${scope}Scope.step01]",
+                message: String.format("Annotation Logging: step started. [chunkJobWithListenerAnnotationWithin%sScope.step01]", scope),
                 logger: AnnotationAmountCheckProcessor.class.name)).size() !=0 ) == stepListener
         ( mongoUtil.find(new LogCondition(
-                message: "Annotation Logging: step finished. [chunkJobWithListenerAnnotationWithin${scope}Scope.step01]",
+                message: String.format("Annotation Logging: step finished. [chunkJobWithListenerAnnotationWithin%sScope.step01]", scope),
                 logger: AnnotationAmountCheckProcessor.class.name)).size() !=0 ) == stepListener
 
         ( mongoUtil.find(new LogCondition(message: 'Annotation Logging: before chunk.',
@@ -579,24 +579,24 @@ class ListenerSpec extends Specification {
         when:
         def exitValue = launcher.syncJob(new JobRequest(
                 jobFilePath: launcher.getBeanDefinitionPath('taskletJobWithListenerAnnotation'),
-                jobName: "taskletJobWithListenerAnnotationWithin${scope}Scope",
+                jobName: String.format("taskletJobWithListenerAnnotationWithin%sScope", scope),
                 jobParameter: "inputFile=${inputFileName}"
         ))
 
         then:
         exitValue == 0
         mongoUtil.find(new LogCondition(
-                message: "Annotation Logging: job started. [taskletJobWithListenerAnnotationWithin${scope}Scope]",
+                message: String.format("Annotation Logging: job started. [taskletJobWithListenerAnnotationWithin%sScope]", scope),
                 logger: AnnotationSalesPlanDetailRegisterTasklet.class.name)).size() == jobListener
         mongoUtil.find(new LogCondition(
-                message: "Annotation Logging: job finished. [taskletJobWithListenerAnnotationWithin${scope}Scope]",
+                message: String.format("Annotation Logging: job finished. [taskletJobWithListenerAnnotationWithin%sScope]", scope),
                 logger: AnnotationSalesPlanDetailRegisterTasklet.class.name)).size() == jobListener
 
         mongoUtil.find(new LogCondition(
-                message: "Annotation Logging: step started. [taskletJobWithListenerAnnotationWithin${scope}Scope.step01]",
+                message: String.format("Annotation Logging: step started. [taskletJobWithListenerAnnotationWithin%sScope.step01]", scope),
                 logger: AnnotationSalesPlanDetailRegisterTasklet.class.name)).size() == stepListener
         mongoUtil.find(new LogCondition(
-                message: "Annotation Logging: step finished. [taskletJobWithListenerAnnotationWithin${scope}Scope.step01]",
+                message: String.format("Annotation Logging: step finished. [taskletJobWithListenerAnnotationWithin%sScope.step01]", scope),
                 logger: AnnotationSalesPlanDetailRegisterTasklet.class.name)).size() == stepListener
 
         mongoUtil.find(new LogCondition(message: 'Annotation Logging: before chunk.',
@@ -646,24 +646,24 @@ class ListenerSpec extends Specification {
         when:
         def exitValue = launcher.syncJob(new JobRequest(
                 jobFilePath: launcher.getBeanDefinitionPath('taskletJobWithListenerAnnotation'),
-                jobName: "taskletJobWithListenerAnnotationWithin${scope}Scope",
+                jobName: String.format("taskletJobWithListenerAnnotationWithin%sScope", scope),
                 jobParameter: "inputFile=${inputFileName}"
         ))
 
         then:
         exitValue == 255
         mongoUtil.find(new LogCondition(
-                message: "Annotation Logging: job started. [taskletJobWithListenerAnnotationWithin${scope}Scope]",
+                message: String.format("Annotation Logging: job started. [taskletJobWithListenerAnnotationWithin%sScope]", scope),
                 logger: AnnotationSalesPlanDetailRegisterTasklet.class.name)).size() == jobListener
         mongoUtil.find(new LogCondition(
-                message: "Annotation Logging: job finished. [taskletJobWithListenerAnnotationWithin${scope}Scope]",
+                message: String.format("Annotation Logging: job finished. [taskletJobWithListenerAnnotationWithin%sScope]", scope),
                 logger: AnnotationSalesPlanDetailRegisterTasklet.class.name)).size() == jobListener
 
         mongoUtil.find(new LogCondition(
-                message: "Annotation Logging: step started. [taskletJobWithListenerAnnotationWithin${scope}Scope.step01]",
+                message: String.format("Annotation Logging: step started. [taskletJobWithListenerAnnotationWithin%sScope.step01]", scope),
                 logger: AnnotationSalesPlanDetailRegisterTasklet.class.name)).size() == stepListener
         mongoUtil.find(new LogCondition(
-                message: "Annotation Logging: step finished. [taskletJobWithListenerAnnotationWithin${scope}Scope.step01]",
+                message: String.format("Annotation Logging: step finished. [taskletJobWithListenerAnnotationWithin%sScope.step01]", scope),
                 logger: AnnotationSalesPlanDetailRegisterTasklet.class.name)).size() == stepListener
 
         mongoUtil.find(new LogCondition(message: 'Annotation Logging: before chunk.',
@@ -723,7 +723,7 @@ class ListenerSpec extends Specification {
         when:
         def exitValue = launcher.syncJob(new JobRequest(
                 jobFilePath: launcher.getBeanDefinitionPath('chunkJobWithMixedListener'),
-                jobName: "chunkJobWithMixedListenerWithin${scope}Scope",
+                jobName: String.format("chunkJobWithMixedListenerWithin%sScope", scope),
                 jobParameter: "inputFile=${inputFileName}"
         ))
 
@@ -731,17 +731,17 @@ class ListenerSpec extends Specification {
         exitValue == 0
         // check interface implements listener
         mongoUtil.find(new LogCondition(
-                message: "Common Logging: job started. [chunkJobWithMixedListenerWithin${scope}Scope]",
+                message: String.format("Common Logging: job started. [chunkJobWithMixedListenerWithin%sScope]", scope),
                 logger: AllProcessListener.class.name)).size() == jobI
         mongoUtil.find(new LogCondition(
-                message: "Common Logging: job finished. [chunkJobWithMixedListenerWithin${scope}Scope]",
+                message: String.format("Common Logging: job finished. [chunkJobWithMixedListenerWithin%sScope]", scope),
                 logger: AllProcessListener.class.name)).size() == jobI
 
         mongoUtil.find(new LogCondition(
-                message: "Common Logging: step started. [chunkJobWithMixedListenerWithin${scope}Scope.step01]",
+                message: String.format("Common Logging: step started. [chunkJobWithMixedListenerWithin%sScope.step01]", scope),
                 logger: AllProcessListener.class.name)).size() == stepI
         mongoUtil.find(new LogCondition(
-                message: "Common Logging: step finished. [chunkJobWithMixedListenerWithin${scope}Scope.step01]",
+                message: String.format("Common Logging: step finished. [chunkJobWithMixedListenerWithin%sScope.step01]", scope),
                 logger: AllProcessListener.class.name)).size() == stepI
 
         mongoUtil.find(new LogCondition(message: 'Common Logging: before chunk.',
@@ -774,17 +774,17 @@ class ListenerSpec extends Specification {
 
         // check annotation base listener
         mongoUtil.find(new LogCondition(
-                message: "Annotation Logging: job started. [chunkJobWithMixedListenerWithin${scope}Scope]",
+                message: String.format("Annotation Logging: job started. [chunkJobWithMixedListenerWithin%sScope]", scope),
                 logger: AnnotationAmountCheckProcessor.class.name)).size() == jobA
         mongoUtil.find(new LogCondition(
-                message: "Annotation Logging: job finished. [chunkJobWithMixedListenerWithin${scope}Scope]",
+                message: String.format("Annotation Logging: job finished. [chunkJobWithMixedListenerWithin%sScope]", scope),
                 logger: AnnotationAmountCheckProcessor.class.name)).size() == jobA
 
         mongoUtil.find(new LogCondition(
-                message: "Annotation Logging: step started. [chunkJobWithMixedListenerWithin${scope}Scope.step01]",
+                message: String.format("Annotation Logging: step started. [chunkJobWithMixedListenerWithin%sScope.step01]", scope),
                 logger: AnnotationAmountCheckProcessor.class.name)).size() == stepA
         mongoUtil.find(new LogCondition(
-                message: "Annotation Logging: step finished. [chunkJobWithMixedListenerWithin${scope}Scope.step01]",
+                message: String.format("Annotation Logging: step finished. [chunkJobWithMixedListenerWithin%sScope.step01]", scope),
                 logger: AnnotationAmountCheckProcessor.class.name)).size() == stepA
 
         mongoUtil.find(new LogCondition(message: 'Annotation Logging: before chunk.',
@@ -856,7 +856,7 @@ class ListenerSpec extends Specification {
         when:
         def exitValue = launcher.syncJob(new JobRequest(
                 jobFilePath: launcher.getBeanDefinitionPath('chunkJobWithMixedListener'),
-                jobName: "chunkJobWithMixedListenerWithin${scope}Scope",
+                jobName: String.format("chunkJobWithMixedListenerWithin%sScope", scope),
                 jobParameter: "inputFile=${inputFileName}"
         ))
 
@@ -864,17 +864,17 @@ class ListenerSpec extends Specification {
         exitValue == 255
         // check interface implements listener
         mongoUtil.find(new LogCondition(
-                message: "Common Logging: job started. [chunkJobWithMixedListenerWithin${scope}Scope]",
+                message: String.format("Common Logging: job started. [chunkJobWithMixedListenerWithin%sScope]", scope),
                 logger: AllProcessListener.class.name)).size() == jobI
         mongoUtil.find(new LogCondition(
-                message: "Common Logging: job finished. [chunkJobWithMixedListenerWithin${scope}Scope]",
+                message: String.format("Common Logging: job finished. [chunkJobWithMixedListenerWithin%sScope]", scope),
                 logger: AllProcessListener.class.name)).size() == jobI
 
         mongoUtil.find(new LogCondition(
-                message: "Common Logging: step started. [chunkJobWithMixedListenerWithin${scope}Scope.step01]",
+                message: String.format("Common Logging: step started. [chunkJobWithMixedListenerWithin%sScope.step01]", scope),
                 logger: AllProcessListener.class.name)).size() == stepI
         mongoUtil.find(new LogCondition(
-                message: "Common Logging: step finished. [chunkJobWithMixedListenerWithin${scope}Scope.step01]",
+                message: String.format("Common Logging: step finished. [chunkJobWithMixedListenerWithin%sScope.step01]", scope),
                 logger: AllProcessListener.class.name)).size() == stepI
 
         mongoUtil.find(new LogCondition(message: 'Common Logging: before chunk.',
@@ -907,17 +907,17 @@ class ListenerSpec extends Specification {
 
         // check annotation base listener
         mongoUtil.find(new LogCondition(
-                message: "Annotation Logging: job started. [chunkJobWithMixedListenerWithin${scope}Scope]",
+                message: String.format("Annotation Logging: job started. [chunkJobWithMixedListenerWithin%sScope]", scope),
                 logger: AnnotationAmountCheckProcessor.class.name)).size() == jobA
         mongoUtil.find(new LogCondition(
-                message: "Annotation Logging: job finished. [chunkJobWithMixedListenerWithin${scope}Scope]",
+                message: String.format("Annotation Logging: job finished. [chunkJobWithMixedListenerWithin%sScope]", scope),
                 logger: AnnotationAmountCheckProcessor.class.name)).size() == jobA
 
         mongoUtil.find(new LogCondition(
-                message: "Annotation Logging: step started. [chunkJobWithMixedListenerWithin${scope}Scope.step01]",
+                message: String.format("Annotation Logging: step started. [chunkJobWithMixedListenerWithin%sScope.step01]", scope),
                 logger: AnnotationAmountCheckProcessor.class.name)).size() == stepA
         mongoUtil.find(new LogCondition(
-                message: "Annotation Logging: step finished. [chunkJobWithMixedListenerWithin${scope}Scope.step01]",
+                message: String.format("Annotation Logging: step finished. [chunkJobWithMixedListenerWithin%sScope.step01]", scope),
                 logger: AnnotationAmountCheckProcessor.class.name)).size() == stepA
 
         mongoUtil.find(new LogCondition(message: 'Annotation Logging: before chunk.',
@@ -1010,7 +1010,7 @@ class ListenerSpec extends Specification {
         when:
         def exitValue = launcher.syncJob(new JobRequest(
                 jobFilePath: launcher.getBeanDefinitionPath('taskletJobWithMixedListener'),
-                jobName: "taskletJobWithMixedListenerWithin${scope}Scope",
+                jobName: String.format("taskletJobWithMixedListenerWithin%sScope", scope),
                 jobParameter: "inputFile=${inputFileName}"
         ))
 
@@ -1018,17 +1018,17 @@ class ListenerSpec extends Specification {
         exitValue == 0
         // check interface implements listener
         mongoUtil.find(new LogCondition(
-                message: "Common Logging: job started. [taskletJobWithMixedListenerWithin${scope}Scope]",
+                message: String.format("Common Logging: job started. [taskletJobWithMixedListenerWithin%sScope]", scope),
                 logger: AllProcessListener.class.name)).size() == jobListener
         mongoUtil.find(new LogCondition(
-                message: "Common Logging: job finished. [taskletJobWithMixedListenerWithin${scope}Scope]",
+                message: String.format("Common Logging: job finished. [taskletJobWithMixedListenerWithin%sScope]", scope),
                 logger: AllProcessListener.class.name)).size() == jobListener
 
         mongoUtil.find(new LogCondition(
-                message: "Common Logging: step started. [taskletJobWithMixedListenerWithin${scope}Scope.step01]",
+                message: String.format("Common Logging: step started. [taskletJobWithMixedListenerWithin%sScope.step01]", scope),
                 logger: AllProcessListener.class.name)).size() == stepListener
         mongoUtil.find(new LogCondition(
-                message: "Common Logging: step finished. [taskletJobWithMixedListenerWithin${scope}Scope.step01]",
+                message: String.format("Common Logging: step finished. [taskletJobWithMixedListenerWithin%sScope.step01]", scope),
                 logger: AllProcessListener.class.name)).size() == stepListener
 
         mongoUtil.find(new LogCondition(message: 'Common Logging: before chunk.',
@@ -1061,17 +1061,17 @@ class ListenerSpec extends Specification {
 
         // check annotation base listener
         mongoUtil.find(new LogCondition(
-                message: "Annotation Logging: job started. [taskletJobWithMixedListenerWithin${scope}Scope]",
+                message: String.format("Annotation Logging: job started. [taskletJobWithMixedListenerWithin%sScope]", scope),
                 logger: AnnotationSalesPlanDetailRegisterTasklet.class.name)).size() == 0
         mongoUtil.find(new LogCondition(
-                message: "Annotation Logging: job finished. [taskletJobWithMixedListenerWithin${scope}Scope]",
+                message: String.format("Annotation Logging: job finished. [taskletJobWithMixedListenerWithin%sScope]", scope),
                 logger: AnnotationSalesPlanDetailRegisterTasklet.class.name)).size() == 0
 
         mongoUtil.find(new LogCondition(
-                message: "Annotation Logging: step started. [taskletJobWithMixedListenerWithin${scope}Scope.step01]",
+                message: String.format("Annotation Logging: step started. [taskletJobWithMixedListenerWithin%sScope.step01]", scope),
                 logger: AnnotationSalesPlanDetailRegisterTasklet.class.name)).size() == 0
         mongoUtil.find(new LogCondition(
-                message: "Annotation Logging: step finished. [taskletJobWithMixedListenerWithin${scope}Scope.step01]",
+                message: String.format("Annotation Logging: step finished. [taskletJobWithMixedListenerWithin%sScope.step01]", scope),
                 logger: AnnotationSalesPlanDetailRegisterTasklet.class.name)).size() == 0
 
         mongoUtil.find(new LogCondition(message: 'Annotation Logging: before chunk.',
@@ -1121,7 +1121,7 @@ class ListenerSpec extends Specification {
         when:
         def exitValue = launcher.syncJob(new JobRequest(
                 jobFilePath: launcher.getBeanDefinitionPath('taskletJobWithMixedListener'),
-                jobName: "taskletJobWithMixedListenerWithin${scope}Scope",
+                jobName: String.format("taskletJobWithMixedListenerWithin%sScope", scope),
                 jobParameter: "inputFile=${inputFileName}"
         ))
 
@@ -1129,17 +1129,17 @@ class ListenerSpec extends Specification {
         exitValue == 255
         // check interface implements listener
         mongoUtil.find(new LogCondition(
-                message: "Common Logging: job started. [taskletJobWithMixedListenerWithin${scope}Scope]",
+                message: String.format("Common Logging: job started. [taskletJobWithMixedListenerWithin%sScope]", scope),
                 logger: AllProcessListener.class.name)).size() == jobListener
         mongoUtil.find(new LogCondition(
-                message: "Common Logging: job finished. [taskletJobWithMixedListenerWithin${scope}Scope]",
+                message: String.format("Common Logging: job finished. [taskletJobWithMixedListenerWithin%sScope]", scope),
                 logger: AllProcessListener.class.name)).size() == jobListener
 
         mongoUtil.find(new LogCondition(
-                message: "Common Logging: step started. [taskletJobWithMixedListenerWithin${scope}Scope.step01]",
+                message: String.format("Common Logging: step started. [taskletJobWithMixedListenerWithin%sScope.step01]", scope),
                 logger: AllProcessListener.class.name)).size() == stepListener
         mongoUtil.find(new LogCondition(
-                message: "Common Logging: step finished. [taskletJobWithMixedListenerWithin${scope}Scope.step01]",
+                message: String.format("Common Logging: step finished. [taskletJobWithMixedListenerWithin%sScope.step01]", scope),
                 logger: AllProcessListener.class.name)).size() == stepListener
 
         mongoUtil.find(new LogCondition(message: 'Common Logging: before chunk.',
@@ -1172,17 +1172,17 @@ class ListenerSpec extends Specification {
 
         // check annotation base listener
         mongoUtil.find(new LogCondition(
-                message: "Annotation Logging: job started. [taskletJobWithMixedListenerWithin${scope}Scope]",
+                message: String.format("Annotation Logging: job started. [taskletJobWithMixedListenerWithin%sScope]", scope),
                 logger: AnnotationSalesPlanDetailRegisterTasklet.class.name)).size() == 0
         mongoUtil.find(new LogCondition(
-                message: "Annotation Logging: job finished. [taskletJobWithMixedListenerWithin${scope}Scope]",
+                message: String.format("Annotation Logging: job finished. [taskletJobWithMixedListenerWithin%sScope]", scope),
                 logger: AnnotationSalesPlanDetailRegisterTasklet.class.name)).size() == 0
 
         mongoUtil.find(new LogCondition(
-                message: "Annotation Logging: step started. [taskletJobWithMixedListenerWithin${scope}Scope.step01]",
+                message: String.format("Annotation Logging: step started. [taskletJobWithMixedListenerWithin%sScope.step01]", scope),
                 logger: AnnotationSalesPlanDetailRegisterTasklet.class.name)).size() == 0
         mongoUtil.find(new LogCondition(
-                message: "Annotation Logging: step finished. [taskletJobWithMixedListenerWithin${scope}Scope.step01]",
+                message: String.format("Annotation Logging: step finished. [taskletJobWithMixedListenerWithin%sScope.step01]", scope),
                 logger: AnnotationSalesPlanDetailRegisterTasklet.class.name)).size() == 0
 
         mongoUtil.find(new LogCondition(message: 'Annotation Logging: before chunk.',

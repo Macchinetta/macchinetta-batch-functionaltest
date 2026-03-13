@@ -38,7 +38,7 @@
     <bean id="multiResourceItemWriter" class="org.springframework.batch.item.file.MultiResourceItemWriter" scope="step"
           p:resource="file:#{jobParameters['outputDir']}"
           p:resourceSuffixCreator-ref="customerListResourceSuffixCreator"
-          p:itemCountLimitPerResource="4"
+          p:itemCountLimitPerResource="6"
           p:delegate-ref="writer"/>
 
     <batch:job id="jobWriteMultipleCsvCommitInterval" job-repository="jobRepository">
